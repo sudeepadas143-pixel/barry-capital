@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useNavigate } from 'react-router-dom';
 import { DESK_COUNT, FIRM_NAME, PARTNER_NAME } from '../../firm.config';
 import { useFirm } from '../hooks/useFirm';
@@ -17,18 +18,6 @@ interface Props {
 }
 
 const FPS = 12;
-
-function useReducedMotion() {
-  const [r, setR] = useState(() => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
-  useEffect(() => {
-    const m = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-    if (!m) return;
-    const on = () => setR(m.matches);
-    m.addEventListener('change', on);
-    return () => m.removeEventListener('change', on);
-  }, []);
-  return !!r;
-}
 
 export function Scene({ hot = null, onHover }: Props) {
   const { state, byId, now } = useFirm();

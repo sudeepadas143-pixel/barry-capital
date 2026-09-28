@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { PARTNER_NAME } from '../../firm.config';
+import { useFollows } from '../hooks/useLocal';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
 import { fmtPct, fmtSol, pad2, pctClass } from '../format';
@@ -12,7 +15,7 @@ export function TraderPanel() {
   const t = openId ? byId.get(openId) : undefined;
   const ref = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
-  const [following, setFollowing] = useState(false);
+  const { isFollowing, toggle } = useFollows();
 
   useEffect(() => {
     if (!t) return;
@@ -119,14 +122,36 @@ export function TraderPanel() {
           </p>
         )}
         <div className="panel-actions">
-          <button
-            type="button"
-            className="btn-black follow-btn"
-            aria-pressed={following}
-            onClick={() => setFollowing((f) => !f)}
-          >
-            {following ? 'following' : 'follow'}
-          </button>
+          {t.local ? (
+            <>
+              <Link to="/hire" className="btn-black follow-btn" onClick={close}>
+                employee file
+              </Link>
+              <span className="muted" style={{ fontSize: 14 }}>
+                Only this browser can see {t.name}.
+              </span>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn-black follow-btn"
+                aria-pressed={isFollowing(t.id)}
+                onClick={() => toggle(t)}
+              >
+                {isFollowing(t.id) ? 'following' : 'follow'}
+              </button>
+              <span className="muted" style={{ fontSize: 14 }}>
+                {t.status === 'seated'
+                  ? t.strikes
+                    ? `${t.strikes} ${t.strikes === 1 ? 'strike' : 'strikes'}. ${PARTNER_NAME} has noticed.`
+                    : 'In good standing.'
+                  : t.status === 'waiting'
+                    ? 'In line for the next desk.'
+                    : 'Left with a box.'}
+              </span>
+            </>
+          )}
         </div>
       </div>
     </>

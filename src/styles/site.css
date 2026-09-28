@@ -1299,3 +1299,85 @@ input[type='range'] {
   padding: 5px 11px;
   font-size: 14px;
 }
+
+/* ---------- your corner, follows, employee file ---------- */
+.mini-list {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+.mini-list li {
+  border-bottom: 1px solid var(--hair);
+}
+.mini {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  padding: 12px 0;
+}
+.mini-main {
+  min-width: 0;
+}
+.mini-name {
+  display: block;
+  font-weight: 500;
+  font-size: 17px;
+}
+.mini-sub {
+  display: block;
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mini-res {
+  font-weight: 500;
+}
+button.mini:hover .mini-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.since-summary {
+  margin-top: 26px;
+}
+.file-id {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 22px;
+  align-items: end;
+  margin: 18px 0 22px;
+}
+.portrait-tall {
+  width: 104px;
+  height: 148px;
+  align-items: center;
+}
+.field-err {
+  display: block;
+  min-height: 1.3em;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--neg);
+}
+.confirm {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+}
+.confirm .textlink,
+.panel-actions .textlink {
+  font-size: 16px;
+  padding-bottom: 6px;
+}
+.desk-name .chip {
+  vertical-align: 2px;
+  margin-left: 6px;
+}

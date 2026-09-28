@@ -162,4 +162,5 @@ export interface FirmState {
   season: { start: number; tick: number };
   /** This visitor's own hires. */
   mine: Trader[];
+  counts: { fired: number; hired: number; bonusDays: number; listed: number; pitched: number };
 }

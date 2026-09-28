@@ -151,6 +151,15 @@ export class Director {
         this.scripts.push({ id: tr.id, look: tr.look, start, segs, end, carry: false, seatDesk: tr.desk });
       }
     }
+    const mine = state.mine[0];
+    if (mine && !this.seen.has(`hire:${mine.id}`)) {
+      this.seen.add(`hire:${mine.id}`);
+      if (this.primed && state.tick - mine.hiredTick <= 2) {
+        const desk = DESK_COUNT + 1;
+        const { segs, end } = buildSegments(arrivalPath(desk), t + 0.3);
+        this.scripts.push({ id: mine.id, look: mine.look, start: t + 0.3, segs, end, carry: false, seatDesk: desk });
+      }
+    }
     this.primed = true;
     this.scripts = this.scripts.filter((s) => t < s.end + 0.2);
   }

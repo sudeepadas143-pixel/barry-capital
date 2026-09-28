@@ -122,5 +122,6 @@ export function toView(s: SimState, now: number): FirmState {
     theme: THEME_LABEL[themeOfDay(s.seed, Math.max(0, tick))],
     season: { start: s.startMs, tick },
     mine: s.locals.map((t) => toTrader(t, s)),
+    counts: { fired: s.c.fired, hired: s.c.hired, bonusDays: s.c.bonusDays, listed: s.c.listed, pitched: s.c.pitched },
   };
 }

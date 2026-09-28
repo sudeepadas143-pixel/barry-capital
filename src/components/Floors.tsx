@@ -22,7 +22,7 @@ export function floorStatus(id: FloorId, s: FirmState, now: number): string {
         ? `${PARTNER_NAME} is down here now · feed ${Math.round((now - s.boardReadAt) / 60000)} min old`
         : `where ${PARTNER_NAME} waits out a stale feed`;
     case 'lobby':
-      return `${fmtInt(s.lobby)} pitched · ${fmtInt(s.passedOn)} passed on`;
+      return `${fmtInt(s.lobby)} waiting · ${fmtInt(s.passedOn)} passed on`;
   }
 }
 

@@ -65,7 +65,7 @@ export default function Traders() {
           <em>one line.</em>
         </h1>
         <p className="prose">
-          {PARTNER_NAME} reviews every desk on the hour. Below {SIM.REVIEW_LINE_PCT}% at {numWord(SIM.STRIKES_TO_FIRE)} reviews in a row,
+          {PARTNER_NAME} reviews every desk on the hour. Below {fmtPct(SIM.REVIEW_LINE_PCT, 0)} at {numWord(SIM.STRIKES_TO_FIRE)} reviews in a row,
           a trader leaves with a box and the next name in line sits down.
         </p>
       </header>

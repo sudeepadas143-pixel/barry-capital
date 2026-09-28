@@ -5,11 +5,12 @@ import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { TraderPanel } from './components/TraderPanel';
 import { FirmProvider } from './hooks/useFirm';
-import BooksPage from './routes/BooksPage';
-import Firm from './routes/Firm';
-import Hire from './routes/Hire';
 import Home from './routes/Home';
-import Traders from './routes/Traders';
+
+const BooksPage = lazy(() => import('./routes/BooksPage'));
+const Firm = lazy(() => import('./routes/Firm'));
+const Hire = lazy(() => import('./routes/Hire'));
+const Traders = lazy(() => import('./routes/Traders'));
 
 const SpriteSheet = import.meta.env.DEV ? lazy(() => import('./routes/SpriteSheet')) : null;
 
@@ -63,24 +64,17 @@ export default function App() {
       <RouteEffects />
       <Header />
       <main id="main">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/traders" element={<Traders />} />
-          <Route path="/firm" element={<Firm />} />
-          <Route path="/hire" element={<Hire />} />
-          <Route path="/books" element={<BooksPage />} />
-          {SpriteSheet && (
-            <Route
-              path="/_sprites"
-              element={
-                <Suspense fallback={null}>
-                  <SpriteSheet />
-                </Suspense>
-              }
-            />
-          )}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<div className="wrap page-head" aria-busy="true" />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/traders" element={<Traders />} />
+            <Route path="/firm" element={<Firm />} />
+            <Route path="/hire" element={<Hire />} />
+            <Route path="/books" element={<BooksPage />} />
+            {SpriteSheet && <Route path="/_sprites" element={<SpriteSheet />} />}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
       <TraderPanel />

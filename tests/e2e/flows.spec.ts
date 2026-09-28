@@ -33,3 +33,17 @@ test('hire a trader, follow another, and both survive a reload', async ({ page }
   await page.getByRole('button', { name: 'yes, hand over the box' }).click();
   await expect(page.getByLabel('Surname')).toBeVisible();
 });
+
+test('a long gap since the last deploy is replayed in chunks without freezing the page', async ({ page }) => {
+  // Pretend it is 30 days after the build.
+  await page.addInitScript(() => {
+    const offset = 30 * 24 * 3600 * 1000;
+    const real = Date.now.bind(Date);
+    Date.now = () => real() + offset;
+  });
+  const t0 = Date.now();
+  await page.goto('/');
+  await expect(page.getByText('Reading the books.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /serious suits/ })).toBeVisible({ timeout: 60_000 });
+  console.log(`caught up 30 days in ${Date.now() - t0} ms`);
+});

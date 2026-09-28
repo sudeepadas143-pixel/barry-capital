@@ -20,7 +20,7 @@ export interface Actor {
   frame: number;
   layer: 'seated' | 'walk' | 'outside';
   desk?: number;
-  /** For the partner: which named spot he is at. */
+  /** For the partner: the named spot currently occupied. */
   spot?: string;
 }
 

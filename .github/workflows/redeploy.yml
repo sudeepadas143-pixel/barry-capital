@@ -1,0 +1,19 @@
+# Optional: rebuild the site once a day so the baked-in checkpoint stays fresh
+# and first visits replay only a day of history at most.
+# Create a Deploy Hook in Vercel (Project → Settings → Git → Deploy Hooks) and
+# save its URL as the repository secret VERCEL_DEPLOY_HOOK.
+name: Daily rebuild
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deploy hook
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "VERCEL_DEPLOY_HOOK not set; skipping."; exit 0; fi
+          curl -fsS -X POST "$HOOK"

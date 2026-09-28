@@ -4,10 +4,11 @@
   --paper-2: #efece3;
   --ink: #1a1a17;
   --muted: #6b6b63;
-  --faint: #9a988e;
+  --faint: #72706a;
   --hair: #d9d6cc;
   --neg: #a94a3a;
   --live: #5f8f6f;
+  --live-ink: #3b6a4a;
 
   --serif: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
   --sans: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
@@ -1271,7 +1272,7 @@ input[type='range'] {
 }
 .chip-yours {
   border-color: var(--live);
-  color: var(--live);
+  color: var(--live-ink);
 }
 .chip-ev {
   color: var(--ink);
@@ -1433,7 +1434,7 @@ button.mini:hover .mini-name {
   margin-left: 14px;
   font-family: var(--sans);
   font-size: 13px;
-  color: var(--live);
+  color: var(--live-ink);
   vertical-align: middle;
 }
 .headshots {

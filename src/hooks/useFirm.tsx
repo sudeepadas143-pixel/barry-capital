@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import checkpoint from 'virtual:checkpoint';
-import { SEASON_START, TICK_SECONDS } from '../../firm.config';
+import { FIRM_NAME, SEASON_START, TICK_SECONDS } from '../../firm.config';
 import { Engine, type HireRecord } from '../sim/engine';
 import type { SimState } from '../sim/firm';
 import { SIM } from '../sim/params';
@@ -10,6 +10,21 @@ import { read, readRaw, write, writeRaw } from '../storage';
 import { useNow } from './useNow';
 
 const SNAP = `snap:v${SIM.VERSION}`;
+/** Ticks replayed synchronously before first paint; beyond this, replay in chunks. */
+const SYNC_LIMIT = 4000;
+const CHUNK = 1500;
+
+function CatchingUp({ behind }: { behind: number }) {
+  return (
+    <main className="wrap page-head catching" aria-busy="true">
+      <p className="label">{FIRM_NAME}</p>
+      <p className="display">Reading the books.</p>
+      <p className="prose muted" aria-live="polite">
+        {behind.toLocaleString('en-US')} minutes to go through.
+      </p>
+    </main>
+  );
+}
 
 interface FirmCtx {
   state: FirmState;
@@ -45,14 +60,35 @@ export function FirmProvider({ children }: { children: ReactNode }) {
       bases: [checkpoint, loadSnapshot()],
       hires,
     });
-    e.advanceToTime(Date.now());
+    // Small gaps are replayed before the first paint; large ones in chunks below.
+    if (e.tickFor(Date.now()) - e.state.tick <= SYNC_LIMIT) e.advanceToTime(Date.now());
     engine.current = e;
   }
   const e = engine.current;
   const [version, setVersion] = useState(0);
+  const [behind, setBehind] = useState(() => Math.max(0, e.tickFor(Date.now()) - e.state.tick));
+  const catching = behind > SYNC_LIMIT;
+
+  useEffect(() => {
+    if (!catching) return;
+    let id = 0;
+    const step = () => {
+      const target = e.tickFor(Date.now());
+      if (target - e.state.tick <= CHUNK) {
+        e.advanceTo(target);
+        setBehind(0);
+        return;
+      }
+      e.advanceTo(e.state.tick + CHUNK);
+      setBehind(target - e.state.tick);
+      id = window.setTimeout(step, 0);
+    };
+    id = window.setTimeout(step, 30);
+    return () => window.clearTimeout(id);
+  }, [catching, e]);
 
   const tick = e.tickFor(now);
-  if (tick !== e.state.tick) e.advanceToTime(now);
+  if (!catching && tick !== e.state.tick) e.advanceToTime(now);
 
   // Save a snapshot now and then, and when the tab goes to the background.
   const lastSaved = useRef(-1);
@@ -121,7 +157,7 @@ export function FirmProvider({ children }: { children: ReactNode }) {
     }),
     [state, now, byId, hires, addHire, removeHire, e],
   );
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={value}>{catching ? <CatchingUp behind={behind} /> : children}</Ctx.Provider>;
 }
 
 export function useFirm(): FirmCtx {

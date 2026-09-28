@@ -8,8 +8,10 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc -b --noEmit",
-    "shots": "playwright test"
+    "test:e2e": "playwright test",
+    "shots": "playwright test tests/e2e/screenshots.spec.ts",
+    "art": "vitest run --config vitest.art.config.ts",
+    "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
     "@fontsource/eb-garamond": "^5.3.0",
@@ -20,6 +22,7 @@
     "react-router-dom": "^6.30.6"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "1.56",
     "@types/node": "^26.6.3",
     "@types/react": "^18.3.31",

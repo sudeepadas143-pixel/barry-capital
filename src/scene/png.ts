@@ -31,6 +31,7 @@ function chunk(type: string, data: Uint8Array): Uint8Array {
   return out;
 }
 
+/** `bg` fills transparent pixels; pass 0 to keep them transparent. */
 export function encodePng(buf: PixelBuffer, scale = 1, bg = 0xffeef4f6): Uint8Array {
   const w = buf.w * scale;
   const h = buf.h * scale;
@@ -45,7 +46,7 @@ export function encodePng(buf: PixelBuffer, scale = 1, bg = 0xffeef4f6): Uint8Ar
       raw[o] = c & 255;
       raw[o + 1] = (c >>> 8) & 255;
       raw[o + 2] = (c >>> 16) & 255;
-      raw[o + 3] = 255;
+      raw[o + 3] = c ? 255 : 0;
     }
   }
   const ihdr = new Uint8Array(13);

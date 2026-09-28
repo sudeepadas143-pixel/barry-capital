@@ -15,7 +15,7 @@ export default function BooksPage() {
           {PARTNER_NAME} reads all of it.
         </p>
       </header>
-      <Books showHead={false} />
+      <Books showHead={false} filters />
     </div>
   );
 }

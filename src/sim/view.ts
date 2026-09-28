@@ -109,6 +109,7 @@ export function toView(s: SimState, now: number): FirmState {
       poolSol: s.c.pool,
       lastAt: s.c.lastBonusTick >= 0 ? endOf(s.c.lastBonusTick) : null,
       lastPaidSol: s.c.lastBonusPaid,
+      lastHolders: s.c.lastBonusHolders,
       totalPaidSol: s.c.bonusPaid,
       days: s.c.bonusDays,
       holders: holderCount(s.seed, Math.max(0, tick)),
@@ -120,8 +121,16 @@ export function toView(s: SimState, now: number): FirmState {
     nextReviewAt: endOf(nextBoundary(tick, SIM.REVIEW_EVERY)),
     lastReviewAt: s.c.lastReviewTick >= 0 ? endOf(s.c.lastReviewTick) : null,
     theme: THEME_LABEL[themeOfDay(s.seed, Math.max(0, tick))],
-    season: { start: s.startMs, tick },
+    season: { start: s.startMs, tick, seed: s.seed },
     mine: s.locals.map((t) => toTrader(t, s)),
-    counts: { fired: s.c.fired, hired: s.c.hired, bonusDays: s.c.bonusDays, listed: s.c.listed, pitched: s.c.pitched },
+    counts: {
+      fired: s.c.fired,
+      hired: s.c.hired,
+      bonusDays: s.c.bonusDays,
+      listed: s.c.listed,
+      pitched: s.c.pitched,
+      outages: s.c.outages,
+      lastOutageAt: s.c.lastOutageTick >= 0 ? endOf(s.c.lastOutageTick) : null,
+    },
   };
 }

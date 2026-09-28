@@ -1,30 +1,47 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DESK_COUNT, PARTNER_NAME } from '../../firm.config';
+import { Strikes } from '../components/Books';
 import { Headshot } from '../components/Sprite';
 import { useFirm } from '../hooks/useFirm';
+import { useFollows } from '../hooks/useLocal';
 import { usePanel } from '../hooks/usePanel';
 import { fmtPct, numWord, pad2, pctClass } from '../format';
 import { ARCHETYPES } from '../sim/archetypes';
+import { SIM } from '../sim/params';
 import type { Trader } from '../sim/types';
 
-function RosterList({ traders, numbered = true }: { traders: Trader[]; numbered?: boolean }) {
+type Sort = 'result' | 'desk' | 'method';
+
+function RosterList({ traders, lead }: { traders: Trader[]; lead: (t: Trader, i: number) => string }) {
   const { open } = usePanel();
+  const { isFollowing } = useFollows();
   return (
     <ul className="roster">
       {traders.map((t, i) => (
         <li key={t.id}>
           <button type="button" onClick={() => open(t.id)}>
-            <span className="desk-no">{numbered && t.desk ? pad2(t.desk) : pad2(i + 1)}</span>
+            <span className="desk-no">{lead(t, i)}</span>
             <span className="avatar" style={{ width: 44, height: 44 }}>
               <Headshot look={t.look} size={40} />
             </span>
-            <span>
-              <span className="roster-name">{t.name}</span>
-              <span className="roster-arch">{ARCHETYPES[t.archetype].title}</span>
+            <span style={{ minWidth: 0 }}>
+              <span className="roster-name">
+                {t.name}
+                {t.local && <span className="chip chip-yours" style={{ marginLeft: 8 }}>YOURS</span>}
+                {isFollowing(t.id) && <span className="chip" style={{ marginLeft: 8 }}>FOLLOWED</span>}
+              </span>
+              <span className="roster-arch">
+                {ARCHETYPES[t.archetype].title}
+                {t.status === 'seated' && !t.local && (
+                  <>
+                    {' · '}
+                    {t.trades} trades · <Strikes n={t.strikes} />
+                  </>
+                )}
+              </span>
             </span>
-            <span className={`roster-res num ${pctClass(t.resultPct)}`}>
-              {t.status === 'waiting' ? '' : fmtPct(t.resultPct)}
-            </span>
+            <span className={`roster-res num ${pctClass(t.resultPct)}`}>{t.status === 'waiting' ? '' : fmtPct(t.resultPct)}</span>
           </button>
         </li>
       ))}
@@ -34,7 +51,11 @@ function RosterList({ traders, numbered = true }: { traders: Trader[]; numbered?
 
 export default function Traders() {
   const { state } = useFirm();
-  const ranked = [...state.traders].sort((a, b) => b.resultPct - a.resultPct);
+  const [sort, setSort] = useState<Sort>('result');
+  const seated = [...state.traders, ...state.mine];
+  const sorted = [...seated].sort((a, b) =>
+    sort === 'result' ? b.resultPct - a.resultPct : sort === 'desk' ? (a.desk ?? DESK_COUNT + 1) - (b.desk ?? DESK_COUNT + 1) : ARCHETYPES[a.archetype].title.localeCompare(ARCHETYPES[b.archetype].title),
+  );
   return (
     <div className="wrap">
       <header className="page-head">
@@ -44,34 +65,38 @@ export default function Traders() {
           <em>one line.</em>
         </h1>
         <p className="prose">
-          Ranked by season result. {PARTNER_NAME} reviews the bottom of this list every hour. Three strikes and a
-          trader leaves with a box.
+          {PARTNER_NAME} reviews every desk on the hour. Below {SIM.REVIEW_LINE_PCT}% at {numWord(SIM.STRIKES_TO_FIRE)} reviews in a row,
+          a trader leaves with a box and the next name in line sits down.
         </p>
       </header>
-      <section className="section" style={{ borderTop: 0, paddingTop: 0 }}>
-        <div className="desks-head" style={{ borderBottom: 0 }}>
-          <h2 className="label" style={{ color: 'var(--ink)' }}>
+      <section className="section" style={{ borderTop: 0, paddingTop: 0 }} aria-labelledby="seated-title">
+        <div className="desks-head" style={{ borderBottom: 0, alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <h2 id="seated-title" className="label" style={{ color: 'var(--ink)' }}>
             Seated
           </h2>
-          <span className="label" style={{ color: 'var(--ink)' }} aria-hidden="true">
-            Result
-          </span>
+          <div className="options" role="radiogroup" aria-label="Sort by">
+            {(['result', 'desk', 'method'] as Sort[]).map((x) => (
+              <button key={x} type="button" role="radio" aria-checked={sort === x} className="option option-sm" onClick={() => setSort(x)}>
+                {x}
+              </button>
+            ))}
+          </div>
         </div>
-        <RosterList traders={ranked} />
+        <RosterList traders={sorted} lead={(t, i) => (sort === 'result' ? pad2(i + 1) : t.desk ? pad2(t.desk) : pad2(DESK_COUNT + 1))} />
       </section>
       <div className="two-col">
-        <section className="section">
-          <h2 className="label" style={{ marginBottom: 14 }}>
+        <section className="section" aria-labelledby="line-title">
+          <h2 id="line-title" className="label" style={{ marginBottom: 14 }}>
             Waiting for a desk
           </h2>
-          <RosterList traders={state.waiting} numbered={false} />
+          <RosterList traders={state.waiting} lead={(_, i) => pad2(i + 1)} />
         </section>
-        <section className="section">
-          <h2 className="label" style={{ marginBottom: 14 }}>
+        <section className="section" aria-labelledby="out-title">
+          <h2 id="out-title" className="label" style={{ marginBottom: 14 }}>
             Escorted out
           </h2>
           {state.alumni.length ? (
-            <RosterList traders={state.alumni} numbered={false} />
+            <RosterList traders={state.alumni} lead={() => '—'} />
           ) : (
             <p className="prose muted">Nobody yet. The box is still flat.</p>
           )}

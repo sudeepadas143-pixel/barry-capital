@@ -148,6 +148,13 @@ const RULES: Record<ArchetypeId, Partial<Record<RuleKey, Rule>> & { entry: Rule 
   },
 };
 
+/** The standing rules for a method, in the order they're usually applied. */
+export function rulesFor(a: ArchetypeId): Rule[] {
+  const r = RULES[a];
+  const order: RuleKey[] = ['entry', 'add', 'tp', 'sl', 'signal', 'time', 'intern', 'delist'];
+  return order.map((k) => r[k]).filter((x): x is Rule => !!x);
+}
+
 const DELIST_RULE: Rule = { code: 'F-0', text: 'When a coin leaves the board, the position leaves with it, at whatever the last price was.' };
 const ESCORT_RULE: Rule = { code: 'HR-3', text: 'On a third strike, positions are closed at market before the box is handed over.' };
 

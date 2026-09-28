@@ -8,7 +8,9 @@ import type { FirmState, FloorId } from '../sim/types';
 export function floorStatus(id: FloorId, s: FirmState, now: number): string {
   switch (id) {
     case 'office':
-      return `treasury ${fmtSol(s.treasurySol)} SOL`;
+      return s.bonus.poolSol > 0.0005
+        ? `treasury ${fmtSol(s.treasurySol)} SOL · bonus pool ${fmtSol(s.bonus.poolSol)}`
+        : `treasury ${fmtSol(s.treasurySol)} SOL`;
     case 'terminal':
       return `${s.coins.length} coins on the board`;
     case 'compliance':

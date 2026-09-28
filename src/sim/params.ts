@@ -3,7 +3,7 @@
  * so bump VERSION when you do (it invalidates cached snapshots).
  */
 export const SIM = {
-  VERSION: 10,
+  VERSION: 11,
 
   /** Firm capital at the start of the season, SOL. */
   TREASURY_START_SOL: 100,

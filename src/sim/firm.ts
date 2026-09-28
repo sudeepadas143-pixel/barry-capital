@@ -40,6 +40,9 @@ export interface Counters {
   lastReviewTreasury: number;
   fired: number;
   hired: number;
+  outages: number;
+  lastOutageTick: number;
+  lastBonusHolders: number;
 }
 
 export interface SimState {
@@ -142,6 +145,9 @@ export function genesis(seasonStart: string, tickSeconds = TICK_SECONDS): SimSta
       lastReviewTreasury: SIM.TREASURY_START_SOL,
       fired: 0,
       hired: 0,
+      outages: 0,
+      lastOutageTick: -1,
+      lastBonusHolders: 0,
     },
     outageLeft: 0,
     lastReadTick: -1,
@@ -236,6 +242,8 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
   if (s.outageLeft > 0) s.outageLeft--;
   else if (or.chance(SIM.OUTAGE_P)) {
     s.outageLeft = 3 + or.int(7);
+    s.c.outages++;
+    s.c.lastOutageTick = tick;
     event('stale', `The board went quiet. ${PARTNER_NAME} has gone down to the server room.`);
   }
   const stale = s.outageLeft > 0;
@@ -366,6 +374,7 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
     s.c.bonusPaid += paid;
     s.c.lastBonusPaid = paid;
     s.c.lastBonusTick = tick;
+    s.c.lastBonusHolders = holders;
     s.c.bonusDays++;
     s.c.pool = 0;
     event('bonus', `Bonus day. ${paid.toFixed(3)} SOL split across ${groupThousands(holders)} holders.`);

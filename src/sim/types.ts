@@ -125,6 +125,7 @@ export interface BonusDay {
   poolSol: number;
   lastAt: number | null;
   lastPaidSol: number;
+  lastHolders: number;
   totalPaidSol: number;
   days: number;
   holders: number;
@@ -159,8 +160,8 @@ export interface FirmState {
   nextReviewAt: number;
   lastReviewAt: number | null;
   theme: string;
-  season: { start: number; tick: number };
+  season: { start: number; tick: number; seed: number };
   /** This visitor's own hires. */
   mine: Trader[];
-  counts: { fired: number; hired: number; bonusDays: number; listed: number; pitched: number };
+  counts: { fired: number; hired: number; bonusDays: number; listed: number; pitched: number; outages: number; lastOutageAt: number | null };
 }

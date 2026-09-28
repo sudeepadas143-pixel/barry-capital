@@ -4,14 +4,15 @@ import { PARTNER_NAME } from '../../firm.config';
 import { useFollows } from '../hooks/useLocal';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
-import { fmtPct, fmtSol, pad2, pctClass } from '../format';
+import { dayTime, fmtPct, fmtSol, pad2, pctClass } from '../format';
+import { rulesFor } from '../sim/traders';
 import { ARCHETYPES } from '../sim/archetypes';
 import { Strikes, TradeRow } from './Books';
 import { Headshot } from './Sprite';
 
 export function TraderPanel() {
   const { openId, close } = usePanel();
-  const { now, byId } = useFirm();
+  const { now, byId, msForTick } = useFirm();
   const t = openId ? byId.get(openId) : undefined;
   const ref = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
@@ -109,6 +110,11 @@ export function TraderPanel() {
             </div>
           </div>
         </div>
+        <p className="panel-record muted">
+          {t.trades} {t.trades === 1 ? 'trade' : 'trades'} · {t.wins} closed up · {t.losses} closed down
+          {t.hiredTick >= 0 && !t.local && ` · hired ${dayTime(msForTick(t.hiredTick))}`}
+          {t.leftTick !== undefined && ` · left ${dayTime(msForTick(t.leftTick))}`}
+        </p>
         <h3 className="label">Last five trades</h3>
         {trades.length ? (
           <ul className="feed">
@@ -121,6 +127,16 @@ export function TraderPanel() {
             Nothing on the books yet.
           </p>
         )}
+        <details className="rules">
+          <summary className="label">Standing rules</summary>
+          <ol>
+            {rulesFor(t.archetype).map((r) => (
+              <li key={r.code}>
+                <span className="mono">{r.code}</span> {r.text}
+              </li>
+            ))}
+          </ol>
+        </details>
         <div className="panel-actions">
           {t.local ? (
             <>

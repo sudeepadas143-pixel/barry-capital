@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { FIRM_NAME, SEASON_START, SITE_DESCRIPTION, TICK_SECONDS } from './firm.config';
@@ -23,10 +25,30 @@ function checkpoint(): Plugin {
   };
 }
 
+/** Tells the app which optional art files exist, so it never requests missing ones. */
+function artManifest(): Plugin {
+  const id = 'virtual:art';
+  const has = (p: string) => existsSync(resolve(__dirname, 'public/art', p));
+  return {
+    name: 'firm-art',
+    resolveId: (s) => (s === id ? `\0${id}` : null),
+    load(s) {
+      if (s !== `\0${id}`) return null;
+      return `export default ${JSON.stringify({
+        building: has('building.png'),
+        hotspots: has('hotspots.json'),
+        foreground: has('foreground.png'),
+        sprites: has('sprites/sprites.json'),
+      })};`;
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     react(),
     checkpoint(),
+    artManifest(),
     {
       name: 'firm-html',
       transformIndexHtml: (html) =>

@@ -4,6 +4,7 @@
  */
 import { C } from './colors';
 import type { PixelBuffer } from './buffer';
+import { S } from './layout';
 
 export const PROP_PAL: Record<string, number> = {
   o: C.ink,
@@ -50,20 +51,21 @@ function rgba2(hex: string) {
   return ((255 << 24) | ((n & 255) << 16) | (((n >> 8) & 255) << 8) | ((n >> 16) & 255)) >>> 0;
 }
 
-export function stamp(buf: PixelBuffer, grid: string[], x: number, y: number, flip = false, pal = PROP_PAL) {
+/** Stamp a grid, each cell drawn as a `scale`×`scale` block. */
+export function stamp(buf: PixelBuffer, grid: string[], x: number, y: number, flip = false, pal = PROP_PAL, scale = S) {
   const w = grid[0].length;
   for (let j = 0; j < grid.length; j++)
     for (let i = 0; i < w; i++) {
       const k = grid[j][i];
       if (k === '.') continue;
       const c = pal[k];
-      if (c !== undefined) buf.set(x + (flip ? w - 1 - i : i), y + j, c);
+      if (c !== undefined) buf.rect(x + (flip ? w - 1 - i : i) * scale, y + j * scale, scale, scale, c);
     }
 }
 
 /** Anchor at bottom centre. */
-export function stampAt(buf: PixelBuffer, grid: string[], sx: number, sy: number, flip = false) {
-  stamp(buf, grid, Math.round(sx - grid[0].length / 2), Math.round(sy - grid.length), flip);
+export function stampAt(buf: PixelBuffer, grid: string[], sx: number, sy: number, flip = false, scale = S) {
+  stamp(buf, grid, Math.round(sx - (grid[0].length * scale) / 2), Math.round(sy - grid.length * scale), flip, PROP_PAL, scale);
 }
 
 export const PALM = [
@@ -162,19 +164,3 @@ export const WATER_TOWER = [
 export const LAMP_HEAD = ['.iii.', 'iyyyi', 'iyByi', 'iyyyi', '.iii.', '..i..'];
 
 export const CAMERA = ['..qq...', 'qqqqqqi', 'qMqqeqi', 'qqqqqqi', '...q...', '..q.q..', '.q...q.', 'q.....q'];
-
-export const PORTRAIT = [
-  'nnnnnnnnnnnn',
-  'nhhhhhhhhhhn',
-  'nhhMMMMMhhhn',
-  'nhMMMMMMMhhn',
-  'nhMwwwwwMhhn',
-  'nhbobbobhhhn',
-  'nhwwwwwwhhhn',
-  'nhhwwmwwhhhn',
-  'nhhhwwwhhhhn',
-  'nhvvvbvvvhhn',
-  'nvvvvbvvvvhn',
-  'nvvvvbvvvvvn',
-  'nnnnnnnnnnnn',
-];

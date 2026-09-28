@@ -9,8 +9,10 @@ import type { Built, ScreenSpec } from './building';
 import { C } from './colors';
 import { drawText, textWidth } from './font';
 import type { Iso } from './iso';
-import { BAY_X, deskSpot, floorZ } from './layout';
-import { CAT_SIT, CAT_TAIL, stamp, stampAt } from './props';
+import { BAY_X, S, deskSpot, floorZ } from './layout';
+import { blitAt, renderCat } from '../art/props';
+
+const CATS = [renderCat(0, false), renderCat(0, true), renderCat(1, false), renderCat(1, true)];
 
 export interface TickerItem {
   text: string;
@@ -33,10 +35,12 @@ function hash(a: number, b: number) {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
+/** Paint one world cell on a y-plane, only over pixels still showing the key colour. */
 function paintY(buf: PixelBuffer, iso: Iso, y: number, x: number, z: number, key: number, c: number) {
-  const sx = Math.floor(iso.sx(x, y));
-  const sy = Math.floor(iso.sy(x + 0.5, y, z + 0.5));
-  if (buf.get(sx, sy) === key) buf.set(sx, sy, c);
+  iso.cellY(y, x, z, (px, py) => {
+    const i = py * buf.w + px;
+    if (buf.data[i] === key) buf.data[i] = c;
+  });
 }
 
 function candles(buf: PixelBuffer, iso: Iso, s: ScreenSpec, series: number[] | undefined) {
@@ -129,24 +133,17 @@ function ticker(buf: PixelBuffer, iso: Iso, b: Built, t: number, items: TickerIt
     }
 }
 
-function highlight(buf: PixelBuffer, iso: Iso, desk: number, t: number) {
+function highlight(iso: Iso, desk: number, t: number) {
   const spot = deskSpot(desk);
   if (!spot) return;
   const cx = BAY_X[spot.bay];
   const zf = floorZ(spot.level);
   const c = Math.floor(t * 3) % 2 ? C.brassHi : C.brass;
-  const plot = (x: number, y: number) => {
-    const [sx, sy] = iso.at(x, y, zf);
-    buf.set(sx, sy, c);
-  };
-  for (let x = cx - 21; x <= cx + 21; x++) {
-    plot(x, 0.5);
-    plot(x, 23);
-  }
-  for (let y = 1; y < 23; y++) {
-    plot(cx - 21, y);
-    plot(cx + 21, y);
-  }
+  const w = 1.4 / S;
+  iso.top(cx - 21, 0.6, cx + 21, 0.6 + w * 2, zf, c);
+  iso.top(cx - 21, 22.6, cx + 21, 22.6 + w * 2, zf, c);
+  iso.top(cx - 21, 0.6, cx - 21 + w * 2, 23, zf, c);
+  iso.top(cx + 21 - w * 2, 0.6, cx + 21, 23, zf, c);
 }
 
 export function animPass(buf: PixelBuffer, iso: Iso, b: Built, t: number, d: SceneData) {
@@ -158,44 +155,40 @@ export function animPass(buf: PixelBuffer, iso: Iso, b: Built, t: number, d: Sce
   ticker(buf, iso, b, t, d.ticker);
   // Server LEDs.
   const step = Math.floor(t * 4);
-  b.leds.forEach(([x, y], i) => {
-    if (buf.get(x, y) !== C.ledOff) return;
+  b.leds.forEach((cell, i) => {
     const r = hash(i, step + (i % 5));
-    buf.set(x, y, d.stale ? (r > 0.5 ? C.amber : C.ledOff) : r > 0.97 ? C.ledRed : r > 0.3 ? C.ledGreen : C.ledOff);
+    const c = d.stale ? (r > 0.5 ? C.amber : C.ledOff) : r > 0.97 ? C.ledRed : r > 0.3 ? C.ledGreen : C.ledOff;
+    for (const k of cell) if (buf.data[k] === C.ledOff) buf.data[k] = c;
   });
   // Coffee steam.
   for (const [sx, sy] of b.steam)
-    for (let k = 0; k < 3; k++) {
-      const p = (t * 0.7 + k / 3) % 1;
-      const wob = Math.round(Math.sin((t + k) * 3) * 1);
-      buf.tint(sx + wob, Math.round(sy - p * 10), C.white, 0.7 * (1 - p));
+    for (let k = 0; k < 4; k++) {
+      const p = (t * 0.7 + k / 4) % 1;
+      const wob = Math.round(Math.sin((t + k) * 3) * S);
+      const y = Math.round(sy - p * 10 * S);
+      const a = 0.65 * (1 - p);
+      for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1], [2, 0], [-1, 1]]) buf.tint(sx + wob + dx, y + dy, C.white, a * (dx === 2 || dx === -1 ? 0.5 : 1));
     }
   // Cat on the filing cabinet, tail flicking.
   if (b.cat[0]) {
-    const [cx, cy] = b.cat;
-    stampAt(buf, CAT_SIT, cx, cy);
-    const tail = CAT_TAIL[Math.floor(t / 1.4) % 2];
-    stamp(buf, tail, cx - 3, cy - 4);
-    if (Math.floor(t * 1.3) % 7 === 0) {
-      // Blink.
-      buf.set(cx - 2, cy - 5, C.cat);
-    }
+    const tail = Math.floor(t / 1.4) % 2;
+    const blink = Math.floor(t * 1.3) % 7 === 0;
+    blitAt(buf, CATS[tail * 2 + (blink ? 1 : 0)], b.cat[0], b.cat[1]);
   }
   // Antenna light.
   if (Math.floor(t * 1.2) % 2 === 0) {
     const [ax, ay] = b.antenna;
-    buf.set(ax, ay - 1, C.ledRed);
-    buf.tint(ax - 1, ay - 1, C.ledRed, 0.4);
-    buf.tint(ax + 1, ay - 1, C.ledRed, 0.4);
+    buf.rect(ax - 1, ay - 2, 3, 3, C.ledRed);
+    for (const [dx, dy] of [[-2, -1], [2, -1], [0, -3], [0, 1]]) buf.tint(ax + dx, ay - 1 + dy, C.ledRed, 0.45);
   }
   // Pendulum.
   const [px, py] = b.pendulum;
   if (px) {
-    const sw = [0, 1, 0, -1][Math.floor(t * 2) % 4];
-    buf.set(px + sw, py, C.brass);
-    buf.set(px + sw, py - 1, C.brassLo);
+    const sw = [0, 1, 0, -1][Math.floor(t * 2) % 4] * S;
+    buf.rect(px + sw - 1, py - 1, S + 1, S + 1, C.brass);
+    buf.rect(px + Math.round(sw / 2), py - 4 * S, 1, 3 * S, C.brassLo);
   }
-  if (d.hotDesk !== null) highlight(buf, iso, d.hotDesk, t);
+  if (d.hotDesk !== null) highlight(iso, d.hotDesk, t);
 }
 
 /** Revolving door: the panes turn while someone is going through. Drawn over the front layer. */
@@ -206,18 +199,18 @@ export function doorPass(iso: Iso, b: Built, t: number, spinning: boolean) {
   const phase = spinning ? Math.floor(t * 10) : 0;
   for (let k = 0; k < 3; k++) {
     const y = y0 + ((k * 5 + phase) % width);
-    for (let z = z0; z < z1; z++) iso.onX(x, y, z, C.brassLo);
+    iso.vlineX(x, y, z0, z1, C.brassLo);
   }
-  for (let y = y0; y < y1; y++) iso.onX(x, y, z1 - 1, C.brass);
+  iso.hlineX(x, y0, y1, z1 - 1, C.brass);
 }
 
 export function marker(buf: PixelBuffer, sx: number, sy: number, t: number) {
-  const bob = Math.round(Math.sin(t * 4)) ;
+  const bob = Math.round(Math.sin(t * 4) * S);
   const y = sy + bob;
-  const rows = ['bbbbb', '.bbb.', '..b..'];
+  const rows = ['bbbbbbbbb', '.bbbbbbb.', '..bbbbb..', '...bbb...', '....b....'];
   rows.forEach((r, j) =>
     r.split('').forEach((ch, i) => {
-      if (ch === 'b') buf.set(sx - 2 + i, y + j, j === 0 ? C.brassHi : C.brass);
+      if (ch === 'b') buf.set(sx - 4 + i, y + j, j === 0 ? C.brassHi : C.brass);
     }),
   );
 }

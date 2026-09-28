@@ -197,7 +197,7 @@ export class Director {
       const x = seg.from.x + (seg.to.x - seg.from.x) * k;
       const y = seg.from.y + (seg.to.y - seg.from.y) * k;
       const away = seg.to.x < seg.from.x || seg.to.y < seg.from.y;
-      const frame = reduced ? 0 : Math.floor(t * 8) % 4;
+      const frame = reduced ? 0 : Math.floor(t * 11) % 8;
       const pose: Pose = s.carry ? (away ? 'backbox' : 'box') : away ? 'back' : 'walk';
       out.push(this.walker(s, seg.from.level, x, y, pose, frame));
     }
@@ -270,7 +270,7 @@ export class Director {
       const moving = (p < 0.35 || (p >= 0.5 && p < 0.85));
       if (moving) {
         pose = p < 0.35 ? 'walk' : 'back';
-        frame = Math.floor(t * 8) % 4;
+        frame = Math.floor(t * 11) % 8;
       }
     }
     return {

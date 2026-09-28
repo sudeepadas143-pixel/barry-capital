@@ -40,5 +40,5 @@ it('zoomed crop', async () => {
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) b.data[y * w + x] = f.get(x0 + x, y0 + y);
     return b;
   };
-  writeFileSync('art-out/zoom-desks.png', encodePng(crop(40, 190, 190, 110), 5));
+  writeFileSync('art-out/zoom-desks.png', encodePng(crop(300, 560, 520, 330), 2));
 });

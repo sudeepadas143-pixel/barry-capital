@@ -4,6 +4,9 @@
  */
 import { FIRM_NAME } from '../../firm.config';
 import { PixelBuffer, mixColor } from './buffer';
+import { renderBust } from '../art/figure';
+import { blitAt, renderPlant } from '../art/props';
+import { PARTNER_LOOK } from '../art/partner';
 import { C } from './colors';
 import { drawText, textWidth } from './font';
 import { Iso } from './iso';
@@ -20,6 +23,7 @@ import {
   OX,
   OY,
   ROOF_Z,
+  S,
   ST,
   W,
   X,
@@ -30,19 +34,21 @@ import {
 } from './layout';
 import {
   CAMERA,
-  FERN,
   FLAG,
-  FLOWERS,
   GLOBE,
   LAMP_HEAD,
-  PALM,
   PIGEON,
-  PORTRAIT,
-  SHRUB,
-  SUCCULENT,
   WATER_TOWER,
   stampAt,
 } from './props';
+
+const PLANTS = {
+  palm: renderPlant('palm'),
+  fern: renderPlant('fern'),
+  succulent: renderPlant('succulent'),
+  shrub: renderPlant('shrub'),
+  flowers: renderPlant('flowers'),
+};
 
 export interface ScreenSpec {
   kind: 'desk' | 'terminal' | 'crt';
@@ -62,7 +68,8 @@ export interface Built {
   front: PixelBuffer;
   screens: ScreenSpec[];
   ticker: { y: number; x0: number; x1: number; z0: number; z1: number };
-  leds: [number, number][];
+  /** Pixel indices of each server LED. */
+  leds: number[][];
   steam: [number, number][];
   cat: [number, number];
   antenna: [number, number];
@@ -78,16 +85,26 @@ const bezel = { top: C.bezelHi, left: C.bezel, right: C.screenOff };
 
 /** Lines on a y-plane face, for panel seams and wainscoting. */
 function hLineY(iso: Iso, y: number, x0: number, x1: number, z: number, c: number) {
-  for (let x = x0; x < x1; x++) iso.onY(y, x, z, c);
+  iso.hlineY(y, x0, x1, z, c);
 }
 function hLineX(iso: Iso, x: number, y0: number, y1: number, z: number, c: number) {
-  for (let y = y0; y < y1; y++) iso.onX(x, y, z, c);
+  iso.hlineX(x, y0, y1, z, c);
 }
 function rectY(iso: Iso, y: number, x0: number, x1: number, z0: number, z1: number, c: number) {
-  for (let x = x0; x < x1; x++) for (let z = z0; z < z1; z++) iso.onY(y, x, z, c);
+  iso.faceY(y, x0, x1, z0, z1, c);
 }
 function rectX(iso: Iso, x: number, y0: number, y1: number, z0: number, z1: number, c: number) {
-  for (let y = y0; y < y1; y++) for (let z = z0; z < z1; z++) iso.onX(x, y, z, c);
+  iso.faceX(x, y0, y1, z0, z1, c);
+}
+/** A 1px line between two world points (screen-space). */
+function line3(iso: Iso, a: [number, number, number], b: [number, number, number], c: number) {
+  const [ax, ay] = iso.p(...a);
+  const [bx, by] = iso.p(...b);
+  iso.buf.poly([[ax, ay], [bx, by], [bx, by + 1], [ax, ay + 1]], c);
+}
+/** A block of S×S pixels at a screen point. */
+function blk(buf: PixelBuffer, x: number, y: number, c: number) {
+  buf.rect(x, y, S, S, c);
 }
 function textY(iso: Iso, y: number, x0: number, zTop: number, s: string, c: number) {
   drawText(s, (dx, dy) => iso.onY(y, x0 + dx, zTop - dy, c));
@@ -133,12 +150,12 @@ function walls(iso: Iso, l: Level) {
   hLineY(iso, 0, 0, X, zf, C.wainscotLo);
   // Wainscot panels.
   for (let x = 6; x < X; x += 12) {
-    for (let z = zf + 2; z < zf + wainH - 1; z++) iso.onY(0, x, z, C.wainscotHi);
+    iso.vlineY(0, x, zf + 2, zf + wainH - 1, C.wainscotHi);
   }
   // Pilasters on the back wall.
   for (const x of lobby ? [36, 148] : [34, 78, 122, 166]) {
     rectY(iso, 0, x - 1, x + 2, zf + wainH + 1, zc, C.wallShade);
-    for (let z = zf + wainH + 1; z < zc; z++) iso.onY(0, x - 1, z, C.stoneHi);
+    iso.vlineY(0, x - 1, zf + wainH + 1, zc, C.stoneHi);
   }
 }
 
@@ -151,28 +168,18 @@ function floorSurface(iso: Iso, l: Level) {
     for (let i = 0; i < 40; i++) {
       const x = Math.floor(hash(i, 3) * X);
       const y = Math.floor(hash(i, 7) * Y);
-      const [sx, sy] = iso.at(x, y, zf);
-      iso.buf.set(sx, sy, C.marbleVein);
-      iso.buf.set(sx + 1, sy, C.marbleVein);
+      line3(iso, [x, y, zf], [x + 2, y + 1, zf], C.marbleVein);
     }
     // Runner to the elevator.
     iso.top(10, 17, X - 20, 23, zf, C.red);
-    for (let x = 10; x < X - 20; x++) {
-      const [sx, sy] = iso.at(x, 17, zf);
-      iso.buf.set(sx, sy, C.brassLo);
-    }
+    line3(iso, [10, 17, zf], [X - 20, 17, zf], C.brassLo);
+    line3(iso, [10, 22.5, zf], [X - 20, 22.5, zf], C.brassLo);
     return;
   }
   if (l.kind === 'server') {
     iso.top(0, 0, X, Y, zf, C.steel);
-    for (let x = 0; x < X; x += 12) for (let y = 0; y < Y; y++) {
-      const [sx, sy] = iso.at(x, y, zf);
-      iso.buf.set(sx, sy, C.steelLo);
-    }
-    for (let y = 0; y < Y; y += 12) for (let x = 0; x < X; x++) {
-      const [sx, sy] = iso.at(x, y, zf);
-      iso.buf.set(sx, sy, C.steelLo);
-    }
+    for (let x = 0; x < X; x += 12) line3(iso, [x, 0, zf], [x, Y, zf], C.steelLo);
+    for (let y = 0; y < Y; y += 12) line3(iso, [0, y, zf], [X, y, zf], C.steelLo);
     return;
   }
   iso.top(0, 0, X, Y, zf, C.carpet);
@@ -180,7 +187,7 @@ function floorSurface(iso: Iso, l: Level) {
   for (let x = 2; x < X; x += 8)
     for (let y = 2; y < Y; y += 6) {
       const [sx, sy] = iso.at(x + ((y / 6) % 2) * 4, y, zf);
-      iso.buf.set(sx, sy, C.carpetHi);
+      iso.buf.rect(sx, sy, 2, 1, C.carpetHi);
     }
   if (l.kind === 'office') {
     // A red rug under the partner's desk.
@@ -188,8 +195,7 @@ function floorSurface(iso: Iso, l: Level) {
     iso.top(95, 4, 173, 20, zf, C.redHi);
     iso.top(98, 6, 170, 18, zf, C.red);
     for (let x = 100; x < 168; x += 6) {
-      const [sx, sy] = iso.at(x, 12, zf);
-      iso.buf.set(sx, sy, C.brass);
+      iso.dot(x, 12, zf, C.brass);
     }
   }
 }
@@ -203,7 +209,7 @@ function slabBand(iso: Iso, l: Level) {
   if (l.index >= 1) for (let x = -3; x < X; x += 4) iso.onY(Y, x, zb + 1, C.stoneLine);
   // Left wall section (the cut through the end wall).
   iso.faceY(Y, -5, 0, zb + ST, zb + FH, C.stoneL);
-  for (let z = zb + ST; z < zb + FH; z++) iso.onY(Y, -1, z, C.stoneR);
+  iso.vlineY(Y, -1, zb + ST, zb + FH, C.stoneR);
 }
 
 function elevator(iso: Iso, l: Level) {
@@ -212,12 +218,10 @@ function elevator(iso: Iso, l: Level) {
   rectX(iso, 0, y0 - 1, y1 + 1, zf, zf + 27, C.brassLo);
   rectX(iso, 0, y0, y1, zf, zf + 26, C.brass);
   const mid = Math.floor((y0 + y1) / 2);
-  for (let z = zf; z < zf + 26; z++) iso.onX(0, mid, z, C.brassLo);
-  for (let y = y0 + 1; y < y1 - 1; y++) if (y !== mid) iso.onX(0, y, zf + 24, C.brassHi);
-  for (let z = zf + 2; z < zf + 22; z += 1) {
-    iso.onX(0, y0 + 1, z, C.brassHi);
-    iso.onX(0, mid + 1, z, C.brassHi);
-  }
+  iso.vlineX(0, mid, zf, zf + 26, C.brassLo);
+  iso.hlineX(0, y0 + 1, y1 - 1, zf + 24, C.brassHi);
+  iso.vlineX(0, y0 + 1, zf + 2, zf + 22, C.brassHi);
+  iso.vlineX(0, mid + 1, zf + 2, zf + 22, C.brassHi);
   // Floor indicator: a small brass plate with the level label.
   rectX(iso, 0, mid - 3, mid + 4, zf + 29, zf + 36, C.woodDark);
   const label = l.label;
@@ -262,7 +266,7 @@ function desk(iso: Iso, fg: Iso, cx: number, zf: number, n: number, pencilled: b
     chair(iso, cx, zf);
     fg.box(cx - half, y0, zf, cx + half, y1, zf + h, wood);
     // Modesty panel grooves and a brass edge.
-    for (const x of [cx - half + 3, cx + half - 3]) for (let z = zf + 1; z < zf + h - 1; z++) fg.onY(y1, x, z, C.woodR);
+    for (const x of [cx - half + 3, cx + half - 3]) fg.vlineY(y1, x, zf + 1, zf + h - 1, C.woodR);
     hLineY(fg, y1, cx - half, cx + half, zf + h - 1, C.brassLo);
     // Numbered brass plaque.
     const label = String(n).padStart(2, '0');
@@ -278,7 +282,7 @@ function desk(iso: Iso, fg: Iso, cx: number, zf: number, n: number, pencilled: b
       fg.box(cx - 12, y0 + 2, zf + h, cx - 10, y0 + 4, zf + h + 3, { top: C.coffee, left: C.white, right: C.paperShade });
     } else {
       const [sx, sy] = fg.at(cx - 11, y0 + 3, zf + h);
-      stampAt(fg.buf, SUCCULENT, sx, sy + 1);
+      blitAt(fg.buf, PLANTS.succulent, sx, sy + S);
     }
     fg.box(cx - 9, y0 + 1, zf + h, cx - 5, y0 + 5, zf + h + 1 + (variant % 3), { top: C.paper, left: C.paperShade, right: C.paperShade });
     // Brass lamp.
@@ -329,7 +333,7 @@ function partition(iso: Iso, x: number, zf: number) {
   iso.faceX(x, 1, 14, zf, zf + 15, C.glass, 0.45);
   hLineX(iso, x, 1, 14, zf + 14, C.glassFrame);
   hLineX(iso, x, 1, 14, zf, C.glassFrame);
-  for (let z = zf; z < zf + 15; z++) iso.onX(x, 13, z, C.glassFrame);
+  iso.vlineX(x, 13, zf, zf + 15, C.glassFrame);
   // Reflection streaks.
   for (let i = 0; i < 5; i++) iso.onX(x, 4 + i, zf + 6 + i, C.glassHi);
 }
@@ -414,12 +418,22 @@ function office(iso: Iso, zf: number, out: Built) {
     [1, 1],
     [0, 2],
   ])
-    iso.buf.set(dx + a, dy + b, C.brass);
-  iso.buf.set(dx, dy, C.brassHi);
+    blk(iso.buf, dx + a * S, dy + b * S, C.brass);
+  blk(iso.buf, dx, dy, C.brassHi);
   hLineY(iso, 9, 39, 51, zf + 15, C.bezelHi);
   // Portrait on the wall.
-  const [px, py] = iso.at(78, 0, zf + 19);
-  stampAt(iso.buf, PORTRAIT, px, py + PORTRAIT.length);
+  rectY(iso, 0, 72, 86, zf + 5, zf + 19, C.brassLo);
+  rectY(iso, 0, 73, 85, zf + 6, zf + 18, C.wainscotLo);
+  {
+    // The partner's portrait, sheared to lie flat on the wall.
+    const bust = renderBust(PARTNER_LOOK, 22, true);
+    const [px, py] = iso.at(73.5, 0, zf + 17.5);
+    for (let j = 0; j < bust.h; j++)
+      for (let i = 0; i < bust.w; i++) {
+        const c = bust.px[j * bust.w + i];
+        if (c) iso.buf.set(px + i, py + j + Math.floor(i / 2), c);
+      }
+  }
   // Globe.
   const [gx, gy] = iso.at(76, 14, zf);
   stampAt(iso.buf, GLOBE, gx, gy);
@@ -454,7 +468,7 @@ function office(iso: Iso, zf: number, out: Built) {
   iso.box(60, 11, zf + 5, 70, 13, zf + 12, leather);
   iso.box(59, 12, zf + 5, 61, 20, zf + 8, leather);
   const [fx, fy] = iso.at(212, 18, zf);
-  stampAt(iso.buf, PALM, fx, fy);
+  blitAt(iso.buf, PLANTS.palm, fx, fy);
 }
 
 function lobby(iso: Iso, zf: number, out: Built) {
@@ -480,7 +494,7 @@ function lobby(iso: Iso, zf: number, out: Built) {
     [150, 18],
   ]) {
     const [sx, sy] = iso.at(x, y, zf);
-    stampAt(iso.buf, PALM, sx, sy);
+    blitAt(iso.buf, PLANTS.palm, sx, sy);
   }
   iso.box(70, 13, zf, 110, 17, zf + 5, leather);
   iso.box(72, 12, zf, 74, 17, zf + 3, steel);
@@ -497,7 +511,9 @@ function server(iso: Iso, zf: number, out: Built) {
       for (let k = 0; k < 3; k++) {
         const x = x0 + 2 + k * 3;
         iso.onY(7, x, z, C.ledOff);
-        out.leds.push([Math.floor(iso.sx(x, 7)), Math.floor(iso.sy(x + 0.5, 7, z + 0.5))]);
+        const cell: number[] = [];
+        iso.cellY(7, x, z, (px, py) => cell.push(py * iso.buf.w + px));
+        out.leds.push(cell);
       }
     }
   }
@@ -536,10 +552,7 @@ function roof(iso: Iso, out: Built) {
   for (let x = -5; x < X; x += 3) iso.onY(Y + 2, x, zr + 2, C.stoneLine);
   const zt = zr + ST;
   // Roof surface texture.
-  for (let x = 4; x < X; x += 10) for (let y = 2; y < Y; y++) {
-    const [sx, sy] = iso.at(x, y, zt);
-    iso.buf.set(sx, sy, C.roofLine);
-  }
+  for (let x = 4; x < X; x += 10) line3(iso, [x, 2, zt], [x, Y - 2, zt], C.roofLine);
   // Parapet along the back and left edges (the front is low so the roof reads).
   iso.box(-5, 0, zt, X, 2, zt + 5, stone);
   iso.box(-5, 0, zt, -3, Y, zt + 5, stone);
@@ -548,13 +561,11 @@ function roof(iso: Iso, out: Built) {
   iso.box(120, 6, zt, 150, 16, zt + 3, { top: C.glass, left: C.steel, right: C.steelLo });
   for (let x = 124; x < 150; x += 6) {
     const [sx, sy] = iso.at(x, 6, zt + 3);
-    for (let k = 0; k < 5; k++) iso.buf.set(sx - k, sy + Math.floor(k / 2), C.glassHi);
+    for (let k = 0; k < 5 * S; k++) iso.buf.set(sx - k, sy + Math.floor(k / 2), C.glassHi);
   }
   // HVAC unit.
   iso.box(80, 4, zt, 100, 16, zt + 9, steel);
-  const [hx, hy] = iso.at(90, 16, zt + 6);
-  for (let k = -3; k <= 3; k++) iso.buf.set(hx + k, hy - 1, C.steelLo);
-  for (let k = -3; k <= 3; k++) iso.buf.set(hx + k, hy + 1, C.steelLo);
+  for (const z of [zt + 3, zt + 5, zt + 7]) iso.hlineY(16, 83, 97, z, C.steelLo);
   // Elevator bulkhead with a slate roof.
   iso.box(196, 3, zt, 226, 21, zt + 16, stone);
   hLineY(iso, 21, 196, 226, zt + 1, C.stoneLine);
@@ -563,32 +574,21 @@ function roof(iso: Iso, out: Built) {
   const zs = zt + 16;
   iso.buf.poly([iso.p(194, 23, zs), iso.p(228, 23, zs), iso.p(228, 12, zs + 11), iso.p(194, 12, zs + 11)], C.slate);
   iso.buf.poly([iso.p(228, 1, zs), iso.p(228, 23, zs), iso.p(228, 12, zs + 11)], C.slateLo);
-  for (let k = 0; k < 11; k += 3) {
-    for (let x = 194; x < 228; x++) {
-      const [sx, sy] = iso.at(x, 23 - k, zs + k);
-      iso.buf.set(sx, sy, C.slateLine);
-    }
-  }
-  for (let x = 194; x < 228; x++) {
-    const [sx, sy] = iso.at(x, 12, zs + 11);
-    iso.buf.set(sx, sy, C.slateHi);
-  }
+  for (let k = 0; k < 11; k += 2) line3(iso, [194, 23 - k, zs + k], [228, 23 - k, zs + k], C.slateLine);
+  line3(iso, [194, 12, zs + 11], [228, 12, zs + 11], C.slateHi);
   // Water tower.
   const [wx, wy] = iso.at(30, 12, zt);
   stampAt(iso.buf, WATER_TOWER, wx, wy);
   // Antenna.
   const [ax, ay] = iso.at(60, 6, zt);
-  for (let k = 0; k < 30; k++) iso.buf.set(ax, ay - k, C.iron);
-  for (const k of [10, 18, 24]) {
-    iso.buf.set(ax - 1, ay - k, C.iron);
-    iso.buf.set(ax + 1, ay - k, C.iron);
-  }
-  out.antenna = [ax, ay - 30];
+  iso.buf.rect(ax, ay - 30 * S, 1, 30 * S, C.iron);
+  for (const k of [10, 18, 24]) iso.buf.rect(ax - S, ay - k * S, 2 * S + 1, 1, C.iron);
+  out.antenna = [ax, ay - 30 * S];
   // Flag on the front corner.
   const [fx, fy] = iso.at(168, 20, zt);
-  for (let k = 0; k < 20; k++) iso.buf.set(fx, fy - k, C.steelHi);
+  iso.buf.rect(fx, fy - 20 * S, 1, 20 * S, C.steelHi);
   const [gx, gy] = iso.at(168, 20, zt + 20);
-  stampAt(iso.buf, FLAG, gx + 3, gy + FLAG.length);
+  stampAt(iso.buf, FLAG, gx + 3 * S, gy + FLAG.length * S);
   // Pigeons.
   for (const [x, y] of [
     [140, 22],
@@ -608,7 +608,7 @@ function facade(iso: Iso, out: Built) {
   iso.faceX(xo, 0, Y, bottom, top, C.stoneR);
   iso.faceY(Y, x, xo, bottom, top, C.stoneL);
   iso.top(x, 0, xo, Y, top, C.stoneTop);
-  for (let z = bottom; z < top; z++) iso.onY(Y, x, z, C.stoneHi);
+  iso.vlineY(Y, x, bottom, top, C.stoneHi);
   // Coursing lines.
   for (let z = bottom + 3; z < top; z += 6) hLineX(iso, xo, 0, Y, z, C.stoneLine);
   for (const l of LEVELS) {
@@ -632,7 +632,7 @@ function facade(iso: Iso, out: Built) {
       for (let z = zb + 4; z < zb + FH; z += 6) hLineX(iso, xo, 0, Y, z, C.baseLine);
       // Barred window.
       rectX(iso, xo, 8, 16, zb + 34, zb + 42, C.screenOff);
-      for (let y = 9; y < 16; y += 2) for (let z = zb + 34; z < zb + 42; z++) iso.onX(xo, y, z, C.iron);
+      for (let y = 9; y < 16; y += 2) iso.vlineX(xo, y, zb + 34, zb + 42, C.iron);
       continue;
     }
     // Two windows per floor.
@@ -642,7 +642,7 @@ function facade(iso: Iso, out: Built) {
     ]) {
       rectX(iso, xo, y0 - 1, y1 + 1, zf + 9, zf + 36, C.stoneLine);
       rectX(iso, xo, y0, y1, zf + 10, zf + 35, C.sky);
-      for (let z = zf + 10; z < zf + 35; z++) iso.onX(xo, Math.floor((y0 + y1) / 2), z, C.stoneR);
+      iso.vlineX(xo, Math.floor((y0 + y1) / 2), zf + 10, zf + 35, C.stoneR);
       hLineX(iso, xo, y0, y1, zf + 22, C.stoneR);
       for (let k = 0; k < 6; k++) iso.onX(xo, y1 - 2 - Math.floor(k / 2), zf + 26 + k, C.skyHi);
       // Sill.
@@ -667,16 +667,13 @@ function lot(iso: Iso) {
   }
   iso.top(x0, y0, x1, y1, 0, C.grass);
   for (let i = 0; i < 60; i++) {
-    const [sx, sy] = iso.at(x0 + Math.floor(hash(i, 31) * (x1 - x0)), y0 + Math.floor(hash(i, 32) * (y1 - y0)), 0);
-    iso.buf.set(sx, sy, i % 2 ? C.grassHi : C.grassLo);
+    iso.dot(x0 + Math.floor(hash(i, 31) * (x1 - x0)), y0 + Math.floor(hash(i, 32) * (y1 - y0)), 0, i % 2 ? C.grassHi : C.grassLo, 1 + (i % 2));
   }
   // Paving: landing, path to the street.
   iso.top(x0 + 6, 2, 262, 22, 0, C.sidewalk);
   iso.top(250, 2, 262, y1, 0, C.sidewalk);
-  for (let y = 4; y < y1; y += 4) for (let x = 250; x < 262; x++) {
-    const [sx, sy] = iso.at(x, y, 0);
-    iso.buf.set(sx, sy, C.sidewalkLine);
-  }
+  for (let y = 4; y < y1; y += 4) line3(iso, [250, y, 0], [262, y, 0], C.sidewalkLine);
+  line3(iso, [256, 2, 0], [256, y1, 0], C.sidewalkLine);
   // Steps up to the door.
   iso.box(x0 + 6, 2, 0, x0 + 12, 22, 3, { top: C.sidewalk, left: C.sidewalkL, right: C.sidewalkR, hi: C.stoneHi });
   iso.box(x0 + 6, 3, 3, x0 + 9, 21, 5, { top: C.sidewalk, left: C.sidewalkL, right: C.sidewalkR, hi: C.stoneHi });
@@ -688,7 +685,7 @@ function lot(iso: Iso) {
     [268, 10],
   ]) {
     const [sx, sy] = iso.at(x, y, 0);
-    stampAt(iso.buf, SHRUB, sx, sy);
+    blitAt(iso.buf, PLANTS.shrub, sx, sy);
   }
   for (const [x, y] of [
     [245, 26],
@@ -697,7 +694,7 @@ function lot(iso: Iso) {
     [258, -2],
   ]) {
     const [sx, sy] = iso.at(x, y, 0);
-    stampAt(iso.buf, FLOWERS, sx, sy);
+    blitAt(iso.buf, PLANTS.flowers, sx, sy);
   }
   // Shredder bin by the fence.
   iso.box(238, 22, 0, 245, 28, 10, { top: C.binLo, left: C.bin, right: C.binLo, hi: C.binHi });
@@ -707,33 +704,28 @@ function lot(iso: Iso) {
   iso.onY(28, 242, 9, C.paper);
   iso.onY(29, 243, 11, C.paper);
   const [bx, by] = iso.at(241, 29, 4);
-  drawText('S', (dx, dy) => iso.buf.set(bx + dx, by + dy - 2, C.paper));
+  drawText('S', (dx, dy) => blk(iso.buf, bx + dx * S, by + (dy - 2) * S, C.paper));
   // Lamppost.
   const [lx, ly] = iso.at(268, -2, 0);
-  for (let k = 0; k < 32; k++) iso.buf.set(lx, ly - k, C.iron);
-  iso.buf.set(lx - 1, ly - 1, C.iron);
-  iso.buf.set(lx + 1, ly - 1, C.iron);
-  stampAt(iso.buf, LAMP_HEAD, lx, ly - 31);
+  iso.buf.rect(lx - 1, ly - 32 * S, 2, 32 * S, C.iron);
+  iso.buf.rect(lx - S, ly - S, 2 * S + 1, S, C.iron);
+  stampAt(iso.buf, LAMP_HEAD, lx, ly - 31 * S);
   // Iron fence along the two front edges, with a gate gap at the path.
   const posts: [number, number][] = [];
   for (let x = x0 + 1; x < x1; x += 3) if (x < 250 || x > 262) posts.push([x, y1 - 1]);
   for (let y = y0 + 1; y < y1; y += 3) posts.push([x1 - 1, y]);
   for (const [x, y] of posts) vline(iso, x, y, 0, 7, C.iron);
-  for (const z of [6, 3]) {
-    for (let x = x0 + 1; x < x1; x++) if (x < 250 || x > 262) {
-      const [sx, sy] = iso.at(x, y1 - 1, z);
-      iso.buf.set(sx, sy, z === 6 ? C.ironHi : C.iron);
-    }
-    for (let y = y0 + 1; y < y1; y++) {
-      const [sx, sy] = iso.at(x1 - 1, y, z);
-      iso.buf.set(sx, sy, z === 6 ? C.ironHi : C.iron);
-    }
+  for (const z of [6.5, 3]) {
+    const c = z > 5 ? C.ironHi : C.iron;
+    line3(iso, [x0 + 1, y1 - 1, z], [250, y1 - 1, z], c);
+    line3(iso, [263, y1 - 1, z], [x1 - 1, y1 - 1, z], c);
+    line3(iso, [x1 - 1, y0 + 1, z], [x1 - 1, y1 - 1, z], c);
   }
   // Gate posts.
   for (const x of [249, 263]) {
     const [sx, sy] = iso.at(x, y1 - 1, 0);
-    for (let k = 0; k < 10; k++) iso.buf.set(sx, sy - k, C.stoneR);
-    iso.buf.set(sx, sy - 10, C.brass);
+    iso.buf.rect(sx - 1, sy - 10 * S, S + 1, 10 * S, C.stoneR);
+    blk(iso.buf, sx - 1, sy - 10 * S - S, C.brass);
   }
 }
 
@@ -797,7 +789,7 @@ export function buildScene(): Built {
       if (l.feature === 'terminal') terminalBoard(b, zf, out);
       // A potted fern by the elevator.
       const [sx, sy] = b.at(26, 20, zf);
-      stampAt(bg, FERN, sx, sy);
+      blitAt(bg, PLANTS.fern, sx, sy);
     }
     if (l.kind === 'office') office(b, zf, out);
     if (l.kind === 'lobby') lobby(b, zf, out);

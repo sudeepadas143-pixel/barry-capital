@@ -7,10 +7,12 @@
  */
 import { DESK_COUNT } from '../../firm.config';
 
-export const W = 312;
-export const H = 516;
-export const OX = 32;
-export const OY = 306;
+/** Pixels per world unit. The scene is drawn at twice the old pixel-art density. */
+export const S = 2;
+export const W = 312 * S;
+export const H = 516 * S;
+export const OX = 32 * S;
+export const OY = 306 * S;
 
 /** Building length, depth, floor-to-floor height and slab thickness. */
 export const X = 236;

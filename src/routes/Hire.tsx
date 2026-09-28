@@ -9,7 +9,6 @@ import { usePanel } from '../hooks/usePanel';
 import { dayTime, fmtPct, fmtSol, pad2, pctClass } from '../format';
 import { ARCHETYPES, ARCHETYPE_IDS } from '../sim/archetypes';
 import type { ArchetypeId, Look } from '../sim/types';
-import { useNow } from '../hooks/useNow';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 function Swatches({
@@ -58,7 +57,6 @@ function EmployeeFile() {
   const { open } = usePanel();
   const t = state.mine[0];
   const [confirm, setConfirm] = useState(false);
-  const pose = useNow(400);
   const reduced = useReducedMotion();
   if (!t) return null;
   const a = ARCHETYPES[t.archetype];
@@ -69,7 +67,7 @@ function EmployeeFile() {
         <p className="label">Employee file · desk {pad2(DESK_COUNT + 1)}, pencilled in</p>
         <div className="file-id">
           <div className="portrait portrait-tall">
-            <Figure look={t.look} pose={reduced ? 'stand' : 'walk'} frame={reduced ? 0 : Math.floor(pose / 400) % 4} scale={5} label={`${t.name}, standing`} />
+            <Figure look={t.look} pose={reduced ? 'stand' : 'walk'} animate={!reduced} height={132} label={`${t.name}, standing`} />
           </div>
           <div>
             <h2 id="file-title" className="panel-name">
@@ -171,8 +169,6 @@ export default function Hire() {
   const [touched, setTouched] = useState(false);
   const set = (k: keyof Look) => (i: number) => setLook((l) => ({ ...l, [k]: i }));
   const reduced = useReducedMotion();
-  const tickNow = useNow(450);
-  const frame = reduced ? 0 : Math.floor(tickNow / 450) % 4;
 
   // Default the sliders to the method's temperament.
   useEffect(() => {
@@ -271,7 +267,7 @@ export default function Hire() {
           <div className="section">
             <div className="file-id">
               <div className="portrait portrait-tall">
-                <Figure look={look} pose={reduced ? 'stand' : 'walk'} frame={frame} scale={5} label="Preview of your trader" />
+                <Figure look={look} pose={reduced ? 'stand' : 'walk'} animate={!reduced} height={132} label="Preview of your trader" />
               </div>
               <div>
                 <p className="panel-name">{clean || 'unnamed'}</p>

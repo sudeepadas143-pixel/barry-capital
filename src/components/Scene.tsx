@@ -73,7 +73,10 @@ export function Scene({ hot = null, onHover }: Props) {
     const nctx = n.getContext('2d')!;
     nctx.putImageData(frame.toImageData(), 0, 0);
     const ctx = c.getContext('2d')!;
-    ctx.imageSmoothingEnabled = false;
+    // Whole-number scales stay pixel-exact; anything else is resampled smoothly.
+    const k = c.width / n.width;
+    ctx.imageSmoothingEnabled = Math.abs(k - Math.round(k)) > 0.001;
+    ctx.imageSmoothingQuality = 'high';
     ctx.clearRect(0, 0, c.width, c.height);
     ctx.drawImage(n, 0, 0, c.width, c.height);
   }, [reduced]);
@@ -86,9 +89,11 @@ export function Scene({ hot = null, onHover }: Props) {
     const fit = () => {
       const cssW = el.clientWidth;
       const dpr = window.devicePixelRatio || 1;
-      const k = Math.max(1, Math.round((cssW * dpr) / dims.w));
-      c.width = dims.w * k;
-      c.height = dims.h * k;
+      const ratio = (cssW * dpr) / dims.w;
+      // Snap to a whole multiple when close; otherwise match the device pixels exactly.
+      const k = ratio >= 1 && Math.abs(ratio - Math.round(ratio)) < 0.12 ? Math.round(ratio) : ratio;
+      c.width = Math.round(dims.w * k);
+      c.height = Math.round(dims.h * k);
       draw(performance.now() / 1000);
     };
     fit();
@@ -174,7 +179,7 @@ export function Scene({ hot = null, onHover }: Props) {
       <div ref={wrap} className="scene-frame" style={{ aspectRatio: `${dims.w} / ${dims.h}` }}>
         <canvas
           ref={canvas}
-          className="pixel scene-canvas"
+          className="scene-canvas"
           style={{ cursor: hot ? 'pointer' : 'default' }}
           role="img"
           aria-label={`Cutaway of the ${FIRM_NAME} building: a server room, the lobby, four floors of trading desks and ${PARTNER_NAME}'s office at the top. Traders can be opened from the desk list below.`}

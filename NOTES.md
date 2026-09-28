@@ -68,11 +68,18 @@ Decisions made along the way, and the things worth a second look.
   traders, desks, walkers, facade and lot, door, people outside. Animated screens only
   repaint pixels still showing their key colour, so anything standing in front keeps
   covering them.
-- **Scaling.** The backing store is a whole multiple of the native 312×516 for the
-  device's pixel ratio, and CSS fits it to the column, which can mean a scale factor like
-  1.25. Pixels are nearest-neighbour throughout, so edges stay crisp. At very small
-  non-integer ratios, some art pixels are one device pixel wider than others; that isn't
-  noticeable on phones.
+- **Higher-resolution characters (owner request).** The first version used 13×25
+  hand-typed pixel grids, which read as retro. Traders are now drawn from shaded shapes
+  (`src/art/figure.ts`) with selective outlines, and the whole scene renders at 2× (624×1032)
+  so the figures have room for faces, lapels and ties. Plants and the cat were redrawn the
+  same way. The water tower, lamp, globe and camera are still upscaled grid props, and
+  could be redrawn if they start to look coarse next to the rest.
+- **Scaling (deviation from the brief).** The brief asked for nearest-neighbour integer
+  upscaling. At 2× native resolution a phone shows fewer than two device pixels per art
+  pixel, and nearest-neighbour at ratios like 1.875 makes lines uneven. So the canvas
+  matches the device's pixels, stays pixel-exact at whole-number ratios, and otherwise
+  resamples with high-quality smoothing. The result looks like finished illustration
+  rather than chunky pixels, which is what was asked for.
 - **Custom art** switches off the procedural-only animations (screens, ticker, walking
   paths). See ART_GUIDE.md.
 - **Known imperfections:** walkers can overlap a partition edge for a frame or two, and a
@@ -110,7 +117,7 @@ Decisions made along the way, and the things worth a second look.
   the README steps are ready, but no deploy has been run.
 - **Placeholder mint** (`BarryCapXXXX…`): the explorer link goes to a page that doesn't
   exist until a real address is set.
-- **Main chunk size** (128 KB gzipped). The checkpoint could move to a parallel chunk,
+- **Main chunk size** (133 KB gzipped). The checkpoint could move to a parallel chunk,
   loaded behind a skeleton, if first paint on slow networks becomes a concern.
 - **Snapshots in `localStorage`** are about 140 KB each. A browser that refuses storage
   just replays from the build checkpoint every visit.

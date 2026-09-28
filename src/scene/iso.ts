@@ -1,9 +1,10 @@
 /**
  * 2:1 isometric projection onto a PixelBuffer.
  * World axes: +x runs down-right on screen, +y runs down-left, +z is up.
- * One world unit along x or y is one screen pixel across and half a pixel down.
+ * One world unit along x or y is `s` pixels across and `s / 2` down.
  */
 import { PixelBuffer } from './buffer';
+import { S } from './layout';
 
 export interface BoxColors {
   top: number;
@@ -13,7 +14,7 @@ export interface BoxColors {
   right: number;
   /** Optional light edge along the top face's front edges. */
   hi?: number;
-  /** Optional dark line down the front corner and along the bottom. */
+  /** Optional dark line down the front corner. */
   lo?: number;
 }
 
@@ -22,13 +23,14 @@ export class Iso {
     public buf: PixelBuffer,
     public ox: number,
     public oy: number,
+    public s: number = S,
   ) {}
 
   sx(x: number, y: number) {
-    return this.ox + x - y;
+    return this.ox + (x - y) * this.s;
   }
   sy(x: number, y: number, z: number) {
-    return this.oy + (x + y) / 2 - z;
+    return this.oy + ((x + y) / 2 - z) * this.s;
   }
   p(x: number, y: number, z: number): [number, number] {
     return [this.sx(x, y), this.sy(x, y, z)];
@@ -65,43 +67,69 @@ export class Iso {
     }
   }
 
-  /** A 1px line along the top-front edge (y = y1) of a surface at height z. */
+  /** A 1px line along the front edge (y = y) of a surface at height z. */
   lineTopY(y: number, x0: number, x1: number, z: number, c: number) {
-    for (let x = x0; x < x1; x++) {
-      const sx = Math.floor(this.sx(x, y));
-      this.buf.set(sx, Math.floor(this.sy(x + 0.5, y, z)), c);
-    }
+    this.top(x0, y - 2 / this.s, x1, y, z, c);
   }
 
-  /** A 1px line along the top-front edge (x = x1). */
+  /** A 1px line along the front edge (x = x). */
   lineTopX(x: number, y0: number, y1: number, z: number, c: number) {
-    for (let y = y0; y < y1; y++) {
-      const sx = Math.floor(this.sx(x, y + 1));
-      this.buf.set(sx, Math.floor(this.sy(x, y + 0.5, z)), c);
-    }
+    this.top(x - 2 / this.s, y0, x, y1, z, c);
   }
 
-  /** Paint pixels on a y-plane face in face space: u along x, v up in z. */
+  /** One world-unit cell on a y-plane face (u along x, v up in z). */
   onY(y: number, x: number, z: number, c: number) {
-    this.buf.set(Math.floor(this.sx(x, y)), Math.floor(this.sy(x + 0.5, y, z + 0.5)), c);
+    this.faceY(y, x, x + 1, z, z + 1, c);
   }
 
-  /** Paint pixels on an x-plane face: u along y, v up in z. */
+  /** One world-unit cell on an x-plane face (u along y, v up in z). */
   onX(x: number, y: number, z: number, c: number) {
-    this.buf.set(Math.floor(this.sx(x, y + 1)), Math.floor(this.sy(x, y + 0.5, z + 0.5)), c);
+    this.faceX(x, y, y + 1, z, z + 1, c);
   }
 
-  /** Vertical run on a y-plane face at world x, from z0 up to z1 (exclusive). */
+  /** Visit the pixels of a y-plane cell. */
+  cellY(y: number, x: number, z: number, fn: (px: number, py: number) => void) {
+    this.buf.polyEach([this.p(x, y, z + 1), this.p(x + 1, y, z + 1), this.p(x + 1, y, z), this.p(x, y, z)], fn);
+  }
+
+  cellX(x: number, y: number, z: number, fn: (px: number, py: number) => void) {
+    this.buf.polyEach([this.p(x, y, z + 1), this.p(x, y + 1, z + 1), this.p(x, y + 1, z), this.p(x, y, z)], fn);
+  }
+
+  /** A thin (1px) horizontal line on a y-plane face at height z. */
+  hlineY(y: number, x0: number, x1: number, z: number, c: number) {
+    this.faceY(y, x0, x1, z, z + 1 / this.s, c);
+  }
+
+  hlineX(x: number, y0: number, y1: number, z: number, c: number) {
+    this.faceX(x, y0, y1, z, z + 1 / this.s, c);
+  }
+
+  /** A thin (1px) vertical line on a y-plane face at x. */
+  vlineY(y: number, x: number, z0: number, z1: number, c: number) {
+    this.faceY(y, x, x + 1 / this.s, z0, z1, c);
+  }
+
+  vlineX(x: number, y: number, z0: number, z1: number, c: number) {
+    this.faceX(x, y, y + 1 / this.s, z0, z1, c);
+  }
+
   runY(y: number, x: number, z0: number, z1: number, c: number) {
-    for (let z = z0; z < z1; z++) this.onY(y, x, z, c);
+    this.faceY(y, x, x + 1, z0, z1, c);
   }
 
   runX(x: number, y: number, z0: number, z1: number, c: number) {
-    for (let z = z0; z < z1; z++) this.onX(x, y, z, c);
+    this.faceX(x, y, y + 1, z0, z1, c);
   }
 
   /** Screen point for a world point, rounded to pixels. */
   at(x: number, y: number, z: number): [number, number] {
     return [Math.round(this.sx(x, y)), Math.round(this.sy(x, y, z))];
+  }
+
+  /** A small square dot of `size` pixels at a world point. */
+  dot(x: number, y: number, z: number, c: number, size = this.s) {
+    const [sx, sy] = this.at(x, y, z);
+    this.buf.rect(sx - Math.floor(size / 2), sy - Math.floor(size / 2), size, size, c);
   }
 }

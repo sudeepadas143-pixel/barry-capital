@@ -8,6 +8,7 @@
 import type { Look } from '../sim/types';
 import { HAIRS, SKINS, SUITS, TIES, shade } from '../art/palette';
 import { rgba } from './buffer';
+import { renderFigure } from '../art/figure';
 
 export interface SpriteImage {
   w: number;
@@ -247,17 +248,21 @@ export function sprite(look: Look, pose: Pose, frame: number, glasses = false): 
   const key = `${look.skin}${look.hair}${look.hairStyle}${look.suit}${look.tie}|${pose}|${frame}|${glasses ? 1 : 0}`;
   const hit = cache.get(key);
   if (hit) return hit;
-  const grid = poseGrid(pose, frame, look.hairStyle, glasses);
-  const pal = paletteFor(look);
-  const w = grid[0].length;
-  const h = grid.length;
-  const px = new Uint32Array(w * h);
-  for (let y = 0; y < h; y++)
-    for (let x = 0; x < w; x++) {
-      const c = pal[grid[y][x]];
-      if (c) px[y * w + x] = c;
-    }
-  const img = { w, h, px };
+  let img: SpriteImage;
+  if (overrides?.get(pose)?.length) {
+    // Hand-drawn sheets, palette-swapped from their key colours.
+    const grid = poseGrid(pose, frame, look.hairStyle, glasses);
+    const pal = paletteFor(look);
+    const w = grid[0].length;
+    const h = grid.length;
+    const px = new Uint32Array(w * h);
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const c = pal[grid[y][x]];
+        if (c) px[y * w + x] = c;
+      }
+    img = { w, h, px };
+  } else img = renderFigure(look, pose, frame, { glasses });
   if (cache.size > 800) cache.clear();
   cache.set(key, img);
   return img;

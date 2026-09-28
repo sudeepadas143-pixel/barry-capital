@@ -91,7 +91,7 @@ export class Renderer {
       const a = actors.find((x) => x.desk === data.hotDesk && x.layer === 'seated');
       if (a) {
         const [sx, sy] = this.screenPoint(a);
-        marker(f, sx, sy - 30, t);
+        marker(f, sx, sy - 62, t);
       }
     }
     return f;

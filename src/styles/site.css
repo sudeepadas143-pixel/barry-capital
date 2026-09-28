@@ -70,6 +70,9 @@ button {
   image-rendering: crisp-edges;
   display: block;
 }
+.figure {
+  display: block;
+}
 
 .sr-only {
   position: absolute;
@@ -1230,7 +1233,7 @@ input[type='range'] {
     top: calc(var(--header-h) + 12px);
   }
   .scene-frame {
-    max-width: min(100%, calc((100vh - var(--header-h) - 84px) * 312 / 516));
+    max-width: min(100%, calc((100vh - var(--header-h) - 84px) * 624 / 1032));
   }
   .home-grid {
     display: grid;

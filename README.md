@@ -101,10 +101,16 @@ every device sees the same firm at the same minute, with no server.
 **The page** reads the state once a second. Each minute's trades are stamped across the
 following minute, so the feed fills in gradually rather than all at once.
 
-**The building** (`src/scene/`) is drawn into a 312×516 pixel buffer with a small
-isometric rasterizer (no WebGL), then scaled up by whole numbers with nearest-neighbour
-sampling. Traders are palette-swapped from one base sprite. See
-[ART_GUIDE.md](ART_GUIDE.md) for dropping in hand-drawn art.
+**The building** (`src/scene/`) is drawn into a 624×1032 pixel buffer with a small
+isometric rasterizer (no WebGL). The canvas matches the device's pixels: exact
+whole-number scales stay pixel-exact, and anything else is resampled smoothly.
+
+**The traders** (`src/art/figure.ts`) are drawn from shaded shapes (face, hair, jacket,
+lapels, tie, arms, legs) with a thin selective outline. One body is palette-swapped per
+trader. The same renderer draws the 50px figures in the building, the large hire-page
+portrait and the headshots, each at the screen's own pixel density. Plants and the office
+cat use it too (`src/art/props.ts`). See [ART_GUIDE.md](ART_GUIDE.md) for dropping in
+hand-drawn art.
 
 **Your own hire** runs on the same board with its own random stream. It never touches
 the shared state, and it lives only in your browser (`localStorage`), along with follows

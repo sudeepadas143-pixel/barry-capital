@@ -1,29 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Look } from '../sim/types';
-import { headshotGrid, HEAD_H, HEAD_W } from '../art/headshot';
-import { paletteFor, type PaletteMap } from '../art/palette';
-import { sprite, type Pose } from '../scene/sprites';
+import { renderBust, renderFigure, type Pose, type SpriteImage } from '../art/figure';
 
-export function paintGrid(
-  ctx: CanvasRenderingContext2D,
-  grid: string[],
-  pal: PaletteMap,
-  ox = 0,
-  oy = 0,
-  flip = false,
-) {
-  const w = grid[0]?.length ?? 0;
-  for (let y = 0; y < grid.length; y++) {
-    const row = grid[y];
-    for (let x = 0; x < row.length; x++) {
-      const k = row[x];
-      if (k === '.' || k === ' ') continue;
-      const c = pal[k];
-      if (!c) continue;
-      ctx.fillStyle = c;
-      ctx.fillRect(ox + (flip ? w - 1 - x : x), oy + y, 1, 1);
-    }
-  }
+const bustCache = new Map<string, SpriteImage>();
+const lookKey = (l: Look) => `${l.skin}${l.hair}${l.hairStyle}${l.suit}${l.tie}`;
+
+function dpr() {
+  return typeof window === 'undefined' ? 2 : Math.min(3, Math.max(1, window.devicePixelRatio || 1));
+}
+
+function paint(c: HTMLCanvasElement | null, img: SpriteImage) {
+  const ctx = c?.getContext('2d');
+  if (!c || !ctx) return;
+  const data = ctx.createImageData(img.w, img.h);
+  new Uint32Array(data.data.buffer).set(img.px);
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.putImageData(data, 0, 0);
 }
 
 interface Props {
@@ -34,21 +26,24 @@ interface Props {
   label?: string;
 }
 
-/** A trader's headshot, drawn at 16x16 and upscaled with crisp pixels. */
+/** A trader's head and shoulders, drawn at the screen's pixel density. */
 export function Headshot({ look, size = 32, glasses, className, label }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const ctx = ref.current?.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, HEAD_W, HEAD_H);
-    paintGrid(ctx, headshotGrid(look.hairStyle, glasses), paletteFor(look));
-  }, [look.skin, look.hair, look.hairStyle, look.suit, look.tie, glasses]);
+  const px = Math.round(size * dpr());
+  const key = `${lookKey(look)}|${px}|${glasses ? 1 : 0}`;
+  let img = bustCache.get(key);
+  if (!img) {
+    img = renderBust(look, px, glasses);
+    if (bustCache.size > 300) bustCache.clear();
+    bustCache.set(key, img);
+  }
+  useEffect(() => paint(ref.current, img!), [img]);
   return (
     <canvas
       ref={ref}
-      width={HEAD_W}
-      height={HEAD_H}
-      className={`pixel ${className ?? ''}`}
+      width={img.w}
+      height={img.h}
+      className={`figure ${className ?? ''}`}
       style={{ width: size, height: size }}
       role={label ? 'img' : undefined}
       aria-label={label}
@@ -57,40 +52,51 @@ export function Headshot({ look, size = 32, glasses, className, label }: Props) 
   );
 }
 
-/** A full-body sprite, drawn at native size and scaled up with crisp pixels. */
+const figCache = new Map<string, SpriteImage>();
+
+/** A full-length figure. `height` is in CSS pixels. With `animate`, it walks on the spot. */
 export function Figure({
   look,
   pose = 'stand',
-  frame = 0,
-  scale = 4,
+  height = 140,
   glasses,
   label,
+  animate = false,
 }: {
   look: Look;
   pose?: Pose;
-  frame?: number;
-  scale?: number;
+  height?: number;
   glasses?: boolean;
   label?: string;
+  animate?: boolean;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const img = sprite(look, pose, frame, glasses);
+  const [frame, setFrame] = useState(0);
   useEffect(() => {
-    const c = ref.current;
-    const ctx = c?.getContext('2d');
-    if (!c || !ctx) return;
-    const data = ctx.createImageData(img.w, img.h);
-    new Uint32Array(data.data.buffer).set(img.px);
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.putImageData(data, 0, 0);
-  }, [img]);
+    if (!animate) {
+      setFrame(0);
+      return;
+    }
+    const id = window.setInterval(() => setFrame((f) => (f + 1) % 8), 110);
+    return () => window.clearInterval(id);
+  }, [animate]);
+  const d = dpr();
+  const scale = (height * d) / 60;
+  const key = `${lookKey(look)}|${pose}|${frame}|${Math.round(scale * 100)}|${glasses ? 1 : 0}`;
+  let img = figCache.get(key);
+  if (!img) {
+    img = renderFigure(look, pose, frame, { scale, glasses });
+    if (figCache.size > 120) figCache.clear();
+    figCache.set(key, img);
+  }
+  useEffect(() => paint(ref.current, img!), [img]);
   return (
     <canvas
       ref={ref}
       width={img.w}
       height={img.h}
-      className="pixel"
-      style={{ width: img.w * scale, height: img.h * scale }}
+      className="figure"
+      style={{ width: img.w / d, height: img.h / d }}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}

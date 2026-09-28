@@ -99,6 +99,33 @@ export class PixelBuffer {
     }
   }
 
+  /** Visit the pixels a convex polygon covers (same sampling as `poly`). */
+  polyEach(pts: [number, number][], fn: (x: number, y: number) => void) {
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const [, y] of pts) {
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+    const n = pts.length;
+    for (let py = Math.max(0, Math.floor(minY)); py <= Math.min(this.h - 1, Math.ceil(maxY)); py++) {
+      const yc = py + 0.5;
+      let xl = Infinity;
+      let xr = -Infinity;
+      for (let i = 0; i < n; i++) {
+        const [ax, ay] = pts[i];
+        const [bx, by] = pts[(i + 1) % n];
+        if (ay === by) continue;
+        if ((yc < ay && yc < by) || (yc > ay && yc > by)) continue;
+        const x = ax + ((yc - ay) * (bx - ax)) / (by - ay);
+        if (x < xl) xl = x;
+        if (x > xr) xr = x;
+      }
+      if (xl === Infinity) continue;
+      for (let x = Math.max(0, Math.ceil(xl - 0.5)); x < Math.min(this.w, Math.ceil(xr - 0.5)); x++) fn(x, py);
+    }
+  }
+
   /** Copy every non-transparent pixel of `src` over this buffer. */
   over(src: PixelBuffer) {
     const s = src.data;

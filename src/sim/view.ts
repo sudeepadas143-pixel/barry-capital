@@ -3,6 +3,7 @@
  * are held back, so each minute's trades trickle into the feed as it passes.
  */
 import { change1h } from './coins';
+import { dress } from '../art/traits';
 import { THEME_LABEL } from './names';
 import { SIM } from './params';
 import { holderCount } from './payout';
@@ -25,7 +26,7 @@ export function toTrader(t: TraderState, s: SimState): Trader {
     name: t.name,
     desk: t.desk,
     archetype: t.archetype,
-    look: t.look,
+    look: dress(t.look, t.archetype, t.seed, t.local ? undefined : t.name),
     status: t.status,
     hiredTick: t.hiredTick,
     resultPct: resultPct(t),

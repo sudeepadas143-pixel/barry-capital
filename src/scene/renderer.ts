@@ -5,10 +5,10 @@
  */
 import { PixelBuffer, Sparse } from './buffer';
 import { buildScene, type Built } from './building';
-import { animPass, doorPass, marker, type SceneData } from './anim';
+import { animPass, doorPass, heliPass, marker, type SceneData } from './anim';
 import type { Actor } from './actors';
 import { Iso } from './iso';
-import { H, OX, OY, W } from './layout';
+import { H, OX, OY, S, W } from './layout';
 import { sprite, type SpriteImage } from './sprites';
 
 export interface CustomArt {
@@ -55,7 +55,7 @@ export class Renderer {
     if (custom?.fg) this.customFg = new Sparse(custom.fg);
   }
 
-  private screenPoint(a: Actor): [number, number] {
+  screenPoint(a: Actor): [number, number] {
     if (this.custom?.seats && a.layer === 'seated' && a.desk !== undefined) {
       const p = this.custom.seats.get(a.desk);
       if (p) return p;
@@ -86,12 +86,13 @@ export class Renderer {
       this.front.draw(f);
       doorPass(this.iso, this.built, t, doorSpin);
       for (const a of actors) if (a.layer === 'outside') this.drawActor(a);
+      heliPass(f, this.built, t);
     }
     if (data.hotDesk !== null) {
       const a = actors.find((x) => x.desk === data.hotDesk && x.layer === 'seated');
       if (a) {
         const [sx, sy] = this.screenPoint(a);
-        marker(f, sx, sy - 62, t);
+        marker(f, sx, sy - 33 * S, t);
       }
     }
     return f;

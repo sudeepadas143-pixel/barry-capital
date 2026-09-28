@@ -12,7 +12,32 @@ export const TIES = ['#8b2f30', '#b88a38', '#3e6a4e', '#3a5580', '#c27b87', '#22
 export const SUIT_NAMES = ['navy', 'charcoal', 'flannel grey', 'tobacco', 'black', 'olive'];
 export const TIE_NAMES = ['burgundy', 'brass', 'bottle green', 'club blue', 'dusty pink', 'black'];
 export const HAIR_NAMES = ['black', 'dark brown', 'chestnut', 'sandy', 'grey', 'white', 'auburn'];
-export const HAIR_STYLE_NAMES = ['side part', 'short crop', 'receding', 'swept back'];
+export const HAIR_STYLE_NAMES = [
+  'side part',
+  'short crop',
+  'receding',
+  'slicked back',
+  'buzz cut',
+  'bald',
+  'curly top',
+  'pompadour',
+  'man bun',
+  'long',
+  'bob',
+  'ponytail',
+  'bun',
+  'afro',
+];
+/** Shirts: white, pale blue, pink, lavender, blue stripe. */
+export const SHIRTS = ['#f6f3ec', '#cfe0f2', '#f2cfd6', '#ddd3ee', '#d8e6f5'];
+export const SHIRT_NAMES = ['white', 'pale blue', 'pink', 'lavender', 'blue stripe'];
+/** Fleece vests and turtlenecks. */
+export const VESTS = ['#6d737c', '#33405a', '#2a2b30', '#59603f'];
+export const OUTFIT_NAMES = ['suit', 'pinstripe suit', 'fleece vest', 'shirtsleeves and braces', 'waistcoat', 'turtleneck and blazer', 'double-breasted'];
+export const NECK_NAMES = ['tie', 'loosened tie', 'bow tie', 'open collar', 'lanyard'];
+export const EYES_NAMES = ['nothing', 'sunglasses, indoors', 'glasses', 'headset', 'earpiece'];
+export const FACE_NAMES = ['clean-shaven', 'stubble', 'beard', 'moustache', 'goatee'];
+export const BUILD_NAMES = ['slim', 'average', 'broad'];
 
 export const INK = '#1d1c19';
 export const SHIRT = '#f4f1e8';

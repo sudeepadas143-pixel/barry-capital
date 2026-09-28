@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Look } from '../sim/types';
-import { renderBust, renderFigure, type Pose, type SpriteImage } from '../art/figure';
+import { lookKey, renderBust, renderFigure, type Pose, type SpriteImage } from '../art/figure';
 
 const bustCache = new Map<string, SpriteImage>();
-const lookKey = (l: Look) => `${l.skin}${l.hair}${l.hairStyle}${l.suit}${l.tie}`;
 
 function dpr() {
   return typeof window === 'undefined' ? 2 : Math.min(3, Math.max(1, window.devicePixelRatio || 1));

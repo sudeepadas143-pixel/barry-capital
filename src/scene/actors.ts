@@ -3,7 +3,8 @@
  * scripted walks cover arrivals, the replay, and escorts out of the building.
  */
 import { PARTNER_LOOK } from '../art/partner';
-import type { FirmState, Look, Trader } from '../sim/types';
+import type { ArchetypeId, FirmState, Look, Trader } from '../sim/types';
+import { SAYS } from '../copy';
 import { DESK_COUNT } from '../../firm.config';
 import { BAY_X, CORRIDOR_Y, DESK, ELEVATOR, PARTNER_SPOTS, SEAT_Y, deskSpot, floorZ } from './layout';
 import type { Pose } from './sprites';
@@ -112,7 +113,81 @@ function inDeskBay(x: number, y: number): boolean {
   return BAY_X.some((cx) => x > cx - 22 && x < cx + 22);
 }
 
+export interface Speech {
+  text: string;
+  tone: 'buy' | 'win' | 'loss' | 'smug' | 'partner';
+}
+
+function hashInt(a: number, b: number) {
+  let h = (a * 374761393 + b * 668265263) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+const h01 = (a: number, b: number) => hashInt(a, b) / 4294967296;
+
+const BASE: Partial<Record<Pose, number>> = { sit: 4, phone: 2, leanback: 1.5, point: 1, coffee: 1.4 };
+const BY_METHOD: Record<ArchetypeId, Partial<Record<Pose, number>>> = {
+  permabull: { leanback: 2.5, phone: 1 },
+  trend: { phone: 3, point: 1 },
+  dip: { phone: 1.5 },
+  sniper: { phone: 2.5, sit: 1 },
+  diamond: { leanback: 3 },
+  fiver: { point: 1.5 },
+  intern: { coffee: 2.5, phone: 1 },
+  quant: { sit: 3, point: 1.5, phone: -1.5 },
+  stops: { sit: 2.5 },
+  narrative: { leanback: 1.5, point: 1.5 },
+  averager: { phone: 1.5, coffee: 1 },
+  contrarian: { leanback: 2.5 },
+};
+const SAY_FOR: Partial<Record<Pose, keyof typeof SAYS>> = { phone: 'phone', celebrate: 'win', leanback: 'smug', slump: 'loss', point: 'point', coffee: 'coffee' };
+const TONE: Record<keyof typeof SAYS, Speech['tone']> = { phone: 'buy', win: 'win', smug: 'smug', loss: 'loss', point: 'buy', coffee: 'smug', partner: 'partner' };
+
+/** What a seated trader is doing right now. */
+function mood(tr: Trader, desk: number, t: number, reduced: boolean, isTop: boolean, isBottom: boolean): { pose: Pose; frame: number; say?: Speech } {
+  const w: Partial<Record<Pose, number>> = { ...BASE };
+  for (const [k, v] of Object.entries(BY_METHOD[tr.archetype] ?? {})) w[k as Pose] = Math.max(0, (w[k as Pose] ?? 0) + (v as number));
+  if (tr.resultPct > 5) w.leanback = (w.leanback ?? 0) + 2;
+  if (isTop && tr.resultPct > 0) w.celebrate = 3.5;
+  if (tr.resultPct < -5) w.phone = (w.phone ?? 0) + 1;
+  if (isBottom && tr.resultPct < -5) w.slump = 6;
+  else if (tr.resultPct < -15) w.slump = 2;
+  const len = 6 + (desk % 4);
+  const phase = (desk * 1.7) % len;
+  const slot = Math.floor((t + phase) / len);
+  const into = (t + phase) % len;
+  const entries = Object.entries(w).filter(([, v]) => (v as number) > 0) as [Pose, number][];
+  const total = entries.reduce((a, [, v]) => a + v, 0);
+  let r = h01(desk * 131 + slot, 17) * total;
+  let pose: Pose = 'sit';
+  for (const [k, v] of entries) {
+    r -= v;
+    if (r < 0) {
+      pose = k;
+      break;
+    }
+  }
+  if (reduced) return { pose: isBottom && tr.resultPct < -5 ? 'slump' : isTop && tr.resultPct > 0 ? 'leanback' : 'sit', frame: 0 };
+  const frame =
+    pose === 'sit' ? (into % 5 < 3.6 ? Math.floor(t * 6 + desk) % 2 : 2)
+    : pose === 'phone' ? Math.floor(t * 2.6 + desk) % 4
+    : pose === 'leanback' ? Math.floor(t / 1.5) % 2
+    : pose === 'point' ? Math.floor(t * 3) % 2
+    : pose === 'coffee' ? (into % 4 < 1.2 ? 0 : into % 4 < 2 ? 1 : 2)
+    : pose === 'celebrate' ? Math.floor(t * 3) % 2
+    : Math.floor(t / 1.6) % 2;
+  const cat = SAY_FOR[pose];
+  let say: Speech | undefined;
+  if (cat && into < 3.4 && h01(desk * 7 + slot, 29) < 0.5) {
+    const lines = SAYS[cat];
+    say = { text: lines[hashInt(desk + slot * 13, 3) % lines.length], tone: TONE[cat] };
+  }
+  return { pose, frame, say };
+}
+
 export class Director {
+  /** Speech bubbles for the current frame, by actor id. */
+  speech = new Map<string, Speech>();
   private scripts: Script[] = [];
   private seen = new Set<string>();
   private replayUntil = 0;
@@ -202,7 +277,8 @@ export class Director {
       out.push(this.walker(s, seg.from.level, x, y, pose, frame));
     }
 
-    // Seated traders.
+    // Seated traders: each one's mood rotates, weighted by method and by how the day is going.
+    this.speech = new Map();
     const seated = state.traders.filter((x) => x.desk);
     const ranked = [...seated].sort((a, b) => b.resultPct - a.resultPct);
     const top = ranked[0];
@@ -214,21 +290,14 @@ export class Director {
       if (pending.has(desk) || walking.has(tr.id)) continue;
       const spot = deskSpot(desk);
       if (!spot) continue;
-      const phase = (desk * 1.7) % 5;
-      let pose: Pose = 'sit';
-      let frame = 2;
-      if (!reduced) {
-        const cyc = (t + phase) % 7;
-        frame = cyc < 5 ? Math.floor(t * 6 + desk) % 2 : 2;
-      }
-      if (tr === top && top.resultPct > 0 && ((t + phase) % 9 < 2.6 || reduced)) {
-        pose = 'celebrate';
-        frame = reduced ? 0 : Math.floor(t * 3) % 2;
-      } else if (tr === bottom && bottom.resultPct < -5) {
-        pose = 'slump';
-        frame = reduced ? 0 : Math.floor(t / 1.6) % 2;
-      }
-      out.push({ id: tr.id, look: tr.look, level: spot.level, x: spot.x, y: SEAT_Y, z: spot.z, pose, frame, layer: 'seated', desk });
+      const m = mood(tr, desk, t, reduced, tr === top, tr === bottom);
+      out.push({ id: tr.id, look: tr.look, level: spot.level, x: spot.x, y: SEAT_Y, z: spot.z, pose: m.pose, frame: m.frame, layer: 'seated', desk });
+      // Speech: fresh trades first, then whatever the mood says.
+      const last = tr.recent[0];
+      if (last && state.at - last.at >= 0 && state.at - last.at < 4500) {
+        const pct = last.pnlPct !== undefined ? ` ${last.pnlPct >= 0 ? '+' : '−'}${Math.abs(last.pnlPct).toFixed(0)}%` : '';
+        this.speech.set(tr.id, { text: last.side === 'BUY' ? `Long $${last.ticker}.` : `Out of $${last.ticker}${pct}.`, tone: last.side === 'BUY' ? 'buy' : (last.pnlPct ?? 0) >= 0 ? 'win' : 'loss' });
+      } else if (m.say) this.speech.set(tr.id, m.say);
     }
 
     // The managing partner.
@@ -260,7 +329,9 @@ export class Director {
     let x = replaying ? 204 : spot.x;
     const y = replaying ? CORRIDOR_Y : spot.y;
     let pose: Pose = key === 'server' ? 'back' : 'stand';
-    let frame = 0;
+    let frame = reduced ? 0 : Math.floor(t / 2.4) % 2;
+    const talk = Math.floor(t / 23);
+    if (!reduced && t % 23 < 3.6) this.speech.set('partner', { text: SAYS.partner[hashInt(talk, 5) % SAYS.partner.length], tone: 'partner' });
     if (!replaying && spot.pace && !reduced) {
       // Pace back and forth with pauses at each end.
       const period = 10;

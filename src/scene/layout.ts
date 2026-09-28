@@ -7,12 +7,14 @@
  */
 import { DESK_COUNT } from '../../firm.config';
 
-/** Pixels per world unit. The scene is drawn at twice the old pixel-art density. */
-export const S = 2;
-export const W = 312 * S;
-export const H = 516 * S;
+/** Pixels per world unit. */
+export const S = 3;
+export const W = 316 * S;
+export const H = 560 * S;
 export const OX = 32 * S;
-export const OY = 306 * S;
+export const OY = 352 * S;
+/** How far the tower rises above the partner's floor before fading out. */
+export const TOWER_H = 58;
 
 /** Building length, depth, floor-to-floor height and slab thickness. */
 export const X = 236;

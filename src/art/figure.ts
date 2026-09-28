@@ -1,18 +1,31 @@
 /**
- * Procedural character renderer. Each trader is built from shaded shapes
- * (head, hair, jacket, shirt, tie, arms, legs) at any scale, then given a thin
- * selective outline. One body, palette-swapped per trader.
+ * Procedural character renderer. Traders are built from shaded shapes at any
+ * scale, then given a thin selective outline. Every trader shares one rig but
+ * differs in build, height, haircut, facial hair, outfit, shirt, neckwear and
+ * accessories (see traits.ts), and in how they carry themselves.
  *
- * Design units: a standing figure is 50 units tall, feet at y = 0, up is negative.
- * At scale 1 a unit is one pixel, which is the scene's resolution.
+ * Design units: a standing figure of average height is 50 units tall, feet at
+ * y = 0, up is negative. Scale 1 means one unit per pixel.
  */
 import type { Look } from '../sim/types';
-import { HAIRS, SKINS, SUITS, TIES, shade } from './palette';
+import { HAIRS, SHIRTS, SKINS, SUITS, TIES, VESTS, shade } from './palette';
 
-export type Pose = 'stand' | 'walk' | 'back' | 'sit' | 'celebrate' | 'slump' | 'box' | 'backbox';
+export type Pose =
+  | 'stand'
+  | 'walk'
+  | 'back'
+  | 'sit'
+  | 'celebrate'
+  | 'slump'
+  | 'box'
+  | 'backbox'
+  | 'leanback'
+  | 'phone'
+  | 'point'
+  | 'coffee';
 
 export const POSE_FRAMES: Record<Pose, number> = {
-  stand: 1,
+  stand: 2,
   walk: 8,
   back: 8,
   sit: 3,
@@ -20,6 +33,10 @@ export const POSE_FRAMES: Record<Pose, number> = {
   slump: 2,
   box: 8,
   backbox: 8,
+  leanback: 2,
+  phone: 4,
+  point: 2,
+  coffee: 3,
 };
 
 export interface SpriteImage {
@@ -44,6 +61,8 @@ export function mix(a: number, b: number, t: number): number {
   return ((255 << 24) | (m(16) << 16) | (m(8) << 8) | m(0)) >>> 0;
 }
 
+const hx = (c: string, a = 0) => rgba(a ? shade(c, a) : c);
+
 interface Pal {
   skin: number;
   skinS: number;
@@ -54,23 +73,42 @@ interface Pal {
   suit: number;
   suitS: number;
   suitH: number;
+  stripe: number;
   trou: number;
   trouS: number;
   shirt: number;
   shirtS: number;
+  shirtStripe: number;
   tie: number;
   tieS: number;
+  tieH: number;
+  vest: number;
+  vestS: number;
+  vestH: number;
   shoe: number;
   shoeH: number;
   eye: number;
+  iris: number;
   white: number;
   mouth: number;
+  lips: number;
+  teeth: number;
   blush: number;
   box: number;
   boxS: number;
   boxH: number;
   tape: number;
+  gold: number;
+  goldS: number;
   frame: number;
+  lens: number;
+  lensH: number;
+  brace: number;
+  phone: number;
+  cup: number;
+  cupS: number;
+  cigar: number;
+  ember: number;
   ink: number;
 }
 
@@ -79,40 +117,60 @@ function palette(look: Look): Pal {
   const hair = HAIRS[look.hair % HAIRS.length];
   const suit = SUITS[look.suit % SUITS.length];
   const tie = TIES[look.tie % TIES.length];
+  const shirt = SHIRTS[(look.shirt ?? 0) % SHIRTS.length];
+  const turtle = look.outfit === 5;
+  const vest = turtle ? VESTS[(look.suit + 2) % VESTS.length] : VESTS[(look.suit + look.tie) % VESTS.length];
   const light = hair === HAIRS[5] || hair === HAIRS[4];
+  const dark = look.skin >= 3;
   return {
-    skin: rgba(skin),
-    skinS: rgba(shade(skin, -0.14)),
-    skinH: rgba(shade(skin, 0.07)),
-    hair: rgba(hair),
-    hairS: rgba(shade(hair, light ? -0.18 : -0.22)),
-    hairH: rgba(shade(hair, light ? 0.08 : 0.35)),
-    suit: rgba(suit),
-    suitS: rgba(shade(suit, -0.26)),
-    suitH: rgba(shade(suit, 0.2)),
-    trou: rgba(shade(suit, -0.18)),
-    trouS: rgba(shade(suit, -0.4)),
-    shirt: rgba('#f6f3ec'),
-    shirtS: rgba('#d9d3c6'),
-    tie: rgba(tie),
-    tieS: rgba(shade(tie, -0.28)),
-    shoe: rgba('#211d1a'),
-    shoeH: rgba('#4a433c'),
-    eye: rgba('#231e1b'),
-    white: rgba('#fbf8f2'),
-    mouth: rgba(shade(skin, -0.38)),
-    blush: rgba('#e8907f'),
-    box: rgba('#c79a62'),
-    boxS: rgba('#a67c48'),
-    boxH: rgba('#dcb47d'),
-    tape: rgba('#e9d9a6'),
-    frame: rgba('#5a4520'),
-    ink: rgba('#1d1a17'),
+    skin: hx(skin),
+    skinS: hx(skin, -0.14),
+    skinH: hx(skin, 0.08),
+    hair: hx(hair),
+    hairS: hx(hair, light ? -0.18 : -0.24),
+    hairH: hx(hair, light ? 0.08 : 0.38),
+    suit: hx(suit),
+    suitS: hx(suit, -0.28),
+    suitH: hx(suit, 0.22),
+    stripe: hx(suit, 0.45),
+    trou: hx(suit, -0.16),
+    trouS: hx(suit, -0.4),
+    shirt: hx(shirt),
+    shirtS: hx(shirt, -0.13),
+    shirtStripe: hx('#8fb0d8'),
+    tie: hx(tie),
+    tieS: hx(tie, -0.3),
+    tieH: hx(tie, 0.25),
+    vest: hx(vest),
+    vestS: hx(vest, -0.25),
+    vestH: hx(vest, 0.2),
+    shoe: hx('#221d1a'),
+    shoeH: hx('#56493f'),
+    eye: hx('#1f1a17'),
+    iris: hx(['#4a3524', '#3f5a6e', '#4b5d3a', '#2e2219'][look.hair % 4]),
+    white: hx('#fbf8f2'),
+    mouth: hx(skin, -0.4),
+    lips: look.fem ? hx('#b3504f', dark ? -0.2 : 0) : hx(skin, -0.22),
+    teeth: hx('#fbf6ec'),
+    blush: hx('#e8907f'),
+    box: hx('#c79a62'),
+    boxS: hx('#a67c48'),
+    boxH: hx('#dcb47d'),
+    tape: hx('#e9d9a6'),
+    gold: hx('#e0b54a'),
+    goldS: hx('#a5812c'),
+    frame: hx('#3b2f25'),
+    lens: hx('#18181c'),
+    lensH: hx('#6f8fb0'),
+    brace: hx(['#7a2a2a', '#222226', '#2f4a73', '#6e5a2a'][look.tie % 4]),
+    phone: hx('#1c1d22'),
+    cup: hx('#f3efe6'),
+    cupS: hx('#c9bfae'),
+    cigar: hx('#6b4428'),
+    ember: hx('#ff8a3c'),
+    ink: hx('#1b1815'),
   };
 }
-
-const LEAF = rgba('#5a8a55');
-const LEAF_S = rgba('#3f6a42');
 
 // ---------------------------------------------------------------- shapes
 
@@ -141,6 +199,25 @@ export const capsule = (ax: number, ay: number, bx: number, by: number, r: numbe
   ];
 };
 
+/** A capsule that tapers from ra to rb. */
+export const taper = (ax: number, ay: number, bx: number, by: number, ra: number, rb: number): [Test, Box] => {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const len2 = dx * dx + dy * dy || 1e-6;
+  const r = Math.max(ra, rb);
+  return [
+    (x, y) => {
+      let t = ((x - ax) * dx + (y - ay) * dy) / len2;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const px = ax + t * dx - x;
+      const py = ay + t * dy - y;
+      const rr = ra + (rb - ra) * t;
+      return px * px + py * py <= rr * rr;
+    },
+    [Math.min(ax, bx) - r, Math.min(ay, by) - r, Math.max(ax, bx) + r, Math.max(ay, by) + r],
+  ];
+};
+
 export const poly = (pts: [number, number][]): [Test, Box] => {
   const xs = pts.map((p) => p[0]);
   const ys = pts.map((p) => p[1]);
@@ -164,6 +241,7 @@ export const union = (...s: [Test, Box][]): [Test, Box] => [
 ];
 
 export const clip = (a: [Test, Box], b: Test): [Test, Box] => [(x, y) => a[0](x, y) && b(x, y), a[1]];
+const minus = (a: [Test, Box], b: [Test, Box]): [Test, Box] => [(x, y) => a[0](x, y) && !b[0](x, y), a[1]];
 
 // ---------------------------------------------------------------- painter
 
@@ -187,8 +265,8 @@ export class Painter {
   }
 
   /**
-   * Fill a shape with a base colour, a shaded rim on the right (away from the light)
-   * and an optional highlight rim on the upper left.
+   * Fill a shape with a base colour, a shaded rim on the right (away from the
+   * light), an optional darker bottom rim and a highlight on the upper left.
    */
   part([test, box]: [Test, Box], base: number, opts: { shade?: number; sd?: number; hi?: number; hd?: number; bottom?: number; bd?: number; only?: number[] } = {}) {
     const { s, ox, oy } = this;
@@ -196,11 +274,10 @@ export class Painter {
     const x1 = Math.min(this.w - 1, Math.ceil(box[2] * s + ox) + 1);
     const y0 = Math.max(0, Math.floor(box[1] * s + oy) - 1);
     const y1 = Math.min(this.h - 1, Math.ceil(box[3] * s + oy) + 1);
-    // Rim widths are in pixels at scales above 1, so detail stays fine as figures grow.
-    const px = 1 / s;
-    const sd = (opts.sd ?? 1.2) * Math.max(px, Math.min(1, 1.6 / s) );
-    const hd = (opts.hd ?? 0.9) * Math.max(px, Math.min(1, 1.6 / s));
-    const bd = (opts.bd ?? 1) * Math.max(px, Math.min(1, 1.6 / s));
+    const unit = Math.max(1 / s, Math.min(1, 1.7 / s));
+    const sd = (opts.sd ?? 1.2) * unit;
+    const hd = (opts.hd ?? 0.9) * unit;
+    const bd = (opts.bd ?? 1) * unit;
     for (let py = y0; py <= y1; py++) {
       const y = (py + 0.5 - oy) / s;
       for (let pxl = x0; pxl <= x1; pxl++) {
@@ -218,20 +295,11 @@ export class Painter {
   }
 
   dot(x: number, y: number, c: number, r = 0.5) {
-    const cx = x * this.s + this.ox;
-    const cy = y * this.s + this.oy;
-    const rr = Math.max(0.5, r * this.s);
-    for (let py = Math.floor(cy - rr); py <= Math.ceil(cy + rr); py++)
-      for (let pxl = Math.floor(cx - rr); pxl <= Math.ceil(cx + rr); pxl++) {
-        if (pxl < 0 || py < 0 || pxl >= this.w || py >= this.h) continue;
-        const dx = pxl + 0.5 - cx;
-        const dy = py + 0.5 - cy;
-        if (dx * dx + dy * dy <= rr * rr) this.px[py * this.w + pxl] = c;
-      }
+    this.part(ellipse(x, y, Math.max(r, 0.5 / this.s), Math.max(r, 0.5 / this.s)), c);
   }
 
-  /** A 1px (at scale 1) line in design units. */
-  line(ax: number, ay: number, bx: number, by: number, c: number, r = 0.45) {
+  /** A thin line in design units, at least one pixel wide. */
+  line(ax: number, ay: number, bx: number, by: number, c: number, r = 0.4) {
     this.part(capsule(ax, ay, bx, by, Math.max(r, 0.5 / this.s)), c);
   }
 
@@ -244,7 +312,7 @@ export class Painter {
       }
   }
 
-  /** Selective outline: every empty pixel touching the figure takes a dark version of its neighbour. */
+  /** Selective outline: empty pixels touching the figure take a dark version of their neighbour. */
   outline(ink: number) {
     const { w, h, px } = this;
     const out = px.slice();
@@ -257,270 +325,671 @@ export class Painter {
         else if (x < w - 1 && px[i + 1]) n = px[i + 1];
         else if (y > 0 && px[i - w]) n = px[i - w];
         else if (y < h - 1 && px[i + w]) n = px[i + w];
-        if (n) out[i] = mix(n, ink, 0.72);
+        if (n) out[i] = mix(n, ink, 0.74);
       }
     px.set(out);
   }
 }
 
-// ---------------------------------------------------------------- body
+// ---------------------------------------------------------------- rig
+
+type P2 = [number, number];
 
 interface Arm {
-  sh: [number, number];
-  el: [number, number];
-  hd: [number, number];
+  sh: P2;
+  el: P2;
+  hd: P2;
+  /** Hand hidden (in a pocket, behind the head). */
+  hide?: boolean;
+  fist?: boolean;
+  /** Drawn after the head (hands at the face). */
+  over?: boolean;
+  finger?: P2;
 }
+
+type Mouth = 'smirk' | 'grin' | 'shout' | 'talk' | 'frown' | 'line' | 'sip';
 
 interface Rig {
   facing: 'front' | 'back';
-  /** Vertical offset of the whole upper body (sitting lowers it). */
+  /** How far the upper body is lowered (sitting). */
   up: number;
   bob: number;
-  legs: 'stand' | 'sit' | 'none';
+  legs: 'stand' | 'sit';
   footL: number;
   footR: number;
   armL: Arm;
   armR: Arm;
-  mouth: 'line' | 'smile' | 'open';
+  mouth: Mouth;
+  brow: 'cocky' | 'flat' | 'up' | 'down';
   head: 'up' | 'down';
+  headDx: number;
   box: boolean;
+  phone?: boolean;
+  cup?: P2;
 }
 
-function standArms(swing: number, up: number): [Arm, Arm] {
-  const L: Arm = { sh: [-6.9, -33.6 + up], el: [-7.9 - swing * 0.3, -27.2 + up], hd: [-7.6 - swing, -21.2 + up + Math.abs(swing) * 0.3] };
-  const R: Arm = { sh: [6.9, -33.6 + up], el: [7.9 + swing * 0.3, -27.2 + up], hd: [7.6 + swing, -21.2 + up + Math.abs(swing) * 0.3] };
-  return [L, R];
+function sideArms(up: number): [Arm, Arm] {
+  return [
+    { sh: [-7, -33.6 + up], el: [-7.9, -27.2 + up], hd: [-7.6, -21.2 + up] },
+    { sh: [7, -33.6 + up], el: [7.9, -27.2 + up], hd: [7.6, -21.2 + up] },
+  ];
 }
 
 function rigFor(pose: Pose, frame: number): Rig {
   const f = frame % POSE_FRAMES[pose];
-  const walkPhase = (f / 8) * Math.PI * 2;
+  const ph = (f / 8) * Math.PI * 2;
   const walking = pose === 'walk' || pose === 'back' || pose === 'box' || pose === 'backbox';
-  const lift = (p: number) => Math.max(0, Math.sin(p)) * 2.2;
-  const bob = walking ? -Math.abs(Math.sin(walkPhase)) * 0.8 : 0;
-  const base: Rig = {
+  const lift = (p: number) => Math.max(0, Math.sin(p)) * 2.3;
+  const bob = walking ? -Math.abs(Math.sin(ph)) * 0.9 : 0;
+  const [L0, R0] = sideArms(bob);
+  const r: Rig = {
     facing: pose === 'back' || pose === 'backbox' ? 'back' : 'front',
     up: 0,
     bob,
     legs: 'stand',
-    footL: walking ? lift(walkPhase) : 0,
-    footR: walking ? lift(walkPhase + Math.PI) : 0,
-    armL: standArms(0, 0)[0],
-    armR: standArms(0, 0)[1],
-    mouth: 'line',
+    footL: walking ? lift(ph) : 0,
+    footR: walking ? lift(ph + Math.PI) : 0,
+    armL: L0,
+    armR: R0,
+    mouth: 'smirk',
+    brow: 'cocky',
     head: 'up',
+    headDx: 0,
     box: pose === 'box' || pose === 'backbox',
   };
-  if (walking && !base.box) {
-    // Arms swing opposite the legs; seen from the front that reads as the hands rising and falling.
-    const sw = Math.sin(walkPhase) * 1.3;
-    const [L, R] = standArms(0, bob);
-    L.hd = [L.hd[0] - Math.abs(sw) * 0.3, L.hd[1] - sw];
-    L.el = [L.el[0], L.el[1] - sw * 0.4];
-    R.hd = [R.hd[0] + Math.abs(sw) * 0.3, R.hd[1] + sw];
-    R.el = [R.el[0], R.el[1] + sw * 0.4];
-    base.armL = L;
-    base.armR = R;
+  const seated = () => {
+    r.up = 11;
+    r.legs = 'sit';
+  };
+  switch (pose) {
+    case 'stand': {
+      // Hands in pockets, chest out, the occasional smug look.
+      r.armL = { sh: [-7, -33.6], el: [-9.2, -27.6], hd: [-5.6, -22.4], hide: true };
+      r.armR = { sh: [7, -33.6], el: [9.2, -27.6], hd: [5.6, -22.4], hide: true };
+      r.headDx = f ? 0.4 : 0;
+      break;
+    }
+    case 'walk':
+    case 'back': {
+      const sw = Math.sin(ph) * 1.4;
+      r.armL = { ...L0, el: [L0.el[0], L0.el[1] - sw * 0.4], hd: [L0.hd[0] - Math.abs(sw) * 0.3, L0.hd[1] - sw] };
+      r.armR = { ...R0, el: [R0.el[0], R0.el[1] + sw * 0.4], hd: [R0.hd[0] + Math.abs(sw) * 0.3, R0.hd[1] + sw] };
+      r.mouth = 'smirk';
+      break;
+    }
+    case 'box':
+    case 'backbox':
+      r.armL = { sh: [-7, -33.6 + bob], el: [-8.8, -28.4 + bob], hd: [-8, -25.4 + bob] };
+      r.armR = { sh: [7, -33.6 + bob], el: [8.8, -28.4 + bob], hd: [8, -25.4 + bob] };
+      r.mouth = 'frown';
+      r.brow = 'up';
+      break;
+    case 'sit': {
+      seated();
+      const tL = f === 0 ? -0.9 : 0;
+      const tR = f === 1 ? -0.9 : 0;
+      r.armL = { sh: [-7, -22.6], el: [-8.4, -16.8], hd: [-4, -13.2 + tL] };
+      r.armR = { sh: [7, -22.6], el: [8.4, -16.8], hd: [4, -13.2 + tR] };
+      r.mouth = 'line';
+      r.brow = 'down';
+      break;
+    }
+    case 'leanback': {
+      // Hands behind the head, elbows wide, very pleased with the position.
+      seated();
+      r.up = 12 + (f ? 0.3 : 0);
+      r.armL = { sh: [-7, -22.8], el: [-12.2, -30.5], hd: [-3.8, -35.8], hide: true };
+      r.armR = { sh: [7, -22.8], el: [12.2, -30.5], hd: [3.8, -35.8], hide: true };
+      r.mouth = f ? 'grin' : 'smirk';
+      r.brow = 'cocky';
+      break;
+    }
+    case 'phone': {
+      seated();
+      r.armR = { sh: [7, -22.6], el: [9.8, -21.4], hd: [6.4, -32.4], over: true };
+      r.phone = true;
+      const g = [0, 1, 2, 1][f];
+      r.armL =
+        g === 2
+          ? { sh: [-7, -22.6], el: [-11, -25.2], hd: [-10.6, -31.8], fist: true }
+          : { sh: [-7, -22.6], el: [-9.6, -18.2], hd: [-7.4 + g, -16.4 - g * 2] };
+      r.mouth = f % 2 ? 'shout' : 'talk';
+      r.brow = f === 2 ? 'down' : 'up';
+      break;
+    }
+    case 'point': {
+      // Standing behind the desk, jabbing at the screen.
+      r.armR = { sh: [7, -33.6], el: [12.2, -37.6], hd: [16 + f * 0.5, -40.6 - f * 0.4], fist: true, finger: [18.4 + f * 0.5, -42 - f * 0.4] };
+      r.armL = { sh: [-7, -33.6], el: [-10.2, -28.2], hd: [-6.8, -24.4], hide: true };
+      r.mouth = 'shout';
+      r.brow = 'down';
+      r.headDx = 0.5;
+      break;
+    }
+    case 'coffee': {
+      seated();
+      const up = f < 2;
+      r.armR = up ? { sh: [7, -22.6], el: [9.6, -19.4], hd: [3.4, -28.2], over: true } : { sh: [7, -22.6], el: [8.8, -17.2], hd: [6.2, -14.4] };
+      r.cup = up ? [3.4, -29.6] : [6.4, -15.8];
+      r.armL = { sh: [-7, -22.6], el: [-8.4, -16.8], hd: [-4, -13.4] };
+      r.mouth = up && f === 0 ? 'sip' : 'smirk';
+      break;
+    }
+    case 'celebrate': {
+      const hgt = f ? -1.4 : 0;
+      r.bob = f ? -0.9 : 0;
+      r.armL = { sh: [-7, -33.6 + r.bob], el: [-11, -39.6 + hgt], hd: [-9.6, -48.4 + hgt], fist: true };
+      r.armR = { sh: [7, -33.6 + r.bob], el: [11, -39.6 + hgt], hd: [9.6, -48.4 + hgt], fist: true };
+      r.mouth = 'shout';
+      r.brow = 'up';
+      break;
+    }
+    case 'slump': {
+      // Head in hand, staring at a red screen.
+      seated();
+      r.up = 13 + (f ? 0.5 : 0);
+      r.head = 'down';
+      r.armL = { sh: [-7, -21.6], el: [-7.6, -15.6], hd: [5, -15.4] };
+      r.armR = { sh: [7, -21.6], el: [9.2, -18.4], hd: [3.4 + (f ? 0.4 : 0), -29.2], over: true };
+      r.mouth = 'frown';
+      r.brow = 'up';
+      break;
+    }
   }
-  if (base.box) {
-    base.armL = { sh: [-6.9, -33.6 + bob], el: [-8.6, -28.4 + bob], hd: [-7.9, -25.4 + bob] };
-    base.armR = { sh: [6.9, -33.6 + bob], el: [8.6, -28.4 + bob], hd: [7.9, -25.4 + bob] };
-  }
-  if (pose === 'sit' || pose === 'slump') {
-    base.up = 11;
-    base.legs = 'sit';
-    const tL = f === 0 ? -0.9 : 0;
-    const tR = f === 1 ? -0.9 : 0;
-    base.armL = { sh: [-6.9, -22.6], el: [-8.2, -16.8], hd: [-3.9, -13.2 + tL] };
-    base.armR = { sh: [6.9, -22.6], el: [8.2, -16.8], hd: [3.9, -13.2 + tR] };
-  }
-  if (pose === 'slump') {
-    base.head = 'down';
-    base.up = 14 + (f === 1 ? 0.6 : 0);
-    base.armL = { sh: [-6.9, -19.6], el: [-7.6, -15.6], hd: [5.2, -15.4] };
-    base.armR = { sh: [6.9, -19.6], el: [7.6, -16.2], hd: [-5.2, -16.4] };
-  }
-  if (pose === 'celebrate') {
-    const h = f === 1 ? -1.2 : 0;
-    base.bob = f === 1 ? -0.8 : 0;
-    base.armL = { sh: [-6.9, -33.6 + base.bob], el: [-10.6, -39.4 + h], hd: [-9.4, -47.8 + h] };
-    base.armR = { sh: [6.9, -33.6 + base.bob], el: [10.6, -39.4 + h], hd: [9.4, -47.8 + h] };
-    base.mouth = 'open';
-  }
-  return base;
+  return r;
 }
 
-function drawArm(p: Painter, a: Arm, c: Pal, front: boolean) {
-  const r = 2.05;
-  p.part(capsule(a.sh[0], a.sh[1], a.el[0], a.el[1], r), c.suit, { shade: c.suitS, hi: c.suitH });
-  p.part(capsule(a.el[0], a.el[1], a.hd[0], a.hd[1] - 0.9, r * 0.95), c.suit, { shade: c.suitS, hi: c.suitH });
-  if (!front) return;
-  // Cuff and hand.
+// ---------------------------------------------------------------- figure
+
+interface Body {
+  /** Width multiplier for the torso, shoulders and arms. */
+  bw: number;
+  /** Height multiplier for the body below the head. */
+  hf: number;
+  look: Look;
+  c: Pal;
+  partner: boolean;
+}
+
+const X = (b: Body, x: number) => x * b.bw;
+const Yb = (b: Body, y: number) => y * b.hf;
+
+function armPoints(b: Body, a: Arm): Arm {
+  const f = (p: P2): P2 => [X(b, p[0]), Yb(b, p[1])];
+  return { ...a, sh: f(a.sh), el: f(a.el), hd: f(a.hd), finger: a.finger ? f(a.finger) : undefined };
+}
+
+function drawArm(p: Painter, b: Body, arm: Arm, front: boolean) {
+  const a = armPoints(b, arm);
+  const { c, look } = b;
+  const jacket = look.outfit === 0 || look.outfit === 1 || look.outfit === 5 || look.outfit === 6;
+  const rolled = look.outfit === 3;
+  const sleeve = jacket ? c.suit : c.shirt;
+  const sleeveS = jacket ? c.suitS : c.shirtS;
+  const sleeveH = jacket ? c.suitH : mix(c.shirt, 0xffffffff, 0.3);
+  const r = 2.05 * Math.min(1.12, b.bw);
+  p.part(capsule(a.sh[0], a.sh[1], a.el[0], a.el[1], r), sleeve, { shade: sleeveS, hi: sleeveH });
+  if (rolled && front) {
+    // Sleeves rolled to the elbow.
+    p.part(capsule(a.el[0], a.el[1], a.hd[0], a.hd[1], r * 0.8), c.skin, { shade: c.skinS, hi: c.skinH });
+    p.part(ellipse(a.el[0], a.el[1], r * 1.02, r * 0.75), c.shirtS, { hi: c.shirt });
+  } else p.part(capsule(a.el[0], a.el[1], a.hd[0], a.hd[1] - 0.6, r * 0.94), sleeve, { shade: sleeveS, hi: sleeveH });
+  if (!front || a.hide) return;
   const dx = a.hd[0] - a.el[0];
   const dy = a.hd[1] - a.el[1];
   const len = Math.hypot(dx, dy) || 1;
   const ux = dx / len;
   const uy = dy / len;
-  p.part(capsule(a.hd[0] - ux * 1.4, a.hd[1] - uy * 1.4, a.hd[0] - ux * 0.7, a.hd[1] - uy * 0.7, 1.55), c.shirt, { shade: c.shirtS });
-  p.part(ellipse(a.hd[0] + ux * 0.4, a.hd[1] + uy * 0.4, 1.55, 1.75), c.skin, { shade: c.skinS, hi: c.skinH });
+  if (!rolled) p.part(capsule(a.hd[0] - ux * 1.3, a.hd[1] - uy * 1.3, a.hd[0] - ux * 0.6, a.hd[1] - uy * 0.6, 1.5), c.shirt, { shade: c.shirtS });
+  if (look.watch && arm.sh[0] < 0) p.part(capsule(a.hd[0] - ux * 2.1, a.hd[1] - uy * 2.1, a.hd[0] - ux * 1.6, a.hd[1] - uy * 1.6, 1.25), c.gold, { shade: c.goldS });
+  const hr = a.fist ? 1.75 : 1.6;
+  p.part(ellipse(a.hd[0] + ux * 0.5, a.hd[1] + uy * 0.5, hr, hr * 1.08), c.skin, { shade: c.skinS, hi: c.skinH });
+  if (a.fist) p.line(a.hd[0] - 0.8, a.hd[1] + 0.2, a.hd[0] + 0.8, a.hd[1] + 0.2, c.skinS, 0.25);
+  if (a.finger) p.part(taper(a.hd[0] + ux * 1.2, a.hd[1] + uy * 1.2, a.finger[0], a.finger[1], 0.75, 0.55), c.skin, { shade: c.skinS });
 }
 
-function drawLegs(p: Painter, rig: Rig, c: Pal) {
-  if (rig.legs === 'none') return;
-  if (rig.legs === 'sit') {
-    // Thighs toward the viewer, mostly behind the desk.
-    p.part(poly([[-6.4, -12], [-0.4, -12], [-0.8, -4], [-6, -4]]), c.trou, { shade: c.trouS });
-    p.part(poly([[0.4, -12], [6.4, -12], [6, -4], [0.8, -4]]), c.trou, { shade: c.trouS });
+function drawLegs(p: Painter, b: Body, r: Rig) {
+  const { c } = b;
+  if (r.legs === 'sit') {
+    p.part(poly([[X(b, -6.4), -12], [X(b, -0.4), -12], [X(b, -0.8), -4], [X(b, -6), -4]]), c.trou, { shade: c.trouS });
+    p.part(poly([[X(b, 0.4), -12], [X(b, 6.4), -12], [X(b, 6), -4], [X(b, 0.8), -4]]), c.trou, { shade: c.trouS });
     return;
   }
   for (const [side, lift] of [
-    [-1, rig.footL],
-    [1, rig.footR],
+    [-1, r.footL],
+    [1, r.footR],
   ] as const) {
-    const x = side * 3.1;
-    p.part(capsule(x, -21 + rig.bob, x + side * 0.2, -3.2 - lift, 2.55), c.trou, { shade: c.trouS, hi: rig.facing === 'front' ? undefined : undefined });
-    p.part(ellipse(x + side * 0.4, -1.5 - lift, 3.1, 1.75), c.shoe, { hi: c.shoeH });
+    const x = X(b, side * 3.1);
+    const hip = Yb(b, -21) + r.bob;
+    const w = b.look.fem ? 2.3 : 2.6 * Math.min(1.1, b.bw);
+    p.part(taper(x, hip, x + side * 0.2, -3.2 - lift, w, w * 0.88), c.trou, { shade: c.trouS, hi: mix(c.trou, 0xffffffff, 0.08) });
+    // Crease.
+    p.line(x - side * 0.2, hip + 3, x, -4.5 - lift, c.trouS, 0.18);
+    p.part(ellipse(x + side * 0.5, -1.5 - lift, b.look.fem ? 2.6 : 3.2, 1.75), c.shoe, { hi: c.shoeH });
   }
 }
 
-function drawTorso(p: Pal, pn: Painter, rig: Rig, partner: boolean) {
-  const y = (v: number) => v + rig.up + rig.bob;
-  const jacket = union(
+function torsoShape(b: Body, y: (v: number) => number, jacket: boolean): [Test, Box] {
+  const sw = b.look.fem ? 7.1 : 7.7;
+  const ww = b.look.fem ? 5.6 : 6.3;
+  return union(
     poly([
-      [-7.7, y(-35.2)],
-      [7.7, y(-35.2)],
-      [6.3, y(-24)],
-      [6.8, y(-19.3)],
-      [-6.8, y(-19.3)],
-      [-6.3, y(-24)],
+      [X(b, -sw), y(-35.2)],
+      [X(b, sw), y(-35.2)],
+      [X(b, ww), y(-24)],
+      [X(b, jacket ? 6.8 : 6.2), y(-19.3)],
+      [X(b, jacket ? -6.8 : -6.2), y(-19.3)],
+      [X(b, -ww), y(-24)],
     ]),
-    ellipse(-5.7, y(-33.9), 2.7, 1.9),
-    ellipse(5.7, y(-33.9), 2.7, 1.9),
+    ellipse(X(b, -(sw - 2)), y(-33.9), 2.7 * b.bw, 1.9),
+    ellipse(X(b, sw - 2), y(-33.9), 2.7 * b.bw, 1.9),
   );
-  pn.part(jacket, p.suit, { shade: p.suitS, hi: p.suitH, bottom: p.suitS });
-  // Neck.
-  pn.part(poly([[-1.7, y(-38.6)], [1.7, y(-38.6)], [1.8, y(-34.6)], [-1.8, y(-34.6)]]), p.skin, { shade: p.skinS });
-  if (rig.facing === 'back') {
-    pn.line(0, y(-34), 0, y(-19.8), p.suitS, 0.35);
-    pn.part(poly([[-2.6, y(-36)], [2.6, y(-36)], [2.2, y(-34.6)], [-2.2, y(-34.6)]]), p.suitS);
+}
+
+function drawNeckwear(p: Painter, b: Body, y: (v: number) => number, V: Test) {
+  const { c, look } = b;
+  const neck = look.fem && look.neck === 0 ? 3 : look.neck ?? 0;
+  if (neck === 2) {
+    // Bow tie.
+    p.part(poly([[-2.3, y(-35.9)], [0, y(-35.1)], [-2.3, y(-34.1)]]), c.tie, { shade: c.tieS });
+    p.part(poly([[2.3, y(-35.9)], [0, y(-35.1)], [2.3, y(-34.1)]]), c.tieS);
+    p.part(ellipse(0, y(-35.05), 0.7, 0.7), c.tieH);
     return;
   }
-  // Shirt V, collar, tie.
+  if (neck === 3) {
+    // Open collar.
+    p.part(poly([[-1.5, y(-35.8)], [1.5, y(-35.8)], [0, y(-32.2)]]), c.skin, { shade: c.skinS });
+    return;
+  }
+  const low = neck === 1 ? 2.4 : 0;
+  if (low) p.part(poly([[-1.6, y(-35.8)], [1.6, y(-35.8)], [0, y(-32.4)]]), c.skin, { shade: c.skinS });
+  const tie = clip(poly([[-1.1, y(-34.2 + low)], [1.1, y(-34.2 + low)], [1.6, y(-28.3 + low * 0.3)], [0, y(-26.2)], [-1.6, y(-28.3 + low * 0.3)]]), V);
+  p.part(tie, c.tie, { shade: c.tieS, hi: c.tieH });
+  p.part(ellipse(0, y(-34.6 + low), 1.25, 0.95), c.tie, { shade: c.tieS });
+  if (neck === 4) {
+    // Lanyard and a visitor-style badge.
+    p.line(-2.2, y(-35.4), -0.8, y(-27.6), c.tieS, 0.25);
+    p.line(2.2, y(-35.4), 0.8, y(-27.6), c.tieS, 0.25);
+    p.part(poly([[-1.6, y(-27.8)], [1.6, y(-27.8)], [1.6, y(-24.6)], [-1.6, y(-24.6)]]), c.white, { shade: c.cupS });
+    p.part(poly([[-1.6, y(-27.8)], [1.6, y(-27.8)], [1.6, y(-26.9)], [-1.6, y(-26.9)]]), c.tie);
+  }
+}
+
+function drawTorso(p: Painter, b: Body, r: Rig) {
+  const { c, look } = b;
+  const y = (v: number) => Yb(b, v) + r.up + r.bob;
+  const outfit = look.outfit ?? 0;
+  const jacket = outfit === 0 || outfit === 1 || outfit === 5 || outfit === 6;
+  const turtle = outfit === 5;
+  // Neck.
+  const nw = look.fem ? 1.45 : 1.8;
+  p.part(poly([[-nw, y(-38.6) - (1 - b.hf) * 2], [nw, y(-38.6) - (1 - b.hf) * 2], [nw + 0.1, y(-34.6)], [-nw - 0.1, y(-34.6)]]), c.skin, { shade: c.skinS });
+  const body = torsoShape(b, y, jacket);
+
+  if (r.facing === 'back') {
+    const col = jacket ? c.suit : outfit === 2 ? c.vest : c.shirt;
+    const colS = jacket ? c.suitS : outfit === 2 ? c.vestS : c.shirtS;
+    p.part(body, col, { shade: colS, hi: jacket ? c.suitH : undefined, bottom: colS });
+    if (jacket) p.line(0, y(-34), 0, y(-20), c.suitS, 0.3);
+    if (outfit === 3) {
+      p.line(X(b, -3.2), y(-35), X(b, -0.4), y(-24), c.brace, 0.5);
+      p.line(X(b, 3.2), y(-35), X(b, 0.4), y(-24), c.brace, 0.5);
+    }
+    if (outfit === 4) p.part(poly([[X(b, -6), y(-33)], [X(b, 6), y(-33)], [X(b, 6.2), y(-19.6)], [X(b, -6.2), y(-19.6)]]), c.suit, { shade: c.suitS });
+    p.part(poly([[-2.6, y(-36)], [2.6, y(-36)], [2.2, y(-34.6)], [-2.2, y(-34.6)]]), turtle ? c.vest : jacket ? c.suitS : c.shirtS);
+    return;
+  }
+
+  // The shirt underneath everything.
   const V = poly([
     [-2.7, y(-35.8)],
     [2.7, y(-35.8)],
     [0, y(-26.2)],
   ]);
-  pn.part(V, p.shirt, { shade: p.shirtS });
-  pn.part(poly([[-2.7, y(-35.9)], [-0.3, y(-35.2)], [-1.4, y(-33)]]), p.shirt, { shade: p.shirtS });
-  pn.part(poly([[2.7, y(-35.9)], [0.3, y(-35.2)], [1.4, y(-33)]]), p.shirtS);
-  const tie = clip(poly([[-1.1, y(-34.2)], [1.1, y(-34.2)], [1.6, y(-28.5)], [0, y(-26.4)], [-1.6, y(-28.5)]]), V[0]);
-  pn.part(tie, p.tie, { shade: p.tieS });
-  pn.part(ellipse(0, y(-34.6), 1.25, 0.95), p.tie, { shade: p.tieS });
-  // Lapels.
-  pn.part(poly([[-2.7, y(-35.6)], [-4.3, y(-35.4)], [-1.2, y(-27.4)], [-0.2, y(-26.6)]]), p.suitH);
-  pn.part(poly([[2.7, y(-35.6)], [4.3, y(-35.4)], [1.2, y(-27.4)], [0.2, y(-26.6)]]), p.suitS);
-  // Buttons.
-  pn.dot(0, y(-24.6), p.suitS, 0.45);
-  pn.dot(0, y(-22.2), p.suitS, 0.45);
-  // Breast pocket (a pocket square for the partner).
-  if (partner) pn.part(poly([[3.2, y(-30.6)], [5.4, y(-30.6)], [4.8, y(-29.4)], [3.6, y(-29.8)]]), p.shirt);
-  else pn.line(3.3, y(-30.2), 5.3, y(-30.2), p.suitS, 0.3);
-}
+  if (!jacket) {
+    p.part(body, c.shirt, { shade: c.shirtS, hi: mix(c.shirt, 0xffffffff, 0.35), bottom: c.shirtS });
+    if (look.shirt === 4) for (let x = -6; x <= 6; x += 1.4) p.part(clip(capsule(X(b, x), y(-35), X(b, x), y(-19.5), 0.18), body[0]), c.shirtStripe);
+    // Placket and buttons.
+    p.line(0, y(-33), 0, y(-19.6), c.shirtS, 0.2);
+    for (const v of [-30, -26.5, -23]) p.dot(0.4, y(v), c.shirtS, 0.3);
+    // Belt.
+    p.part(poly([[X(b, -6.2), y(-20.6)], [X(b, 6.2), y(-20.6)], [X(b, 6.2), y(-19.3)], [X(b, -6.2), y(-19.3)]]), c.shoe);
+    p.part(poly([[-0.8, y(-20.5)], [0.8, y(-20.5)], [0.8, y(-19.4)], [-0.8, y(-19.4)]]), c.gold);
+  }
 
-function hairShapes(style: number, cy: number): { back: [Test, Box]; cap: [Test, Box]; part?: [number, number, number, number] } {
-  const back = ellipse(0, cy - 1.1, 6.95, 6.9);
-  switch (style % 4) {
-    case 0: {
-      // Side part with a swept fringe.
-      const cap = clip(ellipse(0, cy - 3.2, 6.85, 5.3), (x, y) => y < cy - 3.3 + 0.24 * (x + 3.5) - (x < -2 ? 0.6 : 0));
-      return { back, cap, part: [-2.3, cy - 7.9, -2.1, cy - 4.8] };
+  if (outfit === 2) {
+    // Fleece vest over the shirt: the uniform of the trend.
+    const vestShape = union(
+      poly([
+        [X(b, -5.6), y(-35.4)],
+        [X(b, -2.6), y(-35.6)],
+        [0, y(-31.6)],
+        [X(b, 2.6), y(-35.6)],
+        [X(b, 5.6), y(-35.4)],
+        [X(b, 6.1), y(-24)],
+        [X(b, 6.6), y(-19.2)],
+        [X(b, -6.6), y(-19.2)],
+        [X(b, -6.1), y(-24)],
+      ]),
+    );
+    p.part(vestShape, c.vest, { shade: c.vestS, hi: c.vestH, bottom: c.vestS });
+    p.line(0, y(-31.4), 0, y(-19.4), c.vestS, 0.25);
+    p.part(poly([[X(b, 2.2), y(-30.4)], [X(b, 4.4), y(-30.4)], [X(b, 4.4), y(-29.2)], [X(b, 2.2), y(-29.2)]]), mix(c.vest, 0xffffffff, 0.55));
+    p.part(poly([[-2.8, y(-36)], [2.8, y(-36)], [2.4, y(-34.6)], [-2.4, y(-34.6)]]), c.vestS);
+  }
+  if (outfit === 3) {
+    // Braces.
+    p.part(capsule(X(b, -3.4), y(-35.2), X(b, -2.6), y(-20.6), 0.55), c.brace, { shade: mix(c.brace, 0xff000000, 0.3) });
+    p.part(capsule(X(b, 3.4), y(-35.2), X(b, 2.6), y(-20.6), 0.55), c.brace, { shade: mix(c.brace, 0xff000000, 0.3) });
+    for (const x of [-2.6, 2.6]) p.dot(X(b, x), y(-21.2), c.gold, 0.35);
+  }
+  if (outfit === 4) {
+    // Waistcoat.
+    const w = poly([
+      [X(b, -5.8), y(-33.4)],
+      [X(b, -2.2), y(-33.4)],
+      [0, y(-27.8)],
+      [X(b, 2.2), y(-33.4)],
+      [X(b, 5.8), y(-33.4)],
+      [X(b, 6.2), y(-20.4)],
+      [0.8, y(-18.8)],
+      [-0.8, y(-18.8)],
+      [X(b, -6.2), y(-20.4)],
+    ]);
+    p.part(w, c.suit, { shade: c.suitS, hi: c.suitH });
+    for (const v of [-26.2, -24, -21.8]) p.dot(0, y(v), c.gold, 0.32);
+    p.line(X(b, 1.6), y(-23.4), X(b, 4.6), y(-22.4), c.gold, 0.18);
+  }
+
+  if (jacket) {
+    if (turtle) p.part(body, c.vest, { shade: c.vestS });
+    const coat = outfit === 5 ? minus(body, poly([[-3.6, y(-36)], [3.6, y(-36)], [2.2, y(-19)], [-2.2, y(-19)]])) : body;
+    p.part(coat, c.suit, { shade: c.suitS, hi: c.suitH, bottom: c.suitS });
+    if (outfit === 1) for (let x = -6.6; x <= 6.6; x += 1.5) p.part(clip(capsule(X(b, x), y(-34.8), X(b, x * 0.95), y(-19.4), 0.14), coat[0]), c.stripe);
+    if (turtle) {
+      p.part(poly([[-2.6, y(-37.2)], [2.6, y(-37.2)], [2.8, y(-34.4)], [-2.8, y(-34.4)]]), c.vest, { shade: c.vestS, hi: c.vestH });
+      for (const v of [-36.6, -35.6]) p.line(-2.4, y(v), 2.4, y(v), c.vestS, 0.14);
+    } else {
+      p.part(V, c.shirt, { shade: c.shirtS });
+      if (look.shirt === 4) for (let x = -2.4; x <= 2.4; x += 1.2) p.part(clip(capsule(x, y(-36), x, y(-26), 0.16), V[0]), c.shirtStripe);
+      p.part(poly([[-2.7, y(-35.9)], [-0.3, y(-35.2)], [-1.4, y(-33)]]), c.shirt, { shade: c.shirtS });
+      p.part(poly([[2.7, y(-35.9)], [0.3, y(-35.2)], [1.4, y(-33)]]), c.shirtS);
+      drawNeckwear(p, b, y, V[0]);
     }
-    case 1: {
-      const cap = clip(ellipse(0, cy - 2.6, 6.55, 5.1), (_x, y) => y < cy - 3.8);
-      return { back: ellipse(0, cy - 0.9, 6.6, 6.6), cap };
-    }
-    case 2: {
-      // Receding: sides and a thin band at the crown.
-      const cap = clip(ellipse(0, cy - 2.4, 6.7, 5.4), (x, y) => (Math.abs(x) > 3.9 && y < cy - 1.4) || y < cy - 6.6);
-      return { back, cap };
-    }
-    default: {
-      // Swept back, with volume.
-      const cap = clip(ellipse(0, cy - 3.9, 7.1, 5.8), (x, y) => y < cy - 3.9 - 0.08 * Math.abs(x));
-      return { back: ellipse(0, cy - 1.6, 7.1, 7.2), cap };
-    }
+    // Lapels.
+    const dbl = outfit === 6;
+    p.part(poly([[-2.7, y(-35.6)], [-4.5, y(-35.4)], [dbl ? -2.4 : -1.2, y(-27.4)], [-0.2, y(-26.6)]]), c.suitH);
+    p.part(poly([[2.7, y(-35.6)], [4.5, y(-35.4)], [dbl ? 2.4 : 1.2, y(-27.4)], [0.2, y(-26.6)]]), c.suitS);
+    if (dbl) {
+      for (const v of [-25, -22.6]) {
+        p.dot(-1.8, y(v), c.suitS, 0.4);
+        p.dot(1.8, y(v), c.suitS, 0.4);
+      }
+    } else for (const v of [-24.6, -22.2]) p.dot(0, y(v), c.suitS, 0.42);
+    // Pocket square, or a plain breast pocket.
+    if (b.partner || outfit === 6 || outfit === 1) p.part(poly([[X(b, 3.2), y(-30.8)], [X(b, 5.4), y(-30.8)], [X(b, 4.9), y(-29.4)], [X(b, 3.7), y(-29.8)]]), b.partner ? c.gold : c.white);
+    else p.line(X(b, 3.3), y(-30.2), X(b, 5.3), y(-30.2), c.suitS, 0.28);
+  } else if (outfit !== 2) {
+    // Collar and neckwear on a shirt with no jacket.
+    p.part(poly([[-2.7, y(-35.9)], [-0.3, y(-35.2)], [-1.6, y(-33)]]), c.shirt, { shade: c.shirtS });
+    p.part(poly([[2.7, y(-35.9)], [0.3, y(-35.2)], [1.6, y(-33)]]), c.shirtS);
+    drawNeckwear(p, b, y, () => true);
+  } else {
+    // Open collar under the vest.
+    p.part(poly([[-1.5, y(-35.4)], [1.5, y(-35.4)], [0, y(-32.4)]]), c.skin, { shade: c.skinS });
   }
 }
 
-function drawHead(pn: Painter, c: Pal, rig: Rig, style: number, glasses: boolean) {
-  const down = rig.head === 'down';
-  const cy = -44.6 + rig.up + rig.bob + (down ? 2.6 : 0);
-  const hs = hairShapes(style, cy);
-  const detailed = pn.s >= 2;
-  if (rig.facing === 'back' || down) {
-    pn.part(ellipse(-6.1, cy + 0.6, 1.2, 1.8), c.skin, { shade: c.skinS });
-    pn.part(ellipse(6.1, cy + 0.6, 1.2, 1.8), c.skinS);
-    pn.part(ellipse(0, cy, 6.2, 7), c.skin, { shade: c.skinS });
-    // Hair over nearly all of the head.
-    const cover = down ? clip(union(hs.back, hs.cap, ellipse(0, cy, 6.4, 7.1)), (_x, y) => y < cy + 3.4) : clip(union(hs.back, ellipse(0, cy, 6.4, 7.1)), (_x, y) => y < cy + 4.6);
-    if (style % 4 === 2 && !down) {
-      pn.part(clip(ellipse(0, cy, 6.4, 7.1), (x, y) => y < cy + 4.6 && (Math.abs(x) > 2.6 || y > cy - 1)), c.hair, { shade: c.hairS, hi: c.hairH });
-    } else pn.part(cover, c.hair, { shade: c.hairS, hi: c.hairH });
+// ---------------------------------------------------------------- head
+
+interface HairSet {
+  back?: [Test, Box];
+  cap?: [Test, Box];
+  /** Extra shape drawn on top: bun, quiff. */
+  top?: [Test, Box];
+  /** Long hair falling behind the shoulders. */
+  long?: [Test, Box];
+  part?: [number, number, number, number];
+  bald?: boolean;
+  shaved?: boolean;
+}
+
+function bumps(cx: number, cy: number, rx: number, ry: number, n: number, r: number): [Test, Box] {
+  const s: [Test, Box][] = [];
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI + (i / (n - 1)) * Math.PI;
+    s.push(ellipse(cx + Math.cos(a) * rx, cy + Math.sin(a) * ry, r, r));
+  }
+  return union(ellipse(cx, cy, rx, ry), ...s);
+}
+
+function hairFor(style: number, cy: number): HairSet {
+  const back = ellipse(0, cy - 1.1, 6.95, 6.9);
+  switch (style) {
+    case 0:
+      return { back, cap: clip(ellipse(0, cy - 3.2, 6.85, 5.3), (x, y) => y < cy - 3.3 + 0.24 * (x + 3.5) - (x < -2 ? 0.6 : 0)), part: [-2.3, cy - 7.9, -2.1, cy - 4.8] };
+    case 1:
+      return { back: ellipse(0, cy - 0.9, 6.6, 6.6), cap: clip(ellipse(0, cy - 2.6, 6.55, 5.1), (_x, y) => y < cy - 3.8) };
+    case 2:
+      return { back, cap: clip(ellipse(0, cy - 2.4, 6.7, 5.4), (x, y) => (Math.abs(x) > 3.9 && y < cy - 1.4) || y < cy - 6.6) };
+    case 3:
+      // Slicked straight back, with shine.
+      return { back: ellipse(0, cy - 1.6, 7.05, 7.1), cap: clip(ellipse(0, cy - 3.6, 7, 5.6), (x, y) => y < cy - 4.4 - 0.05 * Math.abs(x)) };
+    case 4:
+      return { back: ellipse(0, cy - 0.6, 6.4, 6.6), cap: clip(ellipse(0, cy - 2.2, 6.35, 5), (_x, y) => y < cy - 3.9), shaved: true };
+    case 5:
+      return { bald: true, back: clip(ellipse(0, cy, 6.6, 6.8), (x, y) => Math.abs(x) > 5 && y > cy - 2.4 && y < cy + 1.4) };
+    case 6:
+      return { back: bumps(0, cy - 2.4, 6.4, 5.6, 7, 1.7), cap: clip(bumps(0, cy - 3.2, 6.2, 4.8, 8, 1.6), (_x, y) => y < cy - 3.2) };
+    case 7:
+      // Pompadour.
+      return {
+        back: ellipse(0, cy - 1.2, 6.8, 6.8),
+        cap: clip(ellipse(0, cy - 3.4, 6.8, 5.4), (_x, y) => y < cy - 4.2),
+        top: taper(-2.6, cy - 7.6, 2.6, cy - 9.4, 3.2, 2.2),
+      };
+    case 8:
+      return {
+        back: ellipse(0, cy - 1, 6.9, 6.9),
+        cap: clip(ellipse(0, cy - 3.2, 6.9, 5.4), (_x, y) => y < cy - 4.2),
+        top: ellipse(0.6, cy - 9.8, 2.6, 2.2),
+      };
+    case 9:
+      // Long, past the shoulders.
+      return {
+        back: ellipse(0, cy - 0.6, 7.3, 7.4),
+        cap: clip(ellipse(0, cy - 2.8, 7.1, 5.6), (x, y) => y < cy - 3.6 + 0.22 * Math.abs(x + 1)),
+        long: union(poly([[-7.2, cy - 1], [7.2, cy - 1], [8, cy + 13], [-8, cy + 13]]), ellipse(0, cy + 13, 8, 2.4)),
+      };
+    case 10:
+      // Bob with a fringe.
+      return {
+        back: union(ellipse(0, cy - 0.4, 7.4, 7.3), poly([[-7.4, cy], [7.4, cy], [7.2, cy + 5.6], [-7.2, cy + 5.6]])),
+        cap: clip(ellipse(0, cy - 2.4, 7.2, 5.9), (_x, y) => y < cy - 2.6),
+      };
+    case 11:
+      // Pulled back into a high ponytail.
+      return {
+        back: ellipse(0, cy - 1, 6.8, 6.8),
+        cap: clip(ellipse(0, cy - 3, 6.8, 5.4), (_x, y) => y < cy - 4),
+        top: union(ellipse(3.8, cy - 7.4, 1.6, 1.4), taper(4.6, cy - 7, 7.2, cy + 2.4, 1.6, 0.9)),
+      };
+    case 12:
+      return {
+        back: ellipse(0, cy - 1, 6.9, 6.8),
+        cap: clip(ellipse(0, cy - 3, 6.9, 5.4), (_x, y) => y < cy - 4),
+        top: ellipse(0, cy - 8.8, 3.2, 2.6),
+      };
+    default:
+      // Afro.
+      return { back: ellipse(0, cy - 2.2, 8.8, 8.4), cap: clip(ellipse(0, cy - 3, 8.4, 7), (_x, y) => y < cy - 3.2) };
+  }
+}
+
+function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
+  const { c, look } = b;
+  const down = r.head === 'down';
+  const cy = -44.6 + r.up + r.bob + (down ? 2.2 : 0);
+  const cx = r.headDx;
+  const style = look.hairStyle % 14;
+  const hs = hairFor(style, cy);
+  const shift = (s?: [Test, Box]): [Test, Box] | undefined => (s ? [(x, y) => s[0](x - cx, y), [s[1][0] + cx, s[1][1], s[1][2] + cx, s[1][3]]] : undefined);
+  const H = { back: shift(hs.back), cap: shift(hs.cap), top: shift(hs.top) };
+  const hairOpts = { shade: c.hairS, hi: c.hairH };
+  const shaved = hs.shaved ? mix(c.hair, c.skin, 0.45) : c.hair;
+  const detailed = pn.s >= 1.4;
+
+  if (r.facing === 'back') {
+    pn.part(ellipse(cx - 6.1, cy + 0.6, 1.2, 1.8), c.skin, { shade: c.skinS });
+    pn.part(ellipse(cx + 6.1, cy + 0.6, 1.2, 1.8), c.skinS);
+    pn.part(ellipse(cx, cy, 6.2, 7), c.skin, { shade: c.skinS, hi: c.skinH });
+    if (!hs.bald) {
+      const cover = clip(union(...([H.back, ellipse(cx, cy, 6.4, 7.1), H.cap].filter(Boolean) as [Test, Box][])), (_x, y) => y < cy + (style === 10 ? 6 : 4.4));
+      pn.part(cover, shaved, hairOpts);
+      if (H.top) pn.part(H.top, c.hair, hairOpts);
+      if (style === 11) pn.part(taper(cx, cy - 6, cx + 0.8, cy + 8, 2, 1), c.hair, hairOpts);
+      if (style === 9) pn.part(poly([[cx - 7, cy], [cx + 7, cy], [cx + 7.6, cy + 13], [cx - 7.6, cy + 13]]), c.hair, hairOpts);
+    } else pn.part(H.back!, c.hair, hairOpts);
     return;
   }
-  // Hair behind the head, ears, the head.
-  pn.part(clip(hs.back, (_x, y) => y < cy + 1.5), c.hair, { shade: c.hairS });
-  pn.part(ellipse(-6.1, cy + 0.4, 1.25, 1.85), c.skin, { hi: c.skinH });
-  pn.part(ellipse(6.1, cy + 0.4, 1.25, 1.85), c.skinS);
-  pn.part(union(ellipse(0, cy, 6.15, 7), ellipse(0, cy + 2.6, 4.9, 4.6)), c.skin, { shade: c.skinS, hi: c.skinH });
-  // Face.
-  const ey = cy + 0.4;
-  if (rig.mouth === 'open' && !detailed) {
-    // Happy eyes.
-    for (const sx of [-1, 1]) {
-      pn.line(sx * 2.3 - 0.8, ey + 0.2, sx * 2.3, ey - 0.5, c.eye, 0.35);
-      pn.line(sx * 2.3, ey - 0.5, sx * 2.3 + 0.8, ey + 0.2, c.eye, 0.35);
-    }
-  } else if (detailed) {
-    for (const sx of [-1, 1]) {
-      pn.part(ellipse(sx * 2.35, ey, 1.05, 0.85), c.white);
-      pn.part(ellipse(sx * 2.35 + 0.15, ey + 0.05, 0.55, 0.7), c.eye);
-      pn.dot(sx * 2.35 - 0.05, ey - 0.25, c.white, 0.18);
-    }
-  } else {
-    for (const sx of [-1, 1]) pn.part(ellipse(sx * 2.3, ey, 0.5, 0.95), c.eye);
+
+  // Hair behind the head, ears, the head itself.
+  if (!hs.bald && H.back) pn.part(clip(H.back, (_x, y) => y < cy + (style === 10 ? 6 : 1.6)), shaved, { shade: c.hairS });
+  pn.part(ellipse(cx - 6.1, cy + 0.4, 1.25, 1.85), c.skin, { hi: c.skinH });
+  pn.part(ellipse(cx + 6.1, cy + 0.4, 1.25, 1.85), c.skinS);
+  const jaw = look.fem ? 4.5 : b.bw > 1.05 ? 5.4 : 4.9;
+  pn.part(union(ellipse(cx, cy, 6.15, 7), ellipse(cx, cy + 2.6, jaw, 4.6)), c.skin, { shade: c.skinS, hi: c.skinH });
+  if (look.fem) {
+    pn.dot(cx - 6.1, cy + 2.1, c.gold, 0.45);
   }
-  // Brows.
-  for (const sx of [-1, 1]) pn.line(sx * 1.6, ey - 2.1 - (rig.mouth === 'open' ? 0.4 : 0), sx * 3.2, ey - 2.2 + (sx > 0 ? 0 : 0), c.hairS, 0.38);
-  // Nose, cheeks, mouth.
-  pn.part(ellipse(0.55, cy + 2.5, 0.55, 0.9), c.skinS);
-  pn.tint(ellipse(-3.6, cy + 3, 1.3, 0.75), c.blush, 0.28);
-  pn.tint(ellipse(3.6, cy + 3, 1.3, 0.75), c.blush, 0.22);
-  const my = cy + 4.7;
-  if (rig.mouth === 'open') {
-    pn.part(ellipse(0, my, 1.7, 1.1), c.mouth);
-    if (detailed) pn.part(ellipse(0, my - 0.45, 1.35, 0.4), c.white);
-  } else pn.line(-1.3, my, 1.3, my, c.mouth, 0.36);
+
+  // Eyes, brows.
+  const ey = cy + 0.4 + (down ? 0.8 : 0);
+  const squint = r.brow === 'cocky';
+  for (const sx of [-1, 1]) {
+    const ex = cx + sx * 2.35;
+    if (down) {
+      pn.line(ex - 0.9, ey, ex + 0.9, ey, c.eye, 0.28);
+      continue;
+    }
+    if (detailed) {
+      pn.part(ellipse(ex, ey, 1.1, squint && sx > 0 ? 0.62 : 0.85), c.white);
+      pn.part(ellipse(ex + 0.2, ey + 0.05, 0.6, squint && sx > 0 ? 0.5 : 0.72), c.iris);
+      pn.part(ellipse(ex + 0.2, ey + 0.05, 0.3, 0.38), c.eye);
+      pn.dot(ex - 0.05, ey - 0.3, c.white, 0.16);
+      pn.line(ex - 1.1, ey - 0.75, ex + 1.1, ey - 0.75, look.fem ? c.eye : c.skinS, look.fem ? 0.26 : 0.18);
+    } else pn.part(ellipse(ex, ey, 0.5, 0.95), c.eye);
+  }
+  const brow = (sx: number) => {
+    const bx = cx + sx * 2.4;
+    const by = ey - 2.1;
+    const col = hs.bald ? c.skinS : c.hairS;
+    const w = look.fem ? 0.26 : 0.38;
+    if (r.brow === 'cocky') pn.line(bx - 1.2, by + (sx > 0 ? -0.2 : 0.3), bx + 1.2, by + (sx > 0 ? -0.9 : 0), col, w);
+    else if (r.brow === 'down') pn.line(bx - 1.2 * sx, by - 0.4, bx + 1.2 * sx, by + 0.5, col, w);
+    else if (r.brow === 'up') pn.line(bx - 1.2, by - 0.4, bx + 1.2, by - 0.7, col, w);
+    else pn.line(bx - 1.2, by, bx + 1.2, by, col, w);
+  };
+  if (!down) {
+    brow(-1);
+    brow(1);
+  }
+  // Nose, cheeks.
+  pn.part(ellipse(cx + 0.6, cy + 2.5, 0.6, 1), c.skinS);
+  pn.dot(cx - 0.2, cy + 2.2, c.skinH, 0.28);
+  pn.tint(ellipse(cx - 3.6, cy + 3, 1.3, 0.75), c.blush, look.fem ? 0.26 : 0.12);
+  pn.tint(ellipse(cx + 3.6, cy + 3, 1.3, 0.75), c.blush, look.fem ? 0.2 : 0.09);
+
+  // Facial hair.
+  const face = look.face ?? 0;
+  const fh = c.hairS;
+  const my = cy + 4.8;
+  if (face === 1) pn.tint(clip(union(ellipse(cx, cy + 2.8, 5.2, 4.6)), (_x, y) => y > cy + 3.2), fh, 0.32);
+  if (face === 2) {
+    pn.part(minus(clip(union(ellipse(cx, cy + 2.9, 5.5, 5)), (_x, y) => y > cy + 2.4), ellipse(cx, my + 0.1, 1.9, 0.9)), c.hair, hairOpts);
+  }
+  if (face === 3 || face === 4) pn.part(union(ellipse(cx - 1, my - 0.8, 1.5, 0.6), ellipse(cx + 1, my - 0.8, 1.5, 0.6)), c.hair, { shade: c.hairS });
+  if (face === 4) pn.part(ellipse(cx, my + 1.9, 1.4, 1.2), c.hair, { shade: c.hairS });
+
+  // Mouth.
+  const m = r.mouth;
+  if (m === 'shout') {
+    pn.part(ellipse(cx, my + 0.2, 1.8, 1.35), c.mouth);
+    pn.part(ellipse(cx, my - 0.55, 1.4, 0.4), c.teeth);
+  } else if (m === 'talk') pn.part(ellipse(cx, my, 1.3, 0.75), c.mouth);
+  else if (m === 'grin') {
+    pn.part(clip(ellipse(cx, my - 0.3, 2.2, 1.2), (_x, y) => y > my - 0.5), c.mouth);
+    pn.part(clip(ellipse(cx, my - 0.3, 2, 1), (_x, y) => y > my - 0.5 && y < my + 0.1), c.teeth);
+  } else if (m === 'frown') {
+    pn.line(cx - 1.4, my + 0.4, cx + 1.4, my + 0.4, c.lips, 0.28);
+    pn.line(cx - 1.4, my + 0.4, cx - 1.9, my + 1, c.lips, 0.25);
+    pn.line(cx + 1.4, my + 0.4, cx + 1.9, my + 1, c.lips, 0.25);
+  }
+  else if (m === 'sip') pn.part(ellipse(cx, my, 0.7, 0.6), c.mouth);
+  else if (m === 'smirk') {
+    pn.line(cx - 1.3, my + 0.1, cx + 0.6, my + 0.1, c.lips, 0.3);
+    pn.line(cx + 0.6, my + 0.1, cx + 1.8, my - 0.6, c.lips, 0.3);
+  } else pn.line(cx - 1.3, my, cx + 1.3, my, c.lips, 0.32);
+
   // Hair on top.
-  pn.part(hs.cap, c.hair, { shade: c.hairS, hi: c.hairH });
-  if (hs.part) pn.line(hs.part[0], hs.part[1], hs.part[2], hs.part[3], c.hairS, 0.3);
-  if (style % 4 === 3) {
-    pn.line(-3.5, cy - 7.8, -1.2, cy - 6.6, c.hairH, 0.28);
-    pn.line(0.6, cy - 8.2, 2.9, cy - 7, c.hairH, 0.28);
-  }
-  if (glasses) {
-    for (const sx of [-1, 1]) {
-      const [t] = ellipse(sx * 2.35, ey, 1.75, 1.35);
-      const [t2] = ellipse(sx * 2.35, ey, 1.25, 0.88);
-      pn.part([(x, y) => t(x, y) && !t2(x, y), [sx * 2.35 - 2, ey - 1.5, sx * 2.35 + 2, ey + 1.5]], c.frame);
+  if (hs.bald) {
+    if (H.back) pn.part(H.back, c.hair, hairOpts);
+    pn.part(ellipse(cx - 2.2, cy - 5, 1.6, 0.8), mix(c.skin, 0xffffffff, 0.35));
+  } else {
+    if (H.cap) pn.part(H.cap, shaved, hairOpts);
+    if (H.top) pn.part(H.top, c.hair, hairOpts);
+    if (hs.part) pn.line(cx + hs.part[0], hs.part[1], cx + hs.part[2], hs.part[3], c.hairS, 0.3);
+    if (style === 3) {
+      for (const [a, b2] of [
+        [-3.5, -1.2],
+        [0.4, 2.8],
+      ])
+        pn.line(cx + a, cy - 8.3, cx + b2, cy - 7.2, c.hairH, 0.26);
     }
-    pn.line(-0.7, ey - 0.3, 0.7, ey - 0.3, c.frame, 0.3);
+  }
+
+  // Accessories on the face.
+  const eyes = look.eyes ?? 0;
+  if (eyes === 1 && !down) {
+    // Sunglasses. Indoors.
+    for (const sx of [-1, 1]) pn.part(union(ellipse(cx + sx * 2.45, ey + 0.1, 1.9, 1.3)), c.lens);
+    pn.line(cx - 0.8, ey - 0.3, cx + 0.8, ey - 0.3, c.lens, 0.3);
+    pn.line(cx - 4.2, ey - 0.3, cx - 6.2, ey - 0.6, c.lens, 0.3);
+    pn.line(cx + 4.2, ey - 0.3, cx + 6.2, ey - 0.6, c.lens, 0.3);
+    pn.line(cx - 3.3, ey - 0.4, cx - 2.3, ey + 0.4, c.lensH, 0.22);
+    pn.line(cx + 1.7, ey - 0.4, cx + 2.7, ey + 0.4, c.lensH, 0.22);
+  }
+  if (eyes === 2 && !down) {
+    for (const sx of [-1, 1]) {
+      const [t1] = ellipse(cx + sx * 2.35, ey, 1.75, 1.35);
+      const [t2] = ellipse(cx + sx * 2.35, ey, 1.28, 0.9);
+      pn.part([(x, y) => t1(x, y) && !t2(x, y), [cx + sx * 2.35 - 2, ey - 1.5, cx + sx * 2.35 + 2, ey + 1.5]], b.partner ? c.gold : c.frame);
+    }
+    pn.line(cx - 0.7, ey - 0.3, cx + 0.7, ey - 0.3, b.partner ? c.gold : c.frame, 0.28);
+  }
+  if (eyes === 3) {
+    // Headset: band over the top, a cup on one ear, a boom to the mouth.
+    const [o] = ellipse(cx, cy - 1, 7.6, 8.2);
+    const [i] = ellipse(cx, cy - 1, 6.9, 7.5);
+    pn.part([(x, y) => o(x, y) && !i(x, y) && y < cy - 0.5, [cx - 8, cy - 10, cx + 8, cy]], c.phone);
+    pn.part(ellipse(cx - 6.6, cy + 0.2, 1.4, 2), c.phone, { hi: mix(c.phone, 0xffffffff, 0.3) });
+    pn.line(cx - 6.2, cy + 1.6, cx - 1.8, my + 0.4, c.phone, 0.28);
+    pn.dot(cx - 1.6, my + 0.4, c.phone, 0.55);
+  }
+  if (eyes === 4) {
+    pn.dot(cx + 6.2, cy + 0.6, c.phone, 0.55);
+    pn.line(cx + 6.2, cy + 1.2, cx + 5.4, cy + 7.2, c.cupS, 0.18);
+  }
+  if (look.cigar && r.mouth !== 'shout') {
+    pn.part(capsule(cx + 1.4, my + 0.2, cx + 5.6, my + 1.2, 0.55), c.cigar, { hi: mix(c.cigar, 0xffffffff, 0.2) });
+    pn.dot(cx + 5.9, my + 1.25, c.ember, 0.5);
+    const puff = t % 3;
+    pn.tint(ellipse(cx + 6.4 + puff * 0.4, my - 1.6 - puff * 1.6, 0.9 + puff * 0.3, 0.8 + puff * 0.3), 0xffe8e8e8, 0.55);
   }
 }
 
-function drawBox(pn: Painter, c: Pal, rig: Rig, behind: boolean) {
-  const b = rig.bob;
+function drawBox(pn: Painter, c: Pal, r: Rig, behind: boolean) {
+  const b = r.bob;
   if (behind) {
     pn.part(poly([[-8.6, -31 + b], [8.6, -31 + b], [8.6, -20.5 + b], [-8.6, -20.5 + b]]), c.boxS);
     return;
@@ -528,10 +997,15 @@ function drawBox(pn: Painter, c: Pal, rig: Rig, behind: boolean) {
   pn.part(poly([[-7.8, -31.5 + b], [7.8, -31.5 + b], [7.8, -19.8 + b], [-7.8, -19.8 + b]]), c.box, { shade: c.boxS, hi: c.boxH });
   pn.part(poly([[-7.8, -31.5 + b], [7.8, -31.5 + b], [6.8, -29.8 + b], [-6.8, -29.8 + b]]), c.boxH);
   pn.part(poly([[-0.9, -31.5 + b], [0.9, -31.5 + b], [0.9, -26 + b], [-0.9, -26 + b]]), c.tape);
-  // A plant and some papers poking out of the top.
   pn.part(ellipse(-4.2, -32.6 + b, 1.9, 1.5), LEAF, { shade: LEAF_S });
-  pn.part(poly([[2.2, -34 + b], [5.6, -33.2 + b], [5.2, -31.5 + b], [2, -31.5 + b]]), c.shirt, { shade: c.shirtS });
+  pn.part(poly([[2.2, -34 + b], [5.6, -33.2 + b], [5.2, -31.5 + b], [2, -31.5 + b]]), c.white, { shade: c.cupS });
+  // A framed photo of a sports car.
+  pn.part(poly([[-1.6, -34.4 + b], [1.2, -34.8 + b], [1.4, -31.5 + b], [-1.4, -31.5 + b]]), c.gold);
+  pn.part(poly([[-1.1, -33.8 + b], [0.8, -34.1 + b], [0.9, -32.1 + b], [-0.9, -32.1 + b]]), c.tieH);
 }
+
+const LEAF = rgba('#5a8a55');
+const LEAF_S = rgba('#3f6a42');
 
 // ---------------------------------------------------------------- entry points
 
@@ -541,46 +1015,69 @@ export interface FigureOpts {
 }
 
 const HEAD_SCALE = 1.15;
-const W_UNITS = 30;
-const H_UNITS = 58;
+const W_UNITS = 40;
+const H_UNITS = 64;
+
+/** Every field that changes how a figure looks, for cache keys. */
+export const lookKey = (l: Look) =>
+  [l.skin, l.hair, l.hairStyle, l.suit, l.tie, l.build, l.height, l.face, l.outfit, l.shirt, l.neck, l.eyes, l.watch ? 1 : 0, l.cigar ? 1 : 0, l.fem ? 1 : 0].join('.');
 
 export function renderFigure(look: Look, pose: Pose, frame: number, opts: FigureOpts = {}): SpriteImage {
   const s = opts.scale ?? 1;
   const w = Math.ceil(W_UNITS * s) + 2;
   const h = Math.ceil(H_UNITS * s) + 2;
   const pn = new Painter(w, h, w / 2, h - 1 - 0.5 * s, s);
-  const c = palette(look);
-  const rig = rigFor(pose, frame);
-  const front = rig.facing === 'front';
+  const partner = !!opts.glasses;
+  const lk: Look = partner ? { ...look, eyes: look.eyes ?? 2 } : look;
+  const b: Body = {
+    bw: [0.9, 1, 1.14][lk.build ?? 1] * (lk.fem ? 0.94 : 1),
+    hf: [0.93, 1, 1.07][lk.height ?? 1] * (lk.fem ? 0.97 : 1),
+    look: lk,
+    c: palette(lk),
+    partner,
+  };
+  const r = rigFor(pose, frame);
+  const front = r.facing === 'front';
+  const c = b.c;
 
-  if (rig.box && !front) drawBox(pn, c, rig, true);
-  drawLegs(pn, rig, c);
+  // Long hair falls behind everything.
+  const style = lk.hairStyle % 14;
+  if (front && style === 9) {
+    const cy = -44.6 + r.up + r.bob;
+    pn.part(union(poly([[-7.2, cy - 1], [7.2, cy - 1], [7.8, cy + 12.6], [-7.8, cy + 12.6]]), ellipse(0, cy + 12.6, 7.8, 2.2)), c.hair, { shade: c.hairS, hi: c.hairH });
+  }
+  if (r.box && !front) drawBox(pn, c, r, true);
+  drawLegs(pn, b, r);
   if (!front) {
-    drawArm(pn, rig.armL, c, false);
-    drawArm(pn, rig.armR, c, false);
+    drawArm(pn, b, r.armL, false);
+    drawArm(pn, b, r.armR, false);
   }
-  drawTorso(c, pn, rig, !!opts.glasses);
-  if (front && !rig.box) {
-    drawArm(pn, rig.armL, c, true);
-    drawArm(pn, rig.armR, c, true);
+  // Arms raised behind the head go before the torso and head.
+  const behind = (a: Arm) => a.hide && a.hd[1] < -30;
+  if (front) for (const a of [r.armL, r.armR]) if (behind(a)) drawArm(pn, b, a, true);
+  drawTorso(pn, b, r);
+  if (front && !r.box) for (const a of [r.armL, r.armR]) if (!a.over && !behind(a)) drawArm(pn, b, a, true);
+  if (r.box && front) {
+    drawBox(pn, c, r, false);
+    pn.part(ellipse(-8, -25.4 + r.bob, 1.5, 1.7), c.skin, { shade: c.skinS });
+    pn.part(ellipse(8, -25.4 + r.bob, 1.5, 1.7), c.skin, { shade: c.skinS });
   }
-  if (rig.box && front) {
-    drawBox(pn, c, rig, false);
-    // Hands on the sides of the box.
-    pn.part(ellipse(-7.9, -25.4 + rig.bob, 1.5, 1.7), c.skin, { shade: c.skinS });
-    pn.part(ellipse(7.9, -25.4 + rig.bob, 1.5, 1.7), c.skin, { shade: c.skinS });
+  const chin = Yb(b, -38.2) + r.up + r.bob + (r.head === 'down' ? 2.2 : 0);
+  drawHead(pn.scaled(HEAD_SCALE, 0, chin), b, r, frame);
+  if (front) for (const a of [r.armL, r.armR]) if (a.over) drawArm(pn, b, a, true);
+  if (r.phone) {
+    const hd = armPoints(b, r.armR).hd;
+    pn.part(poly([[hd[0] - 0.9, hd[1] - 3.2], [hd[0] + 0.9, hd[1] - 3.4], [hd[0] + 1.1, hd[1] + 0.8], [hd[0] - 0.7, hd[1] + 1]]), c.phone, { hi: mix(c.phone, 0xffffffff, 0.3) });
   }
-  if (rig.head === 'down') {
-    drawArm(pn, rig.armL, c, true);
-    drawArm(pn, rig.armR, c, true);
+  if (r.cup) {
+    const [x, y] = [X(b, r.cup[0]), Yb(b, r.cup[1])];
+    pn.part(poly([[x - 1.3, y - 1.8], [x + 1.3, y - 1.8], [x + 1, y + 1.8], [x - 1, y + 1.8]]), c.cup, { shade: c.cupS });
+    pn.part(poly([[x - 1.45, y - 2.4], [x + 1.45, y - 2.4], [x + 1.4, y - 1.7], [x - 1.4, y - 1.7]]), c.tie);
+    pn.part(poly([[x - 1.2, y - 0.4], [x + 1.2, y - 0.4], [x + 1.1, y + 0.6], [x - 1.1, y + 0.6]]), c.cupS);
   }
-  // Heads are drawn a little larger than life, scaled up from the chin.
-  const chin = -38.2 + rig.up + rig.bob + (rig.head === 'down' ? 2.6 : 0);
-  drawHead(pn.scaled(HEAD_SCALE, 0, chin), c, rig, look.hairStyle, !!opts.glasses);
-  if (rig.box && !front) {
-    // Arms reach round to the box.
-    pn.part(capsule(-6.9, -33.6 + rig.bob, -8.4, -26 + rig.bob, 2), c.suit, { shade: c.suitS });
-    pn.part(capsule(6.9, -33.6 + rig.bob, 8.4, -26 + rig.bob, 2), c.suit, { shade: c.suitS });
+  if (r.box && !front) {
+    pn.part(capsule(-7, -33.6 + r.bob, -8.6, -26 + r.bob, 2), c.suit, { shade: c.suitS });
+    pn.part(capsule(7, -33.6 + r.bob, 8.6, -26 + r.bob, 2), c.suit, { shade: c.suitS });
   }
   pn.outline(c.ink);
   return { w, h, px: pn.px };
@@ -588,11 +1085,11 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
 
 /** Head and shoulders, square, for headshots. */
 export function renderBust(look: Look, size: number, glasses = false): SpriteImage {
-  // The bust spans roughly 28 design units; pick a scale that fills `size`.
-  const s = size / 28;
+  const s = size / 30;
   const full = renderFigure(look, 'stand', 0, { scale: s, glasses });
   const cx = full.w / 2;
-  const top = full.h - 1 - 0.5 * s - 54 * s;
+  const hf = [0.93, 1, 1.07][look.height ?? 1];
+  const top = full.h - 1 - 0.5 * s - (38.2 * hf + 17.5) * s;
   const x0 = Math.round(cx - size / 2);
   const y0 = Math.round(top);
   const px = new Uint32Array(size * size);

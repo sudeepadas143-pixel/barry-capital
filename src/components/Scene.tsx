@@ -5,11 +5,11 @@ import { DESK_COUNT, FIRM_NAME, PARTNER_NAME } from '../../firm.config';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
 import { fmtPct, pad2 } from '../format';
-import { Director } from '../scene/actors';
+import { Director, type Speech } from '../scene/actors';
 import { loadCustomArt } from '../scene/artswap';
 import { sceneData } from '../scene/data';
 import { hitDesk, proceduralHotspots, type Hotspots } from '../scene/hotspots';
-import { H, W } from '../scene/layout';
+import { H, S, W } from '../scene/layout';
 import { Renderer } from '../scene/renderer';
 
 interface Props {
@@ -18,6 +18,16 @@ interface Props {
 }
 
 const FPS = 12;
+
+interface Bubble extends Speech {
+  id: string;
+  /** Anchor, as a fraction of the frame. */
+  x: number;
+  y: number;
+}
+
+/** Trades and the partner get the floor first; everyone else fills in. */
+const RANK: Record<Speech['tone'], number> = { partner: 0, win: 1, loss: 1, buy: 2, smug: 3 };
 
 export function Scene({ hot = null, onHover }: Props) {
   const { state, byId, now } = useFirm();
@@ -34,6 +44,8 @@ export function Scene({ hot = null, onHover }: Props) {
   const [dims, setDims] = useState({ w: W, h: H });
   const [label, setLabel] = useState<{ text: string; x: number; y: number } | null>(null);
   const [ready, setReady] = useState(false);
+  const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const lastBubbles = useRef({ at: 0, key: '' });
 
   // Latest values for the animation loop.
   const live = useRef({ state, byId, now, hot });
@@ -79,6 +91,27 @@ export function Scene({ hot = null, onHover }: Props) {
     ctx.imageSmoothingQuality = 'high';
     ctx.clearRect(0, 0, c.width, c.height);
     ctx.drawImage(n, 0, 0, c.width, c.height);
+
+    // Speech bubbles, throttled: they're DOM, so they stay sharp at any size.
+    const lb = lastBubbles.current;
+    if (t - lb.at < 0.25 && t >= lb.at) return;
+    lb.at = t;
+    const max = c.clientWidth < 560 ? 2 : 5;
+    const next: Bubble[] = [];
+    for (const a of actors) {
+      const say = d.speech.get(a.id);
+      if (!say) continue;
+      const [sx, sy] = r.screenPoint(a);
+      const lift = a.layer === 'seated' ? 31 : 36;
+      next.push({ ...say, id: a.id, x: sx / n.width, y: (sy - lift * S) / n.height });
+    }
+    next.sort((a, b) => RANK[a.tone] - RANK[b.tone] || a.y - b.y);
+    const shown = next.slice(0, max);
+    const key = shown.map((b) => `${b.id}:${b.text}:${Math.round(b.x * 1000)}:${Math.round(b.y * 1000)}`).join('|');
+    if (key !== lb.key) {
+      lb.key = key;
+      setBubbles(shown);
+    }
   }, [reduced]);
 
   // Size the backing store to a whole multiple of the native resolution.
@@ -190,6 +223,16 @@ export function Scene({ hot = null, onHover }: Props) {
           }}
           onClick={onClick}
         />
+        {bubbles.map((b) => (
+          <span
+            key={b.id}
+            className={`scene-say scene-say--${b.tone}${b.x > 0.72 ? ' scene-say--left' : ''}`}
+            style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%` }}
+            aria-hidden="true"
+          >
+            {b.text}
+          </span>
+        ))}
         {label && (
           <span className="scene-label" style={{ left: label.x, top: label.y }} aria-hidden="true">
             {label.text}

@@ -18,7 +18,7 @@ Reference files, generated from the procedural art with `npm run art`:
 
 | File | What it is |
 | --- | --- |
-| `docs/building.reference.png` | The full procedural building at native size (624×1032), transparent background |
+| `docs/building.reference.png` | The full procedural building at native size (948×1680), transparent background |
 | `docs/building.no-desks.png` | The same without the desks: what `building.png` should contain |
 | `docs/foreground.reference.png` | Only the desks: what `foreground.png` should contain |
 | `docs/hotspots.example.json` | The procedural building's hotspots, in the exact schema below |
@@ -26,12 +26,13 @@ Reference files, generated from the procedural art with `npm run art`:
 ## The building
 
 **`building.png`** is the scene at native resolution, with a transparent background (the
-page colour shows through). The procedural building is 624×1032, two pixels per world
+page colour shows through). The procedural building is 948×1680, three pixels per world
 unit. Any size works as long as `hotspots.json` gives the same `width` and `height`. The
 site fits the image to the device's pixels: exact whole-number scales stay pixel-exact,
 and other scales are resampled smoothly, so painted or anti-aliased art is fine.
 
-Keep the look in the site's palette: warm limestone, navy carpet, walnut, brass, slate.
+Keep the look in the site's palette: a glass-and-steel tower with a travertine and walnut
+banking-hall lobby, charcoal carpet tiles, black desks, gold trim and LED ticker bands.
 Suggested colours are in `src/scene/colors.ts`.
 
 **`foreground.png`** (optional) is the same size, and holds anything that should sit in
@@ -43,14 +44,14 @@ sit on top of them.
 
 ```jsonc
 {
-  "width": 624,            // must match building.png
-  "height": 1032,
+  "width": 948,            // must match building.png
+  "height": 1680,
   "desks": [
     {
       "desk": 1,           // 1–11, and 12 for the pencilled-in desk
-      "polygon": [[84, 498], [132, 474], [220, 518], [220, 582], [172, 606], [84, 562]],
+      "polygon": [[126, 885], [198, 849], [330, 915], [330, 1011], [258, 1047], [126, 981]],
                            // hit area in image pixels, any simple polygon
-      "seat": [112, 528]   // bottom-centre of the seated trader, image pixels
+      "seat": [240, 990]   // bottom-centre of the seated trader, image pixels
     }
   ],
   "partner": {             // optional: where the managing partner stands, bottom-centre
@@ -72,7 +73,7 @@ can't be clicked and nobody sits at them.
 - The hover marker and the desk list sync.
 
 The following are procedural-only and switch off with a custom building: the chart
-screens, the lobby ticker, server LEDs, steam, the cat, the revolving door, and the
+screens, the LED ticker bands and the security-desk ticker, server LEDs, the helicopter, steam, the cat, the revolving door, and the
 walking paths. "Replay arrival" then brings traders in one by one at their seats, with
 no walk.
 
@@ -80,10 +81,19 @@ no walk.
 
 By default the traders aren't sprite sheets at all. `src/art/figure.ts` draws them from
 shaded shapes (face, hair, jacket and lapels, shirt, tie, arms, legs) and adds a thin
-selective outline, so they render cleanly at any size: about 50px tall in the building,
-larger on the hire page, and as busts for headshots. Each trader is the same body with
-their own skin, hair colour, haircut, suit and tie. Changing a haircut, the cut of the
-suit or a pose means editing that file.
+selective outline, so they render cleanly at any size: about 85px tall standing in the
+building (frames are 60×96 at scale 1.5), larger on the hire page, and as busts for
+headshots.
+
+Each trader is dressed by `src/art/traits.ts`: build, height, one of 14 haircuts, facial
+hair, outfit (suit, pinstripe, fleece vest, shirtsleeves and braces, waistcoat,
+turtleneck and blazer, double-breasted), shirt colour, neckwear, eyewear or headset, and
+a watch. The eleven founding traders are dressed by hand in the `ROSTER` table; anyone
+hired later is dressed from their seed and method, so the same trader always looks the
+same. At their desks, traders cycle through moods (typing, on the phone, leaning back,
+pointing at a chart, espresso, celebrating, slumped), weighted by method and by how
+their day is going (`mood()` in `src/scene/actors.ts`). Changing a haircut, an outfit or
+a pose means editing `figure.ts`.
 
 ### Replacing poses with hand-drawn sheets
 
@@ -122,7 +132,9 @@ hire-page figure always use the procedural renderer.
 
 Sprites anchor at the **bottom centre** of the frame. Seated poses are shorter, so leave
 the top rows transparent and keep the seat at the bottom row. A standing trader is about
-50px tall, a little over half a floor's interior height (88px).
+85px tall, a little under two-thirds of a floor's interior height (132px). Hand-drawn
+sheets only cover the original eight poses; the mood poses (`phone`, `leanback`, `point`,
+`coffee`) stay procedural.
 
 ### Key colours
 
@@ -150,10 +162,11 @@ suits the artist better.
 | File | Contents |
 | --- | --- |
 | `src/art/figure.ts` | The character renderer: shapes, poses, shading, outline, busts |
-| `src/art/props.ts` | Plants and the cat, drawn the same way |
+| `src/art/traits.ts` | Who wears what: the hand-dressed roster and the seeded wardrobe |
+| `src/art/props.ts` | Plants, the cat, the bronze bull and the helicopter, drawn the same way |
 | `src/scene/layout.ts` | The building as data: scale, dimensions, floors, desk positions, partner spots |
-| `src/scene/building.ts` | Walls, floors, furniture, roof, facade and lot |
-| `src/scene/props.ts` | Remaining grid props: globe, water tower, lamp, camera, flag, pigeons |
+| `src/scene/building.ts` | Walls, floors, furniture, the tower above, facade and street |
+| `src/scene/props.ts` | Remaining grid props still in use: the globe and the security camera |
 | `src/scene/sprites.ts` | Sprite cache and the loader for hand-drawn sheets |
 | `src/scene/colors.ts` | Scene palette |
 

@@ -35,6 +35,21 @@ export interface Look {
   hairStyle: number;
   suit: number;
   tie: number;
+  /** Optional detail; filled in by `dress()` when missing. */
+  build?: number;
+  height?: number;
+  /** Facial hair: 0 none, 1 stubble, 2 beard, 3 moustache, 4 goatee. */
+  face?: number;
+  /** 0 suit, 1 pinstripe, 2 fleece vest, 3 shirtsleeves and braces, 4 waistcoat, 5 turtleneck and blazer, 6 double-breasted. */
+  outfit?: number;
+  shirt?: number;
+  /** 0 tie, 1 loosened, 2 bow tie, 3 open collar, 4 lanyard. */
+  neck?: number;
+  /** 0 none, 1 sunglasses, 2 glasses, 3 headset, 4 earpiece. */
+  eyes?: number;
+  watch?: boolean;
+  cigar?: boolean;
+  fem?: boolean;
 }
 
 export type CoinPhase = 'launch' | 'pump' | 'chop' | 'bleed' | 'run' | 'rug' | 'delisted';

@@ -159,28 +159,28 @@ const DELIST_RULE: Rule = { code: 'F-0', text: 'When a coin leaves the board, th
 const ESCORT_RULE: Rule = { code: 'HR-3', text: 'On a third strike, positions are closed at market before the box is handed over.' };
 
 const BUY_REASONS: Record<ArchetypeId, string[]> = {
-  permabull: ['Up is the direction.', 'Still early.', 'Looked strong. Everything looks strong.', 'Added to the thesis.', 'Buying before it is obvious.'],
-  trend: ['Everybody was talking about it.', 'Top of the board. Top of the list.', 'Three people mentioned it at the cooler.', 'Joined the queue.'],
-  dip: ['Down thirty. On sale.', 'Bought the dip.', 'Priced to move.', 'Red is just a colour.', 'Discount noted.'],
-  sniper: ['Listed a minute ago. In.', 'First in the door.', 'Did not read the name. Did not need to.', 'Clocked it on arrival.'],
-  diamond: ['Long-term position.', 'Bought for the grandchildren.', 'Entered. Will not be leaving.', 'A core holding, as of now.'],
-  fiver: ['Moving, but quietly.', 'Five percent looks available.', 'Modest opportunity. Modest position.'],
-  intern: ['Seemed good?', 'The name was funny.', 'Saw it on the board.', 'Asked around. Nobody answered.', 'Wanted to help.'],
-  quant: ['Averages crossed.', 'Model says yes. The model is two lines.', 'Signal confirmed, to one decimal place.'],
-  stops: ['Strength noted. Stop placed.', 'Entered with a stop already in.', 'Controlled exposure.'],
-  narrative: ['Fits the theme.', 'The story writes itself.', 'Strong narrative. Weak chart. Narrative wins.', 'On brand for the day.'],
-  averager: ['Red. Buying.', 'Starting a position. Will be adding.', 'The first of several.'],
-  contrarian: ['Nobody else has it. Good.', 'Unloved. Bought.', 'The floor passed. I did not.'],
+  permabull: ['Up only. Loaded the boat.', 'Bears are poor. Buying.', 'Sized up. Obviously.', 'This is the bottom. Every price is the bottom.', 'Adding. Tell me when it stops going up.'],
+  trend: ['Whole floor is in it. So am I.', 'Top of the board. I only buy winners.', 'Chasing? I prefer "leading".', 'The trend is my friend. My only friend.'],
+  dip: ['Blood in the streets. My favourite colour.', 'Down thirty. I call that a sale.', 'You panic, I buy. Circle of life.', 'Caught the knife. With one hand.'],
+  sniper: ['In before you blinked.', 'Listed a minute ago. I was here at second four.', "Didn't read the name. Didn't need to.", 'Fastest hands on the floor. Check the tape.'],
+  diamond: ['Buying. Selling is for tourists.', 'Long-term position. Very long. Forever.', 'Diamond hands. Look it up.', 'My grandchildren will thank me.'],
+  fiver: ['Five percent before your coffee cools.', 'Quick one. Watch this.', "In and out. Nobody's getting hurt."],
+  intern: ['Told the desk I had a guy. I do not have a guy.', 'Bought it. Hope that was okay.', 'Saw it trending. Sort of. On my phone.', 'Big day for me.'],
+  quant: ['The model says yes. The model is never wrong.', 'Signal fired. Emotions are for retail.', 'Two lines crossed. That is science.'],
+  stops: ['Risk managed. Ego intact.', 'In, with a stop tighter than my collar.', 'Calculated. Everything is calculated.'],
+  narrative: ["I don't read charts. Charts read me.", 'The story sells itself. So do I.', 'Vibes are immaculate. Buying.', 'Narrative is alpha. Write that down.'],
+  averager: ['Buying red. Red is a discount.', 'Starting small. I will not stay small.', 'Conviction, first tranche.'],
+  contrarian: ['Everyone hates it. Perfect.', 'The floor is wrong again. Buying.', "I'm early. I'm always early."],
 };
 
 const SELL_REASONS: Record<'tp' | 'sl' | 'time' | 'signal' | 'delist' | 'intern' | 'escort', string[]> = {
-  tp: ['Target hit. Out.', 'Took the money.', 'Up enough. That is the job.', 'Booked it before anyone could object.'],
-  sl: ['Stopped out.', 'Cut it.', 'Rules are rules.', 'Out. Not discussing it.'],
-  time: ['Held long enough.', 'Out of time.', 'Clock ran out before the chart did.'],
-  signal: ['Signal reversed.', 'The hour turned red.', 'Lines crossed the other way.'],
-  delist: ['The coin left the board. So did the position.', 'Held to the end. This was the end.', 'Closed at the last print.'],
-  intern: ['Felt right.', 'Someone said to.', 'Panicked. Politely.', 'Wanted to see what selling was like.'],
-  escort: ['Cleared the desk.', 'Closed on the way out.'],
+  tp: ['Printed. Next.', 'Called it. You saw.', "Took profit. You're welcome.", 'Ring the bell.', 'Booked. Drinks on me. Not really.'],
+  sl: ['Market is wrong. Leaving anyway.', 'Tactical retreat.', 'Stopped. Irrelevant.', "That wasn't a loss. That was tuition."],
+  time: ['Bored. Out.', 'Too slow for this desk.', 'Clock ran out. The chart will regret it.'],
+  signal: ['Trend flipped. I flipped first.', 'Model said out. The model is never wrong.', 'Saw it coming. Obviously.'],
+  delist: ['Coin died. I did not.', 'Held to the end. Legends do.', "Closed at the last print. It's fine. Totally fine."],
+  intern: ['Sold. Was that right?', 'Someone yelled "sell". I think at me.', 'Panicked. Professionally.', 'Took a profit. Or a loss. Checking.'],
+  escort: ['Closing on the way out. Still a good trade.', 'Liquidated. Security was very polite.'],
 };
 
 export function themeOfDay(seed: number, tick: number): Theme {

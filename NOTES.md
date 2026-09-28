@@ -70,9 +70,9 @@ Decisions made along the way, and the things worth a second look.
   covering them.
 - **Higher-resolution characters (owner request).** The first version used 13×25
   hand-typed pixel grids, which read as retro. Traders are now drawn from shaded shapes
-  (`src/art/figure.ts`) with selective outlines, and the whole scene renders at 2× (624×1032)
+  (`src/art/figure.ts`) with selective outlines, and the scene rendered at 2× (624×1032; now 3×, see below)
   so the figures have room for faces, lapels and ties. Plants and the cat were redrawn the
-  same way. The water tower, lamp, globe and camera are still upscaled grid props, and
+  same way. The globe and camera are still upscaled grid props, and
   could be redrawn if they start to look coarse next to the rest.
 - **Scaling (deviation from the brief).** The brief asked for nearest-neighbour integer
   upscaling. At 2× native resolution a phone shows fewer than two device pixels per art
@@ -80,6 +80,30 @@ Decisions made along the way, and the things worth a second look.
   matches the device's pixels, stays pixel-exact at whole-number ratios, and otherwise
   resamples with high-quality smoothing. The result looks like finished illustration
   rather than chunky pixels, which is what was asked for.
+- **Skyscraper restyle (owner request).** The limestone townhouse became a glass tower on
+  Wall Street: a travertine-and-walnut banking-hall lobby with a bronze bull, turnstiles
+  and a security desk with its own ticker; LED ticker bands along every slab; black
+  trading desks with twin monitors and phone turrets; frosted partitions; a skyline behind
+  the glass; the tower continuing above the partner's floor and fading out; a cab, a
+  WALL ST sign and a helicopter on a 34-second loop. The scene now renders at three pixels
+  per world unit (948×1680, up from 624×1032). In headless Chromium on the build machine
+  the page kept animation frames under 30ms while the scene ran at 12 fps; worth a check
+  on a low-end phone.
+- **Unique traders (owner request).** Every trader gets a build, height, haircut (14),
+  facial hair, outfit (7), shirt, neckwear, eyewear and watch (`src/art/traits.ts`). The
+  founding eleven are dressed by hand; later hires are dressed from their seed and method
+  (quants in turtlenecks, perma-bulls in pinstripes, and so on). This lives in the view
+  layer, so the simulation and its checkpoints are untouched. Visitors can choose every
+  trait on the hire page.
+- **Cocky voice (owner request).** Buy and sell reasons, method blurbs, floor events and
+  the partner's lines were rewritten in a Wall Street register ("Printed. Next.", "It's a
+  dip."). Traders now cycle through moods at their desks and say things in speech bubbles
+  (DOM overlays, so they stay sharp), with fresh trades taking priority. Two bubbles at
+  most on phones, five on desktop. `SIM.VERSION` is 12, which clears cached snapshots
+  because the stored reason strings changed.
+- **Desktop scene size.** The scene used to shrink to fit the viewport height, which made
+  traders about 18px tall at 1280×800. It now takes the column's width (up to 640px) and
+  scrolls with the page instead of sticking.
 - **Custom art** switches off the procedural-only animations (screens, ticker, walking
   paths). See ART_GUIDE.md.
 - **Known imperfections:** walkers can overlap a partition edge for a frame or two, and a

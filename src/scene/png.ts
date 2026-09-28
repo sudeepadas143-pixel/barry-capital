@@ -46,7 +46,7 @@ export function encodePng(buf: PixelBuffer, scale = 1, bg = 0xffeef4f6): Uint8Ar
       raw[o] = c & 255;
       raw[o + 1] = (c >>> 8) & 255;
       raw[o + 2] = (c >>> 16) & 255;
-      raw[o + 3] = c ? 255 : 0;
+      raw[o + 3] = c ? (c >>> 24) & 255 : 0;
     }
   }
   const ihdr = new Uint8Array(13);

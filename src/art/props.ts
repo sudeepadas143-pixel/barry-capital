@@ -2,7 +2,7 @@
  * Plants and the office cat, drawn with the same shaded-shape renderer as the
  * traders so the whole scene shares one finish. Design units, feet at y = 0.
  */
-import { Painter, capsule, ellipse, poly, rgba, type Box, type SpriteImage, type Test } from './figure';
+import { Painter, capsule, clip, ellipse, poly, rgba, taper, type Box, type SpriteImage, type Test } from './figure';
 
 const LEAF = rgba('#5b8f55');
 const LEAF_S = rgba('#3f6b41');
@@ -137,4 +137,59 @@ export function blitAt(buf: { w: number; h: number; data: Uint32Array }, img: Sp
       if (c && dx >= 0 && dx < buf.w) buf.data[dy * buf.w + dx] = c;
     }
   }
+}
+
+const BRONZE = rgba('#8a5a2e');
+const BRONZE_S = rgba('#5a381b');
+const BRONZE_H = rgba('#c99255');
+
+/** A charging bronze bull, facing left, for the lobby. Design units ≈ world units. */
+export function renderBull(scale = 3): SpriteImage {
+  const p = canvas(34, 20, scale);
+  const o = { shade: BRONZE_S, hi: BRONZE_H };
+  // Legs, braced.
+  p.part(taper(-9, -6, -12, 0, 1.4, 1), BRONZE, o);
+  p.part(taper(-5, -6, -4, 0, 1.4, 1), BRONZE_S);
+  p.part(taper(6, -6, 9, 0, 1.5, 1), BRONZE, o);
+  p.part(taper(9, -6, 12.5, -0.4, 1.4, 1), BRONZE_S);
+  // Body: a big shoulder hump sloping to the haunches.
+  p.part(ellipse(0, -9, 11, 5.2), BRONZE, o);
+  p.part(ellipse(-6, -11, 6.4, 5.6), BRONZE, o);
+  p.part(ellipse(8.5, -9.6, 4.6, 4.4), BRONZE, o);
+  // Head down, horns forward.
+  p.part(ellipse(-13, -8.2, 3.6, 3), BRONZE, o);
+  p.part(ellipse(-15.6, -6.8, 1.9, 1.6), BRONZE_S);
+  p.part(taper(-12.2, -10.6, -16.2, -14.8, 0.9, 0.35), BRONZE_H);
+  p.part(taper(-11, -10.8, -9.4, -15.4, 0.9, 0.35), BRONZE_H);
+  // Tail up.
+  p.part(taper(12.4, -11, 15.6, -16.4, 0.6, 0.4), BRONZE, o);
+  p.dot(15.8, -16.8, BRONZE_S, 0.8);
+  // Polished nose and highlights where everyone touches it.
+  p.dot(-15.9, -6.8, BRONZE_H, 0.6);
+  p.part(ellipse(-5, -14, 3, 1), BRONZE_H);
+  return done(p);
+}
+
+/** A small corporate helicopter, side view facing left. `f` spins the rotor. */
+export function renderHeli(f: number, scale = 3): SpriteImage {
+  const p = canvas(40, 18, scale);
+  const navy = rgba('#1f2c45');
+  const navyS = rgba('#141c2e');
+  const navyH = rgba('#3a4d70');
+  const glass = rgba('#9fc3dc');
+  p.part(ellipse(-3, -8, 9, 4.6), navy, { shade: navyS, hi: navyH });
+  p.part(taper(4, -8.6, 17, -9.6, 2.2, 0.8), navy, { shade: navyS });
+  p.part(poly([[15.4, -9.6], [18.4, -14], [19.4, -13.6], [17.6, -9]]), navy);
+  p.part(clip(ellipse(-6.4, -9, 5.2, 3), (x, y) => y < -8 && x < -3), glass, { hi: rgba('#e3f0f8') });
+  p.part(poly([[-4, -8.8], [2.4, -8.8], [2.4, -6.6], [-4, -6.6]]), rgba('#d8ae4a'));
+  // Skids.
+  p.line(-9, -1.6, 4, -1.6, rgba('#2a2c31'), 0.45);
+  p.line(-6, -1.6, -5, -3.6, rgba('#2a2c31'), 0.4);
+  p.line(1.6, -1.6, 1, -3.6, rgba('#2a2c31'), 0.4);
+  p.line(-1.6, -12.6, -1.6, -14.4, rgba('#2a2c31'), 0.4);
+  // Rotor: a blur that sweeps.
+  const span = [18, 11, 4, 11][f % 4];
+  p.part(ellipse(-1.6, -14.8, span, 0.45), rgba('#3a3d44'));
+  p.dot(18, -9.8 + (f % 2 ? -2 : 2), rgba('#3a3d44'), 0.6);
+  return done(p);
 }

@@ -24,14 +24,26 @@ export const FLOORS: { id: FloorId; name: string; blurb: string; floor: string }
 ];
 
 export const PARTNER_AT: Record<FloorId | 'review', string[]> = {
-  office: [`${P} is in the corner office, counting the treasury twice.`, `${P} is in the corner office, on hold with nobody.`],
-  terminal: [`${P} is at the terminal, reading tickers aloud.`, `${P} is at the terminal, squinting at a four-letter ticker.`],
-  compliance: [`${P} is in compliance, asking a trade to explain itself.`, `${P} is in compliance, initialling things.`],
-  hr: [`${P} is in HR, updating the headshots.`, `${P} is in HR, folding a box.`],
-  server: [`${P} is in the server room, waiting out a stale feed.`],
-  lobby: [`${P} is in the lobby, hearing pitches.`, `${P} is in the lobby, turning down a coin named after a sandwich.`],
-  review: [`${P} is on the fifth floor, doing performance reviews.`],
+  office: [`${P} is in the corner office, putting.`, `${P} is in the corner office, counting the treasury twice.`],
+  terminal: [`${P} is on the terminal floor, telling a junior to size up.`, `${P} is at the terminal, reading tickers aloud, badly.`],
+  compliance: [`${P} is in compliance, asking a trade to explain itself.`, `${P} is in compliance, feeding the shredder.`],
+  hr: [`${P} is in HR, ordering more boxes.`, `${P} is in HR, approving a headshot.`],
+  server: [`${P} is in the server room, yelling at a stale feed.`],
+  lobby: [`${P} is in the lobby, patting the bull for luck.`, `${P} is in the lobby, turning down a coin named after a sandwich.`],
+  review: [`${P} is on the terminal floor, doing performance reviews. Nobody is making eye contact.`],
 };
+
+/** Things traders say out loud. Shown in speech bubbles over the building. */
+export const SAYS = {
+  phone: ['Buy it all.', 'Size up. Now.', "Who's selling?!", 'I said market order.', 'Get me more.', "Don't tell me the risk.", 'Send it.', 'Call me when it’s up.'],
+  win: ['Printed.', 'Too easy.', 'Called it.', 'Bonus season.', 'Ring the bell!', "Who's buying lunch? Not you."],
+  smug: ["I don't lose. I learn.", 'Paper hands everywhere.', "I'm the liquidity.", 'Watch and learn.', 'Wake me at +50.', "Relax. I've got a model."],
+  loss: ["It's a dip.", "Not a loss till I sell.", "Market's wrong.", 'Averaging down.', 'Temporary.', 'Who moved my stop?'],
+  point: ['Look at that candle!', 'There. Right there.', "That's a breakout.", 'Told you.'],
+  coffee: ['Fourth espresso.', 'Sleep is for index funds.', 'I trade better caffeinated.'],
+  partner: ['Size up or ship out.', "Nobody leaves till we're green.", 'Somebody ring the bell.', 'My office. Now.', 'Who bought this?', 'Bonus day is a state of mind.'],
+};
+
 
 export const CORNER = {
   label: 'your corner of the firm',

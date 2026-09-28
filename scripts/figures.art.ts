@@ -3,28 +3,38 @@ import { it } from 'vitest';
 import { PixelBuffer } from '../src/scene/buffer';
 import { encodePng } from '../src/scene/png';
 import { renderBust, renderFigure, type Pose } from '../src/art/figure';
+import { dress } from '../src/art/traits';
+import { STARTING_ROSTER } from '../src/sim/names';
+import { PARTNER_LOOK } from '../src/art/partner';
+import type { Look } from '../src/sim/types';
 
 function paste(buf: PixelBuffer, img: { w: number; h: number; px: Uint32Array }, x0: number, y0: number) {
-  for (let y = 0; y < img.h; y++) for (let x = 0; x < img.w; x++) if (img.px[y * img.w + x]) buf.set(x0 + x, y0 + y, img.px[y * img.w + x]);
+  for (let y = 0; y < img.h; y++) for (let x = 0; x < img.w; x++) if (img.px[y * img.w + x]) buf.set(Math.round(x0 + x), Math.round(y0 + y), img.px[y * img.w + x]);
 }
+
+export const rosterLooks = (): [string, Look, boolean][] => [
+  ...STARTING_ROSTER.map(([name, arch], i): [string, Look, boolean] => [name, dress({ skin: [0, 4, 2, 0, 3, 5, 1, 0, 1, 2, 3][i], hair: [3, 0, 0, 3, 4, 0, 6, 1, 1, 2, 0][i], hairStyle: 0, suit: [0, 1, 2, 4, 5, 0, 1, 4, 3, 1, 2][i], tie: i % 6 }, arch, i * 7919 + 13, name), false]),
+  ['barry', PARTNER_LOOK, true],
+];
 
 it('figure contact sheets', () => {
   mkdirSync('art-out', { recursive: true });
-  const poses: [Pose, number][] = [['stand', 0], ['walk', 1], ['walk', 3], ['walk', 5], ['back', 2], ['sit', 0], ['sit', 1], ['celebrate', 0], ['celebrate', 1], ['slump', 0], ['box', 2], ['backbox', 0]];
-  const looks = Array.from({ length: 6 }, (_, i) => ({ skin: i, hair: (i * 3) % 7, hairStyle: i % 4, suit: (i * 5) % 6, tie: (i * 7) % 6 }));
-  for (const scale of [1, 3]) {
-    const cw = Math.ceil(32 * scale) + 4;
-    const ch = Math.ceil(60 * scale) + 4;
-    const buf = new PixelBuffer(poses.length * cw, looks.length * ch);
+  const poses: [Pose, number][] = [['stand', 0], ['walk', 1], ['sit', 0], ['leanback', 0], ['phone', 1], ['phone', 2], ['point', 0], ['coffee', 0], ['celebrate', 1], ['slump', 0], ['box', 2], ['back', 2]];
+  const looks = rosterLooks();
+  for (const scale of [1.5, 4]) {
+    const cw = Math.ceil(42 * scale);
+    const ch = Math.ceil(66 * scale);
+    const list = scale > 2 ? looks.slice(0, 6) : looks;
+    const buf = new PixelBuffer(poses.length * cw, list.length * ch);
     buf.rect(0, 0, buf.w, buf.h, 0xffeef4f6);
-    looks.forEach((l, j) => poses.forEach(([p, f], i) => {
-      const img = renderFigure(l, p, f, { scale, glasses: j === 4 });
+    list.forEach(([, l, g], j) => poses.forEach(([p, f], i) => {
+      const img = renderFigure(l, p, f, { scale, glasses: g });
       paste(buf, img, i * cw + (cw - img.w) / 2, j * ch + (ch - img.h));
     }));
-    writeFileSync(`art-out/figures-${scale}x.png`, encodePng(buf, scale === 1 ? 4 : 1));
+    writeFileSync(`art-out/figures-${scale}x.png`, encodePng(buf, scale < 2 ? 2 : 1));
   }
-  const busts = new PixelBuffer(6 * 100, 100);
+  const busts = new PixelBuffer(looks.length * 110, 110);
   busts.rect(0, 0, busts.w, busts.h, 0xffeef4f6);
-  looks.forEach((l, i) => paste(busts, renderBust(l, 90, i === 4), i * 100 + 5, 5));
+  looks.forEach(([, l, g], i) => paste(busts, renderBust(l, 100, g), i * 110 + 5, 5));
   writeFileSync('art-out/busts.png', encodePng(busts, 1));
 });

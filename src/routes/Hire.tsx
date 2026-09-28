@@ -3,7 +3,23 @@ import { Link } from 'react-router-dom';
 import { DESK_COUNT, PARTNER_NAME } from '../../firm.config';
 import { Figure, Headshot } from '../components/Sprite';
 import { Strikes, TradeRow } from '../components/Books';
-import { HAIRS, HAIR_NAMES, HAIR_STYLE_NAMES, SKINS, SUITS, SUIT_NAMES, TIES, TIE_NAMES } from '../art/palette';
+import {
+  BUILD_NAMES,
+  EYES_NAMES,
+  FACE_NAMES,
+  HAIRS,
+  HAIR_NAMES,
+  HAIR_STYLE_NAMES,
+  NECK_NAMES,
+  OUTFIT_NAMES,
+  SHIRTS,
+  SHIRT_NAMES,
+  SKINS,
+  SUITS,
+  SUIT_NAMES,
+  TIES,
+  TIE_NAMES,
+} from '../art/palette';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
 import { dayTime, fmtPct, fmtSol, pad2, pctClass } from '../format';
@@ -44,6 +60,27 @@ function Swatches({
     </div>
   );
 }
+
+function Options({ label, names, value, onChange }: { label: string; names: string[]; value: number; onChange: (i: number) => void }) {
+  return (
+    <div className="field" role="radiogroup" aria-label={label}>
+      <span className="label">{label}</span>
+      <div className="options">
+        {names.map((n, i) => (
+          <button key={n} type="button" role="radio" aria-checked={value === i} className="option" onClick={() => onChange(i)}>
+            {n}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const CUT_NAMES = ['men’s cut', 'women’s cut'];
+const HEIGHT_NAMES = ['short', 'average', 'tall'];
+const WRIST_NAMES = ['bare wrist', 'gold watch'];
+
+const START: Look = { skin: 1, hair: 1, hairStyle: 3, suit: 0, tie: 0, fem: false, build: 1, height: 1, face: 0, outfit: 0, shirt: 0, neck: 0, eyes: 0, watch: true };
 
 const cleanName = (s: string) =>
   s
@@ -165,9 +202,10 @@ export default function Hire() {
   const [arch, setArch] = useState<ArchetypeId>('intern');
   const [risk, setRisk] = useState(50);
   const [patience, setPatience] = useState(50);
-  const [look, setLook] = useState<Look>({ skin: 1, hair: 1, hairStyle: 0, suit: 0, tie: 0 });
+  const [look, setLook] = useState<Look>(START);
   const [touched, setTouched] = useState(false);
   const set = (k: keyof Look) => (i: number) => setLook((l) => ({ ...l, [k]: i }));
+  const setFlag = (k: 'fem' | 'watch') => (i: number) => setLook((l) => ({ ...l, [k]: i === 1, ...(k === 'fem' && i === 1 ? { face: 0 } : {}) }));
   const reduced = useReducedMotion();
 
   // Default the sliders to the method's temperament.
@@ -191,7 +229,23 @@ export default function Hire() {
 
   const randomise = () => {
     const r = (n: number) => Math.floor(Math.random() * n);
-    setLook({ skin: r(SKINS.length), hair: r(HAIRS.length), hairStyle: r(HAIR_STYLE_NAMES.length), suit: r(SUITS.length), tie: r(TIES.length) });
+    const fem = Math.random() < 0.35;
+    setLook({
+      skin: r(SKINS.length),
+      hair: r(HAIRS.length),
+      hairStyle: r(HAIR_STYLE_NAMES.length),
+      suit: r(SUITS.length),
+      tie: r(TIES.length),
+      fem,
+      build: r(BUILD_NAMES.length),
+      height: r(HEIGHT_NAMES.length),
+      face: fem || Math.random() < 0.4 ? 0 : r(FACE_NAMES.length),
+      outfit: r(OUTFIT_NAMES.length),
+      shirt: r(SHIRTS.length),
+      neck: r(NECK_NAMES.length),
+      eyes: Math.random() < 0.4 ? 0 : r(EYES_NAMES.length),
+      watch: Math.random() < 0.6,
+    });
   };
 
   return (
@@ -277,20 +331,20 @@ export default function Hire() {
                 </div>
               </div>
             </div>
+            <Options label="Cut" names={CUT_NAMES} value={look.fem ? 1 : 0} onChange={setFlag('fem')} />
+            <Options label="Build" names={BUILD_NAMES} value={look.build ?? 1} onChange={set('build')} />
+            <Options label="Height" names={HEIGHT_NAMES} value={look.height ?? 1} onChange={set('height')} />
             <Swatches label="Skin" colors={SKINS} value={look.skin} onChange={set('skin')} />
             <Swatches label="Hair" colors={HAIRS} names={HAIR_NAMES} value={look.hair} onChange={set('hair')} />
-            <div className="field" role="radiogroup" aria-label="Haircut">
-              <span className="label">Haircut</span>
-              <div className="options">
-                {HAIR_STYLE_NAMES.map((n, i) => (
-                  <button key={n} type="button" role="radio" aria-checked={look.hairStyle === i} className="option" onClick={() => set('hairStyle')(i)}>
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <Options label="Haircut" names={HAIR_STYLE_NAMES} value={look.hairStyle} onChange={set('hairStyle')} />
+            {!look.fem && <Options label="Facial hair" names={FACE_NAMES} value={look.face ?? 0} onChange={set('face')} />}
+            <Options label="Outfit" names={OUTFIT_NAMES} value={look.outfit ?? 0} onChange={set('outfit')} />
             <Swatches label="Suit" colors={SUITS} names={SUIT_NAMES} value={look.suit} onChange={set('suit')} />
+            <Swatches label="Shirt" colors={SHIRTS} names={SHIRT_NAMES} value={look.shirt ?? 0} onChange={set('shirt')} />
+            <Options label="Neck" names={NECK_NAMES} value={look.neck ?? 0} onChange={set('neck')} />
             <Swatches label="Tie" colors={TIES} names={TIE_NAMES} value={look.tie} onChange={set('tie')} />
+            <Options label="Eyes and ears" names={EYES_NAMES} value={look.eyes ?? 0} onChange={set('eyes')} />
+            <Options label="Wrist" names={WRIST_NAMES} value={look.watch ? 1 : 0} onChange={setFlag('watch')} />
             <div className="panel-actions">
               <button type="submit" className="btn-black">
                 sign the paperwork <span aria-hidden="true">↗</span>

@@ -8,7 +8,8 @@
 import type { Look } from '../sim/types';
 import { HAIRS, SKINS, SUITS, TIES, shade } from '../art/palette';
 import { rgba } from './buffer';
-import { renderFigure } from '../art/figure';
+import { lookKey, renderFigure } from '../art/figure';
+import { S } from './layout';
 
 export interface SpriteImage {
   w: number;
@@ -92,15 +93,8 @@ function mirror(rows: string[]): string[] {
   return rows.map((r) => r.split('').reverse().join(''));
 }
 
-export type Pose =
-  | 'stand'
-  | 'walk'
-  | 'back'
-  | 'sit'
-  | 'celebrate'
-  | 'slump'
-  | 'box'
-  | 'backbox';
+export type { Pose } from '../art/figure';
+import type { Pose } from '../art/figure';
 
 let overrides: Map<Pose, string[][]> | null = null;
 
@@ -210,6 +204,8 @@ export function poseGrid(pose: Pose, frame: number, hairStyle: number, glasses: 
       if (frame % 2) rows.unshift('.............'), rows.pop();
       return pad(fix(rows));
     }
+    default:
+      return pad([...headF, ...torsoF, ...stand]);
   }
 }
 
@@ -245,7 +241,7 @@ function paletteFor(look: Look): Record<string, number> {
 
 
 export function sprite(look: Look, pose: Pose, frame: number, glasses = false): SpriteImage {
-  const key = `${look.skin}${look.hair}${look.hairStyle}${look.suit}${look.tie}|${pose}|${frame}|${glasses ? 1 : 0}`;
+  const key = `${lookKey(look)}|${pose}|${frame}|${glasses ? 1 : 0}`;
   const hit = cache.get(key);
   if (hit) return hit;
   let img: SpriteImage;
@@ -262,7 +258,7 @@ export function sprite(look: Look, pose: Pose, frame: number, glasses = false): 
         if (c) px[y * w + x] = c;
       }
     img = { w, h, px };
-  } else img = renderFigure(look, pose, frame, { glasses });
+  } else img = renderFigure(look, pose, frame, { glasses, scale: S / 2 });
   if (cache.size > 800) cache.clear();
   cache.set(key, img);
   return img;

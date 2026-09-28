@@ -48,6 +48,9 @@ export interface Coin {
   change1h: number;
   phase: CoinPhase;
   listedTick: number;
+  /** Recent prices, oldest first. */
+  hist: number[];
+  holders: number;
 }
 
 export type Side = 'BUY' | 'SELL';
@@ -71,7 +74,22 @@ export interface Trade {
   pnlPct?: number;
   reason: string;
   rule: Rule;
+  /** A visitor's own hire; only ever shown in that browser. */
+  local?: boolean;
 }
+
+export type EventKind = 'escorted' | 'hired' | 'bonus' | 'review' | 'stale' | 'rug';
+
+export interface FirmEvent {
+  id: string;
+  kind: EventKind;
+  tick: number;
+  at: number;
+  text: string;
+  traderId?: string;
+}
+
+export type FeedItem = ({ type: 'trade' } & Trade) | ({ type: 'event' } & FirmEvent);
 
 export type TraderStatus = 'seated' | 'escorted' | 'waiting';
 
@@ -93,12 +111,22 @@ export interface Trader {
   strikes: number;
   openPositions: number;
   underWater: number;
+  trades: number;
+  wins: number;
+  losses: number;
+  leftTick?: number;
+  risk: number;
+  patience: number;
+  recent: Trade[];
+  local?: boolean;
 }
 
 export interface BonusDay {
   poolSol: number;
   lastAt: number | null;
   lastPaidSol: number;
+  totalPaidSol: number;
+  days: number;
   holders: number;
   nextAt: number;
 }
@@ -114,8 +142,8 @@ export interface FirmState {
   /** Traders who have left the building, newest first. */
   alumni: Trader[];
   coins: Coin[];
-  /** Newest first. */
-  feed: Trade[];
+  /** Newest first. Trades and firm events. */
+  feed: FeedItem[];
   treasurySol: number;
   feesInSol: number;
   shredder: number;
@@ -127,6 +155,11 @@ export interface FirmState {
   /** Epoch ms of the last board read. */
   boardReadAt: number;
   feedStale: boolean;
-  partnerFloor: FloorId;
+  partnerFloor: FloorId | 'review';
   nextReviewAt: number;
+  lastReviewAt: number | null;
+  theme: string;
+  season: { start: number; tick: number };
+  /** This visitor's own hires. */
+  mine: Trader[];
 }

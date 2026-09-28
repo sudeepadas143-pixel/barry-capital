@@ -1,10 +1,12 @@
 import { useId, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { PARTNER_LOOK } from '../art/partner';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
-import { ago, fmtPct, fmtSignedSol, pad2, pctClass } from '../format';
+import { ago, fmtPct, fmtSignedSol, fmtSol, pad2, pctClass } from '../format';
 import { ARCHETYPES } from '../sim/archetypes';
-import type { Trade, Trader } from '../sim/types';
+import { SIM } from '../sim/params';
+import type { EventKind, FeedItem, FirmEvent, Trade, Trader } from '../sim/types';
 import { Headshot } from './Sprite';
 
 type Tab = 'feed' | 'payroll' | 'waiting';
@@ -14,7 +16,16 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'waiting', label: 'waiting for a desk' },
 ];
 
-export function Strikes({ n, of = 3 }: { n: number; of?: number }) {
+const EVENT_CHIP: Record<EventKind, string> = {
+  escorted: 'HR',
+  hired: 'HR',
+  bonus: 'BONUS',
+  review: 'REVIEW',
+  stale: 'FEED',
+  rug: 'RUG',
+};
+
+export function Strikes({ n, of = SIM.STRIKES_TO_FIRE }: { n: number; of?: number }) {
   return (
     <span className="strikes" aria-label={`${n} of ${of} strikes`}>
       {Array.from({ length: of }, (_, i) => (i < n ? '●' : '○')).join('')}
@@ -36,11 +47,9 @@ export function TradeRow({ trade, trader, now }: { trade: Trade; trader?: Trader
           <button type="button" className="trade-who" onClick={() => trader && openPanel(trader.id)}>
             {trader?.name ?? trade.traderId}
           </button>
+          {trade.local && <span className="chip chip-yours">YOURS</span>}
           <span className={`chip ${trade.side === 'BUY' ? 'chip-buy' : 'chip-sell'}`}>{trade.side}</span>
           <span className="ticker">${trade.ticker}</span>
-          {trade.pnlPct !== undefined && (
-            <span className={`ticker num ${pctClass(trade.pnlPct)}`}>{fmtPct(trade.pnlPct)}</span>
-          )}
           <button
             type="button"
             className="chip"
@@ -55,7 +64,18 @@ export function TradeRow({ trade, trader, now }: { trade: Trade; trader?: Trader
           {ago(now - trade.at)}
         </time>
       </div>
-      <p className="trade-reason">{trade.reason}</p>
+      <p className="trade-reason">
+        {trade.reason}{' '}
+        <span className="trade-meta num">
+          {fmtSol(trade.sizeSol, 2)} SOL
+          {trade.pnlPct !== undefined && (
+            <>
+              {' · '}
+              <span className={pctClass(trade.pnlPct)}>{fmtPct(trade.pnlPct)}</span>
+            </>
+          )}
+        </span>
+      </p>
       {open && (
         <div id={ruleId} className="trade-rule">
           <span className="mono">rule {trade.rule.code}</span>
@@ -66,22 +86,80 @@ export function TradeRow({ trade, trader, now }: { trade: Trade; trader?: Trader
   );
 }
 
-function Feed({ limit }: { limit?: number }) {
-  const { state, now, byId } = useFirm();
-  const rows = limit ? state.feed.slice(0, limit) : state.feed;
+export function EventRow({ ev, trader, now }: { ev: FirmEvent; trader?: Trader; now: number }) {
+  const { open } = usePanel();
+  const look = trader && (ev.kind === 'hired' || ev.kind === 'escorted') ? trader.look : PARTNER_LOOK;
   return (
-    <ul className="feed">
-      {rows.map((t) => (
-        <TradeRow key={t.id} trade={t} trader={byId.get(t.traderId)} now={now} />
-      ))}
-    </ul>
+    <li className="trade trade-event">
+      <div className="trade-top">
+        <span className="avatar" aria-hidden="true">
+          <Headshot look={look} size={30} glasses={look === PARTNER_LOOK} />
+        </span>
+        <div className="trade-mid">
+          <span className={`chip chip-ev chip-${ev.kind}`}>{EVENT_CHIP[ev.kind]}</span>
+          {trader && (
+            <button type="button" className="trade-who" onClick={() => open(trader.id)}>
+              {trader.name}
+            </button>
+          )}
+        </div>
+        <time className="ago num" dateTime={new Date(ev.at).toISOString()}>
+          {ago(now - ev.at)}
+        </time>
+      </div>
+      <p className="trade-reason">{ev.text}</p>
+    </li>
+  );
+}
+
+export function FeedRow({ item, now, byId }: { item: FeedItem; now: number; byId: Map<string, Trader> }) {
+  return item.type === 'trade' ? (
+    <TradeRow trade={item} trader={byId.get(item.traderId)} now={now} />
+  ) : (
+    <EventRow ev={item} trader={item.traderId ? byId.get(item.traderId) : undefined} now={now} />
+  );
+}
+
+type Filter = 'all' | 'trades' | 'events' | 'mine';
+
+function Feed({ limit, filters }: { limit?: number; filters?: boolean }) {
+  const { state, now, byId } = useFirm();
+  const [f, setF] = useState<Filter>('all');
+  let rows = state.feed;
+  if (f === 'trades') rows = rows.filter((x) => x.type === 'trade');
+  if (f === 'events') rows = rows.filter((x) => x.type === 'event');
+  if (f === 'mine') rows = rows.filter((x) => x.type === 'trade' && x.local);
+  if (limit) rows = rows.slice(0, limit);
+  return (
+    <>
+      {filters && (
+        <div className="options feed-filters" role="radiogroup" aria-label="Show">
+          {(['all', 'trades', 'events', ...(state.mine.length ? ['mine' as const] : [])] as Filter[]).map((x) => (
+            <button key={x} type="button" role="radio" aria-checked={f === x} className="option" onClick={() => setF(x)}>
+              {x === 'mine' ? 'yours' : x}
+            </button>
+          ))}
+        </div>
+      )}
+      {rows.length ? (
+        <ul className="feed">
+          {rows.map((t) => (
+            <FeedRow key={t.id} item={t} now={now} byId={byId} />
+          ))}
+        </ul>
+      ) : (
+        <p className="prose muted" style={{ fontSize: 17, padding: '18px 0' }}>
+          Nothing on the books yet. Check back in a minute.
+        </p>
+      )}
+    </>
   );
 }
 
 function Payroll() {
   const { state } = useFirm();
   const { open } = usePanel();
-  const rows = [...state.traders].sort((a, b) => (a.desk ?? 99) - (b.desk ?? 99));
+  const rows = [...state.traders, ...state.mine].sort((a, b) => (a.desk ?? 99) - (b.desk ?? 99));
   return (
     <table className="table">
       <thead>
@@ -89,7 +167,7 @@ function Payroll() {
           <th scope="col">Desk</th>
           <th scope="col">Trader</th>
           <th scope="col" className="r">
-            P&amp;L
+            P&amp;L SOL
           </th>
           <th scope="col" className="r">
             Strikes
@@ -99,19 +177,21 @@ function Payroll() {
       <tbody>
         {rows.map((t) => (
           <tr key={t.id}>
-            <td className="mono muted">{t.desk ? pad2(t.desk) : '—'}</td>
+            <td className="mono muted">{t.desk ? pad2(t.desk) : t.local ? '12' : '—'}</td>
             <td>
               <div className="who">
+                <span className="avatar" aria-hidden="true">
+                  <Headshot look={t.look} size={30} />
+                </span>
                 <button type="button" onClick={() => open(t.id)}>
                   {t.name}
+                  {t.local && <span className="chip chip-yours" style={{ marginLeft: 8 }}>YOURS</span>}
                   <span className="sub">{ARCHETYPES[t.archetype].title}</span>
                 </button>
               </div>
             </td>
             <td className={`r mono num ${pctClass(t.pnlSol, 3)}`}>{fmtSignedSol(t.pnlSol)}</td>
-            <td className="r">
-              <Strikes n={t.strikes} />
-            </td>
+            <td className="r">{t.local ? <span className="muted">—</span> : <Strikes n={t.strikes} />}</td>
           </tr>
         ))}
       </tbody>
@@ -145,23 +225,28 @@ function Waiting() {
   );
 }
 
-export function Books({ limit, showHead = true }: { limit?: number; showHead?: boolean }) {
+export function Books({ limit, showHead = true, filters = false }: { limit?: number; showHead?: boolean; filters?: boolean }) {
   const { state } = useFirm();
   const [tab, setTab] = useState<Tab>('feed');
   const base = useId();
   const counts: Record<Tab, number> = {
     feed: state.feed.length,
-    payroll: state.traders.length,
+    payroll: state.traders.length + state.mine.length,
     waiting: state.waiting.length,
   };
   const onKey = (e: KeyboardEvent) => {
     const i = TABS.findIndex((t) => t.id === tab);
-    if (e.key === 'ArrowRight') setTab(TABS[(i + 1) % TABS.length].id);
-    if (e.key === 'ArrowLeft') setTab(TABS[(i + TABS.length - 1) % TABS.length].id);
+    let n = -1;
+    if (e.key === 'ArrowRight') n = (i + 1) % TABS.length;
+    if (e.key === 'ArrowLeft') n = (i + TABS.length - 1) % TABS.length;
+    if (n >= 0) {
+      setTab(TABS[n].id);
+      document.getElementById(`${base}-${TABS[n].id}`)?.focus();
+    }
   };
   return (
     <section aria-labelledby={`${base}-title`}>
-      {showHead && (
+      {showHead ? (
         <div className="section-head">
           <h2 id={`${base}-title`} className="label">
             The books
@@ -170,8 +255,7 @@ export function Books({ limit, showHead = true }: { limit?: number; showHead?: b
             notebook <span aria-hidden="true">→</span>
           </Link>
         </div>
-      )}
-      {!showHead && (
+      ) : (
         <h2 id={`${base}-title`} className="sr-only">
           The books
         </h2>
@@ -195,7 +279,7 @@ export function Books({ limit, showHead = true }: { limit?: number; showHead?: b
         ))}
       </div>
       <div id={`${base}-${tab}-panel`} role="tabpanel" aria-labelledby={`${base}-${tab}`}>
-        {tab === 'feed' && <Feed limit={limit} />}
+        {tab === 'feed' && <Feed limit={limit} filters={filters} />}
         {tab === 'payroll' && <Payroll />}
         {tab === 'waiting' && <Waiting />}
       </div>

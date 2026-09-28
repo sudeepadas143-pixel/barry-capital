@@ -8,7 +8,7 @@ import { Headshot } from './Sprite';
 
 export function TraderPanel() {
   const { openId, close } = usePanel();
-  const { state, now, byId } = useFirm();
+  const { now, byId } = useFirm();
   const t = openId ? byId.get(openId) : undefined;
   const ref = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
@@ -46,9 +46,14 @@ export function TraderPanel() {
 
   if (!t) return null;
   const a = ARCHETYPES[t.archetype];
-  const trades = state.feed.filter((x) => x.traderId === t.id).slice(0, 5);
-  const where =
-    t.status === 'seated' ? `desk ${pad2(t.desk!)}` : t.status === 'waiting' ? 'waiting for a desk' : 'escorted out';
+  const trades = t.recent.filter((x) => x.at <= now).slice(0, 5);
+  const where = t.local
+    ? 'desk 12, pencilled in'
+    : t.status === 'seated'
+      ? `desk ${pad2(t.desk!)}`
+      : t.status === 'waiting'
+        ? 'waiting for a desk'
+        : 'escorted out';
 
   return (
     <>

@@ -118,33 +118,6 @@ export function TraderPanel() {
             </div>
           </div>
         </div>
-        <p className="panel-record muted">
-          {t.trades} {t.trades === 1 ? 'trade' : 'trades'} · {t.wins} closed up · {t.losses} closed down
-          {t.hiredTick >= 0 && !t.local && ` · hired ${dayTime(msForTick(t.hiredTick))}`}
-          {t.leftTick !== undefined && ` · left ${dayTime(msForTick(t.leftTick))}`}
-        </p>
-        <h3 className="label">Last five trades</h3>
-        {trades.length ? (
-          <ul className="feed">
-            {trades.map((x) => (
-              <TradeRow key={x.id} trade={x} trader={t} now={now} />
-            ))}
-          </ul>
-        ) : (
-          <p className="prose muted" style={{ fontSize: 17, marginTop: 10 }}>
-            Nothing on the books yet.
-          </p>
-        )}
-        <details className="rules">
-          <summary className="label">Standing rules</summary>
-          <ol>
-            {rulesFor(t.archetype).map((r) => (
-              <li key={r.code}>
-                <span className="mono">{r.code}</span> {r.text}
-              </li>
-            ))}
-          </ol>
-        </details>
         <div className="panel-actions">
           {t.local ? (
             <>
@@ -183,6 +156,33 @@ export function TraderPanel() {
             </>
           )}
         </div>
+        <p className="panel-record muted">
+          {t.trades} {t.trades === 1 ? 'trade' : 'trades'} · {t.wins} closed up · {t.losses} closed down
+          {t.hiredTick >= 0 && !t.local && ` · hired ${dayTime(msForTick(t.hiredTick))}`}
+          {t.leftTick !== undefined && ` · left ${dayTime(msForTick(t.leftTick))}`}
+        </p>
+        <h3 className="label">Last five trades</h3>
+        {trades.length ? (
+          <ul className="feed">
+            {trades.map((x) => (
+              <TradeRow key={x.id} trade={x} trader={t} now={now} />
+            ))}
+          </ul>
+        ) : (
+          <p className="prose muted" style={{ fontSize: 17, marginTop: 10 }}>
+            Nothing on the books yet.
+          </p>
+        )}
+        <details className="rules">
+          <summary className="label">Standing rules</summary>
+          <ol>
+            {rulesFor(t.archetype).map((r) => (
+              <li key={r.code}>
+                <span className="mono">{r.code}</span> {r.text}
+              </li>
+            ))}
+          </ol>
+        </details>
       </div>
     </>
   );

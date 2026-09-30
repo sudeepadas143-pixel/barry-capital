@@ -6,6 +6,7 @@ import { FLOORS } from '../copy';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
 import { agoWords, dayTime, fmtInt, fmtPct, fmtSol, pad2, pctClass, until } from '../format';
+import { SIM } from '../sim/params';
 import { capTable, splitProRata, toLamports, toSol } from '../sim/payout';
 import type { CoinPhase, FirmState, FloorId, Trade } from '../sim/types';
 
@@ -138,7 +139,7 @@ function underReview(s: FirmState): Trade[] {
   const out: Trade[] = [];
   for (const f of s.feed) {
     if (f.type !== 'trade' || f.local) continue;
-    if ((f.side === 'SELL' && (f.pnlPct ?? 0) < -20) || f.sizeSol > 1.25) out.push(f);
+    if ((f.side === 'SELL' && (f.pnlPct ?? 0) < -20) || f.sizeSol > SIM.BOOK_SOL * 0.25) out.push(f);
     if (out.length >= 6) break;
   }
   return out;

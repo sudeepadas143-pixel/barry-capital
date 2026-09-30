@@ -142,7 +142,7 @@ export function genesis(seasonStart: string, tickSeconds = TICK_SECONDS): SimSta
       lastBonusTick: -1,
       lastBonusPaid: 0,
       lastReviewTick: -1,
-      lastReviewTreasury: SIM.TREASURY_START_SOL,
+      lastReviewTreasury: 0,
       fired: 0,
       hired: 0,
       outages: 0,
@@ -196,10 +196,20 @@ export function genesis(seasonStart: string, tickSeconds = TICK_SECONDS): SimSta
   return s;
 }
 
+/**
+ * The firm's own money: its starting balance plus creator fees. Fees only
+ * come in, so the treasury only goes up. The desks trade their own books;
+ * their results feed the bonus pool, not the treasury.
+ */
 export function treasury(s: SimState): number {
+  return SIM.TREASURY_START_SOL + s.c.feesIn;
+}
+
+/** Combined trading result of every desk this season, open and closed. */
+export function deskPnl(s: SimState): number {
   let open = 0;
   for (const t of s.traders) open += t.equity - t.book0;
-  return SIM.TREASURY_START_SOL + s.c.feesIn + s.c.retiredPnl + open - s.c.pooled;
+  return s.c.retiredPnl + open;
 }
 
 const S = {
@@ -362,12 +372,13 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
     }
     if (s.alumni.length > SIM.ALUMNI_KEEP) s.alumni.length = SIM.ALUMNI_KEEP;
     // A share of profit above the high-water mark goes into the bonus pool.
-    const profit = treasury(s) - s.c.lastReviewTreasury;
+    // lastReviewTreasury holds the desks' high-water mark.
+    const profit = deskPnl(s) - s.c.lastReviewTreasury;
     if (profit > 0) {
       const share = profit * SIM.BONUS_SHARE;
       s.c.pool += share;
       s.c.pooled += share;
-      s.c.lastReviewTreasury = treasury(s);
+      s.c.lastReviewTreasury = deskPnl(s);
     }
     s.c.lastReviewTick = tick;
   }

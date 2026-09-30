@@ -269,9 +269,11 @@ describe('money', () => {
     const s = run(SIM.BONUS_EVERY * 3 + 5);
     expect(s.c.bonusPaid + s.c.pool).toBeCloseTo(s.c.pooled, 9);
     expect(s.c.feesIn).toBeGreaterThan(0);
-    let open = 0;
-    for (const t of s.traders) open += t.equity - t.book0;
-    expect(treasury(s)).toBeCloseTo(SIM.TREASURY_START_SOL + s.c.feesIn + s.c.retiredPnl + open - s.c.pooled, 9);
+    expect(treasury(s)).toBeCloseTo(SIM.TREASURY_START_SOL + s.c.feesIn, 9);
+    // The treasury never goes down.
+    const before = treasury(s);
+    run(500, s);
+    expect(treasury(s)).toBeGreaterThanOrEqual(before);
     if (s.c.bonusDays > 0) expect(s.feed.some((f) => f.type === 'event' && f.kind === 'bonus') || s.c.bonusDays > 0).toBe(true);
   });
 

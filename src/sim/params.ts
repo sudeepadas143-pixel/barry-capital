@@ -3,14 +3,14 @@
  * so bump VERSION when you do (it invalidates cached snapshots).
  */
 export const SIM = {
-  VERSION: 14,
+  VERSION: 15,
 
   /** Firm capital at the start of the season, SOL. */
-  TREASURY_START_SOL: 100,
+  TREASURY_START_SOL: 10,
   /** Each desk's paper book on hire, SOL. */
-  BOOK_SOL: 5,
+  BOOK_SOL: 0.5,
   /** Largest single paper trade, SOL. Memecoin liquidity is thin. */
-  MAX_TRADE_SOL: 2,
+  MAX_TRADE_SOL: 0.2,
   /** Swap fee plus slippage, charged on every buy and sell. */
   TRADE_COST: 0.01,
   /** Extra slippage for buying in a coin's first two minutes, when everyone else is too. */
@@ -40,7 +40,7 @@ export const SIM = {
   BONUS_EVERY: 1440,
 
   /** The firm's own token: simulated volume per tick and the creator fee rate. */
-  TOKEN_VOLUME_MEAN_SOL: 9,
+  TOKEN_VOLUME_MEAN_SOL: 0.9,
   CREATOR_FEE_RATE: 0.001,
 
   /** Chance per tick that the price feed goes stale. */

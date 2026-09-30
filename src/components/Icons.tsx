@@ -13,3 +13,16 @@ export const CopyIcon = () => (
     <path d="M3 10.5V3.8C3 3.36 3.36 3 3.8 3h6.7" />
   </svg>
 );
+
+/** Arrows drawn as SVG, so no platform can swap them for emoji. */
+export const ArrowUpRight = () => (
+  <svg className="arrow" width="0.8em" height="0.8em" viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9L9 3M4 3h5v5" />
+  </svg>
+);
+
+export const ArrowRight = () => (
+  <svg className="arrow" width="0.85em" height="0.85em" viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1.5 6h9M7 2.5L10.5 6 7 9.5" />
+  </svg>
+);

@@ -1,5 +1,6 @@
 import { EXPLORER_LABEL, TOKEN_MINT, explorerUrl } from '../../firm.config';
 import { useCopy } from '../hooks/useCopy';
+import { ArrowUpRight } from './Icons';
 
 export function CACard() {
   const { copied, copy } = useCopy(TOKEN_MINT);
@@ -11,7 +12,7 @@ export function CACard() {
           {copied ? 'copied' : 'copy'}
         </button>
         <a className="textlink" href={explorerUrl()} target="_blank" rel="noreferrer">
-          {EXPLORER_LABEL} <span aria-hidden="true">↗</span>
+          {EXPLORER_LABEL} <ArrowUpRight />
         </a>
       </div>
       <p className="ca-addr">{TOKEN_MINT}</p>

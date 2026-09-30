@@ -27,6 +27,7 @@ import { dayTime, fmtPct, fmtSol, pad2, pctClass } from '../format';
 import { ARCHETYPES, ARCHETYPE_IDS } from '../sim/archetypes';
 import type { ArchetypeId, Look } from '../sim/types';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { ArrowUpRight, ArrowRight } from '../components/Icons';
 
 function Swatches({
   label,
@@ -151,7 +152,7 @@ function EmployeeFile() {
               <dt>built from</dt>
               <dd>
                 <a className="textlink mono" href={accountUrl(wallet)} target="_blank" rel="noreferrer" title={wallet}>
-                  {shortAddress(wallet)} <span aria-hidden="true">↗</span>
+                  {shortAddress(wallet)} <ArrowUpRight />
                 </a>
               </dd>
             </>
@@ -198,7 +199,7 @@ function EmployeeFile() {
         )}
         <p style={{ marginTop: 24 }}>
           <Link to="/" className="textlink">
-            see the desk <span aria-hidden="true">→</span>
+            see the desk <ArrowRight />
           </Link>
         </p>
       </section>
@@ -432,7 +433,7 @@ export default function Hire() {
             <Options label="Wrist" names={WRIST_NAMES} value={look.watch ? 1 : 0} onChange={setFlag('watch')} />
             <div className="panel-actions">
               <button type="submit" className="btn-black">
-                sign the paperwork <span aria-hidden="true">↗</span>
+                sign the paperwork <ArrowUpRight />
               </button>
               <button type="button" className="textlink" onClick={randomise}>
                 surprise me

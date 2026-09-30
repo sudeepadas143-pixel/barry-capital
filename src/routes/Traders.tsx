@@ -10,6 +10,7 @@ import { fmtPct, numWord, pad2, pctClass } from '../format';
 import { ARCHETYPES } from '../sim/archetypes';
 import { SIM } from '../sim/params';
 import type { Trader } from '../sim/types';
+import { ArrowRight } from '../components/Icons';
 
 type Sort = 'result' | 'desk' | 'method';
 
@@ -103,7 +104,7 @@ export default function Traders() {
           )}
           <p style={{ marginTop: 24 }}>
             <Link to="/hire" className="textlink">
-              hire a trader <span aria-hidden="true">→</span>
+              hire a trader <ArrowRight />
             </Link>
           </p>
         </section>

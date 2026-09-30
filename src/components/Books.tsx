@@ -8,6 +8,7 @@ import { ARCHETYPES } from '../sim/archetypes';
 import type { EventKind, FeedItem, FirmEvent, Trade, Trader } from '../sim/types';
 import { Headshot } from './Sprite';
 import { Standing } from './Standing';
+import { ArrowRight } from './Icons';
 
 type Tab = 'feed' | 'payroll' | 'waiting';
 const TABS: { id: Tab; label: string }[] = [
@@ -246,7 +247,7 @@ export function Books({ limit, showHead = true, filters = false }: { limit?: num
             The books
           </h2>
           <Link to="/books" className="textlink">
-            everything <span aria-hidden="true">→</span>
+            everything <ArrowRight />
           </Link>
         </div>
       ) : (

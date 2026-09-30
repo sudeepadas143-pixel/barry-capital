@@ -1537,3 +1537,10 @@ button.mini:hover .mini-name {
     border-top: 2px solid var(--ink);
   }
 }
+
+svg.arrow {
+  display: inline-block;
+  vertical-align: -0.08em;
+  margin-left: 0.3em;
+  flex: none;
+}

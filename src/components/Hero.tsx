@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { HERO } from '../copy';
+import { ArrowUpRight, ArrowRight } from './Icons';
 
 export function Hero() {
   return (
@@ -14,10 +15,10 @@ export function Hero() {
       <p className="prose">{HERO.body}</p>
       <div className="hero-cta">
         <Link to="/hire" className="btn-black">
-          {HERO.cta} <span aria-hidden="true">↗</span>
+          {HERO.cta} <ArrowUpRight />
         </Link>
         <Link to="/traders" className="textlink">
-          {HERO.secondary} <span className="arr" aria-hidden="true">→</span>
+          {HERO.secondary} <ArrowRight />
         </Link>
       </div>
     </section>

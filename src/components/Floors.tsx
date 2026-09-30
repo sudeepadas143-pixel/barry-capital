@@ -4,6 +4,7 @@ import { FLOORS } from '../copy';
 import { useFirm } from '../hooks/useFirm';
 import { fmtInt, fmtSol } from '../format';
 import type { FirmState, FloorId } from '../sim/types';
+import { ArrowRight } from './Icons';
 
 export function floorStatus(id: FloorId, s: FirmState, now: number): string {
   switch (id) {
@@ -35,7 +36,7 @@ export function Floors() {
           {PARTNER_NAME}’s floors
         </h2>
         <Link to="/firm" className="textlink">
-          inside the firm <span aria-hidden="true">→</span>
+          inside the firm <ArrowRight />
         </Link>
       </div>
       <ul className="rows">

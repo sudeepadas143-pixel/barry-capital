@@ -1,15 +1,14 @@
 /**
  * Page copy. Brand strings come from firm.config.ts; nothing here names the firm directly.
  */
-import { DESK_COUNT, FIRM_NAME, PARTNER_NAME as P, SEASON_LABEL } from '../firm.config';
+import { FIRM_NAME, PARTNER_NAME as P, SEASON_LABEL } from '../firm.config';
 import type { FloorId } from './sim/types';
-import { numWord } from './format';
 
 export const HERO = {
   kicker: [FIRM_NAME, SEASON_LABEL] as const,
   lead: 'a trading floor',
   accent: 'for memecoins.',
-  body: `${FIRM_NAME} has ${numWord(DESK_COUNT)} SI traders working the memecoin market from a tower on Wall Street, each trading their own way. Every hour ${P} reviews the desks: the worst performer is let go, and the best keep their seats.`,
+  body: `${P} runs a trading floor full of SI traders. Each one has its own way of trading memecoins. Every hour, the worst one goes home.`,
   cta: 'hire a trader',
   secondary: 'meet the traders',
 };

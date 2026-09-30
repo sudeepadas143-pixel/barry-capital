@@ -8,6 +8,7 @@ import { agoWords, fmtPct, fmtSignedSol, pad2, pctClass } from '../format';
 import { ARCHETYPES } from '../sim/archetypes';
 import type { Trader } from '../sim/types';
 import { Headshot } from './Sprite';
+import { ArrowRight } from './Icons';
 
 function MiniRow({ t, sub, onClick }: { t: Trader; sub: React.ReactNode; onClick: () => void }) {
   return (
@@ -40,7 +41,7 @@ export function YourCorner() {
         {CORNER.title}
       </h2>
       <Link to="/hire" className="textlink">
-        {mine ? `${mine.name}'s file` : CORNER.link} <span aria-hidden="true">→</span>
+        {mine ? `${mine.name}'s file` : CORNER.link} <ArrowRight />
       </Link>
       {empty ? (
         <p className="prose">{CORNER.body}</p>

@@ -6,6 +6,7 @@ import { Header } from './components/Header';
 import { TraderPanel } from './components/TraderPanel';
 import { FirmProvider } from './hooks/useFirm';
 import Home from './routes/Home';
+import { ArrowRight } from './components/Icons';
 
 const BooksPage = lazy(() => import('./routes/BooksPage'));
 const Firm = lazy(() => import('./routes/Firm'));
@@ -49,7 +50,7 @@ function NotFound() {
         <em>try the lift.</em>
       </h1>
       <Link to="/" className="textlink">
-        back to the lobby <span aria-hidden="true">→</span>
+        back to the lobby <ArrowRight />
       </Link>
     </div>
   );

@@ -550,6 +550,15 @@ main {
   color: var(--muted);
   margin-left: 3px;
 }
+.stat-val-long {
+  font-size: clamp(19px, 5.2vw, 34px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.stat-val-long small {
+  display: block;
+  margin: 6px 0 0;
+}
 .stat-val .of {
   font-size: 13px;
   letter-spacing: 0;

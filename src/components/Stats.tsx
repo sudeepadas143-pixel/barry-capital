@@ -24,15 +24,15 @@ export function Stats() {
         </div>
         <div className="stat">
           <p className="label">Treasury</p>
-          <div className="stat-val stat-val-long num">
-            {fmtSol(treasury, 6)}
+          <div className="stat-val num">
+            {fmtSol(treasury, 2)}
             <small>SOL</small>
           </div>
         </div>
         <div className="stat">
           <p className="label">Creator fees in</p>
-          <div className="stat-val stat-val-long num">
-            {fmtSol(fees, 6)}
+          <div className="stat-val num">
+            {fmtSol(fees, 2)}
             <small>SOL</small>
           </div>
         </div>

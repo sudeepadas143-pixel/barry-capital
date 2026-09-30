@@ -5,29 +5,66 @@ import { DESK_COUNT, FIRM_NAME, PARTNER_NAME } from '../../firm.config';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
 import { fmtPct, pad2 } from '../format';
-import { Director, type Speech } from '../scene/actors';
+import { Director } from '../scene/actors';
 import { loadCustomArt } from '../scene/artswap';
 import { sceneData } from '../scene/data';
 import { hitDesk, proceduralHotspots, type Hotspots } from '../scene/hotspots';
-import { H, S, W } from '../scene/layout';
-import { Renderer } from '../scene/renderer';
+import { H, W } from '../scene/layout';
+import { CanvasBackend, Renderer, type CustomArt } from '../scene/renderer';
+import { figureSrc } from '../scene/sprites';
+import { spriteCanvas, type SpriteSrc } from '../scene/surface';
+import { POSE_FRAMES, SEATED_POSES, type Pose } from '../art/figure';
+import { PARTNER_LOOK } from '../art/partner';
+import type { FirmState } from '../sim/types';
 
 interface Props {
   hot?: number | null;
   onHover?: (desk: number | null) => void;
 }
 
-const FPS = 12;
+const FPS = 15;
+/** Upper bound on device pixels per scene pixel, to keep memory sane on big screens. */
+const MAX_K = 2;
 
-interface Bubble extends Speech {
-  id: string;
-  /** Anchor, as a fraction of the frame. */
-  x: number;
-  y: number;
+/** Wait for the faces the building uses for its signs and tickers. */
+async function fontsReady() {
+  if (typeof document === 'undefined' || !document.fonts) return;
+  try {
+    await Promise.all([
+      document.fonts.load("500 20px 'EB Garamond'"),
+      document.fonts.load("600 20px 'Inter Tight'"),
+      document.fonts.load("600 20px 'JetBrains Mono'"),
+    ]);
+  } catch {
+    /* draw with fallbacks */
+  }
 }
 
-/** Trades and the partner get the floor first; everyone else fills in. */
-const RANK: Record<Speech['tone'], number> = { partner: 0, win: 1, loss: 1, buy: 2, smug: 3 };
+/** Render everyone's likely poses in idle time, so new poses don't stutter the first time. */
+function prewarm(state: FirmState, k: number): () => void {
+  const jobs: SpriteSrc[] = [];
+  const desk: Pose[] = [...SEATED_POSES, 'hips', 'arms', 'point', 'celebrate', 'walk', 'back'];
+  for (const tr of [...state.traders.filter((x) => x.desk), ...state.mine.slice(0, 1)])
+    for (const p of desk) for (let f = 0; f < POSE_FRAMES[p]; f++) jobs.push(figureSrc(tr.look, p, f));
+  const boss: Pose[] = ['walk', 'back', 'stand', 'arms', 'hips', 'watch', 'drink', 'putt', 'call', 'point'];
+  for (const p of boss) for (let f = 0; f < POSE_FRAMES[p]; f++) jobs.push(figureSrc(PARTNER_LOOK, p, f, true));
+  let stop = false;
+  let handle = 0;
+  const hasIdle = typeof window.requestIdleCallback === 'function';
+  const idle = (fn: () => void) => (hasIdle ? window.requestIdleCallback(fn, { timeout: 500 }) : setTimeout(fn, 16) as unknown as number);
+  const step = () => {
+    if (stop) return;
+    const t0 = performance.now();
+    while (jobs.length && performance.now() - t0 < 10) spriteCanvas(jobs.shift()!, k);
+    if (jobs.length) handle = idle(step);
+  };
+  handle = idle(step);
+  return () => {
+    stop = true;
+    if (hasIdle) window.cancelIdleCallback(handle);
+    else clearTimeout(handle);
+  };
+}
 
 export function Scene({ hot = null, onHover }: Props) {
   const { state, byId, now } = useFirm();
@@ -38,33 +75,26 @@ export function Scene({ hot = null, onHover }: Props) {
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const renderer = useRef<Renderer | null>(null);
+  const custom = useRef<CustomArt | undefined>(undefined);
   const hotspots = useRef<Hotspots | null>(null);
   const director = useRef(new Director());
-  const native = useRef<HTMLCanvasElement | null>(null);
   const [dims, setDims] = useState({ w: W, h: H });
   const [label, setLabel] = useState<{ text: string; x: number; y: number } | null>(null);
   const [ready, setReady] = useState(false);
-  const [bubbles, setBubbles] = useState<Bubble[]>([]);
-  const lastBubbles = useRef({ at: 0, key: '' });
+  const [k, setK] = useState(0);
 
   // Latest values for the animation loop.
   const live = useRef({ state, byId, now, hot });
   live.current = { state, byId, now, hot };
 
-  // Build the renderer once, with custom art if any exists.
+  // Load custom art (if any) and fonts once.
   useEffect(() => {
     let cancelled = false;
-    loadCustomArt().then(({ custom, hotspots: hs }) => {
+    Promise.all([loadCustomArt(), fontsReady()]).then(([{ custom: c, hotspots: hs }]) => {
       if (cancelled) return;
-      renderer.current = new Renderer(custom);
+      custom.current = c;
       hotspots.current = hs ?? proceduralHotspots();
-      const w = renderer.current.frame.w;
-      const h = renderer.current.frame.h;
-      const n = document.createElement('canvas');
-      n.width = w;
-      n.height = h;
-      native.current = n;
-      setDims({ w, h });
+      setDims({ w: c?.bg.w ?? W, h: c?.bg.h ?? H });
       setReady(true);
     });
     return () => {
@@ -72,76 +102,58 @@ export function Scene({ hot = null, onHover }: Props) {
     };
   }, []);
 
-  const draw = useCallback((t: number) => {
-    const r = renderer.current;
-    const c = canvas.current;
-    const n = native.current;
-    if (!r || !c || !n) return;
-    const { state, byId, now, hot } = live.current;
-    const d = director.current;
-    d.sync(state, byId, now, t);
-    const actors = d.actors(state, t, reduced);
-    const frame = r.render(t, { ...sceneData(state), hotDesk: hot }, actors, !reduced && d.doorBusy(t));
-    const nctx = n.getContext('2d')!;
-    nctx.putImageData(frame.toImageData(), 0, 0);
-    const ctx = c.getContext('2d')!;
-    // Whole-number scales stay pixel-exact; anything else is resampled smoothly.
-    const k = c.width / n.width;
-    ctx.imageSmoothingEnabled = Math.abs(k - Math.round(k)) > 0.001;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.drawImage(n, 0, 0, c.width, c.height);
+  const draw = useCallback(
+    (t: number) => {
+      const r = renderer.current;
+      if (!r) return;
+      const { state, byId, now, hot } = live.current;
+      const d = director.current;
+      d.sync(state, byId, now, t);
+      const actors = d.actors(state, t, reduced);
+      const t0 = performance.now();
+      r.render(t, { ...sceneData(state), hotDesk: hot }, actors, !reduced && d.doorBusy(t));
+      if (canvas.current) canvas.current.dataset.frameMs = (performance.now() - t0).toFixed(1);
+    },
+    [reduced],
+  );
 
-    // Speech bubbles, throttled: they're DOM, so they stay sharp at any size.
-    const lb = lastBubbles.current;
-    if (t - lb.at < 0.25 && t >= lb.at) return;
-    lb.at = t;
-    const max = c.clientWidth < 560 ? 2 : 5;
-    const next: Bubble[] = [];
-    for (const a of actors) {
-      const say = d.speech.get(a.id);
-      if (!say) continue;
-      const [sx, sy] = r.screenPoint(a);
-      const lift = a.layer === 'seated' ? 31 : 36;
-      next.push({ ...say, id: a.id, x: sx / n.width, y: (sy - lift * S) / n.height });
-    }
-    next.sort((a, b) => RANK[a.tone] - RANK[b.tone] || a.y - b.y);
-    const shown = next.slice(0, max);
-    const key = shown.map((b) => `${b.id}:${b.text}:${Math.round(b.x * 1000)}:${Math.round(b.y * 1000)}`).join('|');
-    if (key !== lb.key) {
-      lb.key = key;
-      setBubbles(shown);
-    }
-  }, [reduced]);
-
-  // Size the backing store to a whole multiple of the native resolution.
+  // Match the backing store to the device's pixels; redraw the static layers when that changes.
   useEffect(() => {
     const el = wrap.current;
-    const c = canvas.current;
-    if (!el || !c) return;
+    if (!el || !ready) return;
+    let timer = 0;
     const fit = () => {
-      const cssW = el.clientWidth;
       const dpr = window.devicePixelRatio || 1;
-      const ratio = (cssW * dpr) / dims.w;
-      // Snap to a whole multiple when close; otherwise match the device pixels exactly.
-      const k = ratio >= 1 && Math.abs(ratio - Math.round(ratio)) < 0.12 ? Math.round(ratio) : ratio;
-      c.width = Math.round(dims.w * k);
-      c.height = Math.round(dims.h * k);
-      draw(performance.now() / 1000);
+      const next = Math.min(MAX_K, Math.max(0.5, (el.clientWidth * dpr) / dims.w));
+      setK((prev) => (prev && Math.abs(next - prev) / prev < 0.02 ? prev : next));
     };
     fit();
-    const ro = new ResizeObserver(fit);
+    const ro = new ResizeObserver(() => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(fit, 120);
+    });
     ro.observe(el);
-    window.addEventListener('resize', fit);
     return () => {
       ro.disconnect();
-      window.removeEventListener('resize', fit);
+      window.clearTimeout(timer);
     };
-  }, [dims, draw, ready]);
+  }, [dims, ready]);
 
-  // The loop: ~12fps, paused when hidden or scrolled away; a single frame under reduced motion.
   useEffect(() => {
-    if (!ready) return;
+    const c = canvas.current;
+    if (!c || !ready || !k) return;
+    c.width = Math.round(dims.w * k);
+    c.height = Math.round(dims.h * k);
+    const t0 = performance.now();
+    renderer.current = new Renderer(new CanvasBackend(c, k, dims.w, dims.h), custom.current);
+    c.dataset.buildMs = (performance.now() - t0).toFixed(0);
+    draw(reduced ? 0 : performance.now() / 1000);
+    return reduced ? undefined : prewarm(live.current.state, k);
+  }, [k, ready, dims, draw, reduced]);
+
+  // The loop: paused when hidden or scrolled away; a single frame under reduced motion.
+  useEffect(() => {
+    if (!ready || !k) return;
     if (reduced) {
       draw(0);
       return;
@@ -163,12 +175,12 @@ export function Scene({ hot = null, onHover }: Props) {
       cancelAnimationFrame(raf);
       io.disconnect();
     };
-  }, [ready, reduced, draw]);
+  }, [ready, k, reduced, draw]);
 
   // Under reduced motion, redraw when the data changes.
   useEffect(() => {
-    if (reduced && ready) draw(0);
-  }, [reduced, ready, draw, state.tick, hot]);
+    if (reduced && ready && k) draw(0);
+  }, [reduced, ready, k, draw, state.tick, hot]);
 
   const toNative = (e: React.PointerEvent | React.MouseEvent) => {
     const r = canvas.current!.getBoundingClientRect();
@@ -178,10 +190,10 @@ export function Scene({ hot = null, onHover }: Props) {
   const describe = (desk: number) => {
     if (desk === DESK_COUNT + 1) {
       const m = state.mine[0];
-      return m ? `${pad2(desk)} · ${m.name} · ${fmtPct(m.resultPct)}` : `${pad2(desk)} · pencilled in`;
+      return m ? `${pad2(desk)} · ${m.name} · ${fmtPct(m.resultPct)}` : `${pad2(desk)} · spare desk`;
     }
     const t = state.traders.find((x) => x.desk === desk);
-    return t ? `${pad2(desk)} · ${t.name} · ${fmtPct(t.resultPct)}` : `${pad2(desk)} · being cleaned`;
+    return t ? `${pad2(desk)} · ${t.name} · ${fmtPct(t.resultPct)}` : `${pad2(desk)} · empty for now`;
   };
 
   const onMove = (e: React.PointerEvent) => {
@@ -223,16 +235,6 @@ export function Scene({ hot = null, onHover }: Props) {
           }}
           onClick={onClick}
         />
-        {bubbles.map((b) => (
-          <span
-            key={b.id}
-            className={`scene-say scene-say--${b.tone}${b.x > 0.72 ? ' scene-say--left' : ''}`}
-            style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%` }}
-            aria-hidden="true"
-          >
-            {b.text}
-          </span>
-        ))}
         {label && (
           <span className="scene-label" style={{ left: label.x, top: label.y }} aria-hidden="true">
             {label.text}

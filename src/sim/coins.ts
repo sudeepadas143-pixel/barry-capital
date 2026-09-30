@@ -3,7 +3,7 @@
  * launch → pump → chop → (bleed | run | rug). Returns are fat-tailed.
  */
 import { SIM } from './params';
-import { ADJECTIVES, NOUNS, THEMES, cap, type Theme } from './names';
+import { COINS, type Theme } from './names';
 import type { Rng } from './prng';
 import type { CoinPhase } from './types';
 
@@ -79,26 +79,17 @@ function enter(c: CoinState, p: Exclude<CoinPhase, 'delisted'>, r: Rng) {
 
 export function newCoin(board: BoardState, tick: number, r: Rng): CoinState {
   const taken = new Set(board.coins.map((c) => c.ticker));
-  const theme = r.pick(THEMES);
-  let noun = r.pick(NOUNS[theme]);
-  let adj = r.pick(ADJECTIVES);
-  let ticker = noun.toUpperCase();
-  for (let i = 0; taken.has(ticker) && i < 6; i++) {
-    ticker = (adj.slice(0, 1) + noun).toUpperCase().slice(0, 8);
-    if (taken.has(ticker)) {
-      noun = r.pick(NOUNS[theme]);
-      adj = r.pick(ADJECTIVES);
-      ticker = noun.toUpperCase();
-    }
-  }
-  if (taken.has(ticker)) ticker = `${ticker.slice(0, 6)}${board.nextId % 100}`;
+  const free = COINS.filter((c) => !taken.has(c.ticker));
+  const pick = free.length ? r.pick(free) : r.pick(COINS);
+  const ticker = free.length ? pick.ticker : `${pick.ticker.slice(0, 6)}${board.nextId % 100}`;
+  const theme = pick.theme;
   const price = 0.00001 * (0.4 + r.next() * 3);
   const hist: number[] = [];
   for (let i = 0; i < SIM.HISTORY; i++) hist.push(price);
   const c: CoinState = {
     id: board.nextId++,
     ticker,
-    name: `${cap(adj)} ${cap(noun)}`,
+    name: pick.name,
     theme,
     price,
     ath: price,

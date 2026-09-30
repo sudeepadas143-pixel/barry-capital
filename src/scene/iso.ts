@@ -1,9 +1,9 @@
 /**
- * 2:1 isometric projection onto a PixelBuffer.
+ * 2:1 isometric projection onto a Surface.
  * World axes: +x runs down-right on screen, +y runs down-left, +z is up.
  * One world unit along x or y is `s` pixels across and `s / 2` down.
  */
-import { PixelBuffer } from './buffer';
+import type { Affine, Pt, Surface, TextOpts } from './surface';
 import { S } from './layout';
 
 export interface BoxColors {
@@ -20,7 +20,7 @@ export interface BoxColors {
 
 export class Iso {
   constructor(
-    public buf: PixelBuffer,
+    public buf: Surface,
     public ox: number,
     public oy: number,
     public s: number = S,
@@ -60,10 +60,8 @@ export class Iso {
       this.lineTopX(x1, y0, y1, z1, c.hi);
     }
     if (c.lo !== undefined) {
-      const sx = Math.round(this.sx(x1, y1)) - 1;
-      const yTop = Math.floor(this.sy(x1, y1, z1));
-      const yBot = Math.ceil(this.sy(x1, y1, z0));
-      for (let y = yTop + 1; y < yBot; y++) this.buf.set(sx, y, c.lo);
+      const sx = this.sx(x1, y1);
+      this.buf.rect(sx - 1, this.sy(x1, y1, z1), 1, (z1 - z0) * this.s, c.lo);
     }
   }
 
@@ -87,13 +85,34 @@ export class Iso {
     this.faceX(x, y, y + 1, z, z + 1, c);
   }
 
-  /** Visit the pixels of a y-plane cell. */
-  cellY(y: number, x: number, z: number, fn: (px: number, py: number) => void) {
-    this.buf.polyEach([this.p(x, y, z + 1), this.p(x + 1, y, z + 1), this.p(x + 1, y, z), this.p(x, y, z)], fn);
+  /** Corners of a y-plane rectangle, for clipping. */
+  quadY(y: number, x0: number, x1: number, z0: number, z1: number): Pt[] {
+    return [this.p(x0, y, z1), this.p(x1, y, z1), this.p(x1, y, z0), this.p(x0, y, z0)];
   }
 
-  cellX(x: number, y: number, z: number, fn: (px: number, py: number) => void) {
-    this.buf.polyEach([this.p(x, y, z + 1), this.p(x, y + 1, z + 1), this.p(x, y + 1, z), this.p(x, y, z)], fn);
+  quadX(x: number, y0: number, y1: number, z0: number, z1: number): Pt[] {
+    return [this.p(x, y0, z1), this.p(x, y1, z1), this.p(x, y1, z0), this.p(x, y0, z0)];
+  }
+
+  /** Text space on a y-plane: u runs along +x, v runs down (−z), origin at (x0, y, z). */
+  planeY(y: number, x0: number, z: number): Affine {
+    const [e, f] = this.p(x0, y, z);
+    return { a: this.s, b: this.s / 2, c: 0, d: this.s, e, f };
+  }
+
+  /** Text space on an x-plane, reading left to right on screen (along −y). */
+  planeX(x: number, y0: number, z: number): Affine {
+    const [e, f] = this.p(x, y0, z);
+    return { a: this.s, b: -this.s / 2, c: 0, d: this.s, e, f };
+  }
+
+  /** Text on a y-plane with its baseline at height z. */
+  textY(y: number, x: number, z: number, str: string, o: TextOpts) {
+    this.buf.text(str, this.planeY(y, x, z), o);
+  }
+
+  textX(x: number, y: number, z: number, str: string, o: TextOpts) {
+    this.buf.text(str, this.planeX(x, y, z), o);
   }
 
   /** A thin (1px) horizontal line on a y-plane face at height z. */

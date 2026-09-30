@@ -22,7 +22,19 @@ export type Pose =
   | 'leanback'
   | 'phone'
   | 'point'
-  | 'coffee';
+  | 'coffee'
+  | 'stretch'
+  | 'rub'
+  | 'mobile'
+  | 'eat'
+  | 'hips'
+  | 'arms'
+  | 'tie'
+  | 'chat'
+  | 'watch'
+  | 'drink'
+  | 'putt'
+  | 'call';
 
 export const POSE_FRAMES: Record<Pose, number> = {
   stand: 2,
@@ -37,7 +49,22 @@ export const POSE_FRAMES: Record<Pose, number> = {
   phone: 4,
   point: 2,
   coffee: 3,
+  stretch: 2,
+  rub: 2,
+  mobile: 2,
+  eat: 3,
+  hips: 2,
+  arms: 2,
+  tie: 2,
+  chat: 2,
+  watch: 2,
+  drink: 2,
+  putt: 4,
+  call: 4,
 };
+
+/** Poses drawn sitting down (the lower body is hidden by a desk). */
+export const SEATED_POSES: Pose[] = ['sit', 'leanback', 'phone', 'coffee', 'slump', 'stretch', 'rub', 'mobile', 'eat', 'tie', 'chat'];
 
 export interface SpriteImage {
   w: number;
@@ -247,6 +274,11 @@ const minus = (a: [Test, Box], b: [Test, Box]): [Test, Box] => [(x, y) => a[0](x
 
 export class Painter {
   readonly px: Uint32Array;
+  /**
+   * `ss` is the supersampling factor: the painter works at `ss`× the final
+   * resolution, and minimum line widths, rims and the outline are measured in
+   * final pixels so the downsampled result keeps the same weight.
+   */
   constructor(
     readonly w: number,
     readonly h: number,
@@ -254,14 +286,20 @@ export class Painter {
     readonly oy: number,
     readonly s: number,
     px?: Uint32Array,
+    readonly ss = 1,
   ) {
     this.px = px ?? new Uint32Array(w * h);
+  }
+
+  /** Pixels per design unit in the final (downsampled) image. */
+  get fs() {
+    return this.s / this.ss;
   }
 
   /** A view that draws `k` times larger around the design point (ax, ay), on the same pixels. */
   scaled(k: number, ax: number, ay: number): Painter {
     const s2 = this.s * k;
-    return new Painter(this.w, this.h, this.ox + ax * this.s - ax * s2, this.oy + ay * this.s - ay * s2, s2, this.px);
+    return new Painter(this.w, this.h, this.ox + ax * this.s - ax * s2, this.oy + ay * this.s - ay * s2, s2, this.px, this.ss);
   }
 
   /**
@@ -274,7 +312,8 @@ export class Painter {
     const x1 = Math.min(this.w - 1, Math.ceil(box[2] * s + ox) + 1);
     const y0 = Math.max(0, Math.floor(box[1] * s + oy) - 1);
     const y1 = Math.min(this.h - 1, Math.ceil(box[3] * s + oy) + 1);
-    const unit = Math.max(1 / s, Math.min(1, 1.7 / s));
+    const fs = s / this.ss;
+    const unit = Math.max(1 / fs, Math.min(1, 1.7 / fs));
     const sd = (opts.sd ?? 1.2) * unit;
     const hd = (opts.hd ?? 0.9) * unit;
     const bd = (opts.bd ?? 1) * unit;
@@ -295,12 +334,13 @@ export class Painter {
   }
 
   dot(x: number, y: number, c: number, r = 0.5) {
-    this.part(ellipse(x, y, Math.max(r, 0.5 / this.s), Math.max(r, 0.5 / this.s)), c);
+    const m = Math.max(r, 0.5 / this.fs);
+    this.part(ellipse(x, y, m, m), c);
   }
 
   /** A thin line in design units, at least one pixel wide. */
   line(ax: number, ay: number, bx: number, by: number, c: number, r = 0.4) {
-    this.part(capsule(ax, ay, bx, by, Math.max(r, 0.5 / this.s)), c);
+    this.part(capsule(ax, ay, bx, by, Math.max(r, 0.5 / this.fs)), c);
   }
 
   tint([test, box]: [Test, Box], c: number, t: number) {
@@ -312,23 +352,85 @@ export class Painter {
       }
   }
 
-  /** Selective outline: empty pixels touching the figure take a dark version of their neighbour. */
+  /**
+   * Selective outline: empty pixels within `ss` pixels of the figure take a
+   * dark version of their nearest neighbour (one final pixel wide).
+   */
   outline(ink: number) {
-    const { w, h, px } = this;
-    const out = px.slice();
+    const { w, h, px, ss } = this;
+    const r = Math.max(1, Math.round(ss));
+    // Separable square dilation that carries the source colour along.
+    const horiz = new Uint32Array(w * h);
+    for (let y = 0; y < h; y++) {
+      const row = y * w;
+      for (let x = 0; x < w; x++) {
+        const i = row + x;
+        if (px[i]) {
+          horiz[i] = px[i];
+          continue;
+        }
+        for (let d = 1; d <= r; d++) {
+          if (x - d >= 0 && px[i - d]) {
+            horiz[i] = px[i - d];
+            break;
+          }
+          if (x + d < w && px[i + d]) {
+            horiz[i] = px[i + d];
+            break;
+          }
+        }
+      }
+    }
     for (let y = 0; y < h; y++)
       for (let x = 0; x < w; x++) {
         const i = y * w + x;
         if (px[i]) continue;
-        let n = 0;
-        if (x > 0 && px[i - 1]) n = px[i - 1];
-        else if (x < w - 1 && px[i + 1]) n = px[i + 1];
-        else if (y > 0 && px[i - w]) n = px[i - w];
-        else if (y < h - 1 && px[i + w]) n = px[i + w];
-        if (n) out[i] = mix(n, ink, 0.74);
+        let n = horiz[i];
+        for (let d = 1; !n && d <= r; d++) {
+          if (y - d >= 0 && horiz[i - d * w]) n = horiz[i - d * w];
+          else if (y + d < h && horiz[i + d * w]) n = horiz[i + d * w];
+        }
+        if (n) px[i] = mix(n, ink, 0.74);
       }
-    px.set(out);
   }
+
+  /** The finished image, box-filtered down by `ss`. */
+  image(): SpriteImage {
+    return downsample({ w: this.w, h: this.h, px: this.px }, this.ss);
+  }
+}
+
+/** Average `k`×`k` blocks, weighting colour by alpha. */
+export function downsample(img: SpriteImage, k: number): SpriteImage {
+  if (k <= 1) return img;
+  const w = Math.floor(img.w / k);
+  const h = Math.floor(img.h / k);
+  const px = new Uint32Array(w * h);
+  const n = k * k;
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      let a = 0;
+      for (let j = 0; j < k; j++) {
+        const row = (y * k + j) * img.w + x * k;
+        for (let i = 0; i < k; i++) {
+          const c = img.px[row + i];
+          if (!c) continue;
+          const ca = c >>> 24;
+          a += ca;
+          r += (c & 255) * ca;
+          g += ((c >>> 8) & 255) * ca;
+          b += ((c >>> 16) & 255) * ca;
+        }
+      }
+      if (!a) continue;
+      const oa = Math.round(a / n);
+      if (!oa) continue;
+      px[y * w + x] = ((oa << 24) | (Math.round(b / a) << 16) | (Math.round(g / a) << 8) | Math.round(r / a)) >>> 0;
+    }
+  return { w, h, px };
 }
 
 // ---------------------------------------------------------------- rig
@@ -366,6 +468,14 @@ interface Rig {
   box: boolean;
   phone?: boolean;
   cup?: P2;
+  /** A phone held low in both hands. */
+  mobile?: P2;
+  /** A sandwich on its way to the mouth. */
+  food?: P2;
+  /** A whisky tumbler. */
+  glass?: P2;
+  /** Putter: grip point and club-head x offset. */
+  putter?: { grip: P2; head: number };
 }
 
 function sideArms(up: number): [Arm, Arm] {
@@ -484,6 +594,125 @@ function rigFor(pose: Pose, frame: number): Rig {
       r.brow = 'up';
       break;
     }
+    case 'stretch': {
+      // Arms straight up, a long seated stretch.
+      seated();
+      r.up = 10.4 - (f ? 0.4 : 0);
+      const hgt = f ? -1.2 : 0;
+      r.armL = { sh: [-7, -22.8], el: [-10.4, -35 + hgt], hd: [-7.6, -47.6 + hgt], fist: true };
+      r.armR = { sh: [7, -22.8], el: [10.4, -35 + hgt], hd: [7.6, -47.6 + hgt], fist: true };
+      r.mouth = f ? 'shout' : 'line';
+      r.brow = 'flat';
+      break;
+    }
+    case 'rub': {
+      // Rubbing tired eyes, elbows on the desk.
+      seated();
+      r.up = 12;
+      r.head = 'down';
+      r.armL = { sh: [-7, -21.8], el: [-8.6, -15.8], hd: [-2.2 - (f ? 0.3 : 0), -28.4], over: true };
+      r.armR = { sh: [7, -21.8], el: [8.6, -15.8], hd: [2.2 + (f ? 0.3 : 0), -28.6], over: true };
+      r.mouth = 'line';
+      r.brow = 'down';
+      break;
+    }
+    case 'mobile': {
+      // Head down, thumbing through a phone under the desk line.
+      seated();
+      r.head = 'down';
+      r.armL = { sh: [-7, -22.6], el: [-8.2, -16.4], hd: [-2, -19.2] };
+      r.armR = { sh: [7, -22.6], el: [8.2, -16.4], hd: [2, -19.4 + (f ? 0.4 : 0)] };
+      r.mobile = [0, -20.2];
+      r.mouth = 'line';
+      r.brow = 'flat';
+      break;
+    }
+    case 'eat': {
+      // Lunch at the desk, eyes on the screen.
+      seated();
+      const up = f !== 2;
+      r.armR = up ? { sh: [7, -22.6], el: [9.4, -19.6], hd: [3.2, -27.6 - (f ? 0.6 : 0)], over: true } : { sh: [7, -22.6], el: [8.8, -17.2], hd: [6, -14.6] };
+      r.food = up ? [2.6, -28.8 - (f ? 0.6 : 0)] : [6.4, -15.6];
+      r.armL = { sh: [-7, -22.6], el: [-8.4, -16.8], hd: [-4, -13.4] };
+      r.mouth = f === 1 ? 'sip' : 'line';
+      r.brow = 'flat';
+      break;
+    }
+    case 'tie': {
+      // Loosening the tie with one finger.
+      seated();
+      r.armR = { sh: [7, -22.6], el: [9.2, -24.6], hd: [1.4, -32.8 + (f ? 0.6 : 0)], over: true, fist: true };
+      r.armL = { sh: [-7, -22.6], el: [-8.4, -16.8], hd: [-4, -13.4] };
+      r.mouth = 'line';
+      r.brow = f ? 'up' : 'flat';
+      r.headDx = -0.5;
+      break;
+    }
+    case 'chat': {
+      // Turned to the next desk, one hand making the point.
+      seated();
+      r.headDx = 1.1;
+      r.armR = { sh: [7, -22.6], el: [11, -21], hd: [13 + (f ? 0.6 : 0), -26 - (f ? 1 : 0)] };
+      r.armL = { sh: [-7, -22.6], el: [-8.4, -16.8], hd: [-4, -13.4] };
+      r.mouth = f ? 'talk' : 'grin';
+      r.brow = 'cocky';
+      break;
+    }
+    case 'hips': {
+      // Standing at the desk, hands on hips, reading the screen.
+      r.armL = { sh: [-7, -33.6], el: [-11.4, -27.6], hd: [-7.2, -22.6], fist: true };
+      r.armR = { sh: [7, -33.6], el: [11.4, -27.6], hd: [7.2, -22.6], fist: true };
+      r.mouth = 'line';
+      r.brow = 'down';
+      r.headDx = f ? 0.4 : -0.2;
+      break;
+    }
+    case 'arms': {
+      // Arms folded.
+      r.armL = { sh: [-7, -33.6], el: [-8.6, -26.8], hd: [4.8, -28.4] };
+      r.armR = { sh: [7, -33.6], el: [8.6, -27.4], hd: [-4.8, -28.8] };
+      r.mouth = f ? 'smirk' : 'line';
+      r.brow = 'cocky';
+      break;
+    }
+    case 'watch': {
+      // Checking the time, wrist up.
+      r.armL = { sh: [-7, -33.6], el: [-9.4, -29.6], hd: [-1.2, -33.8 - (f ? 0.4 : 0)], over: true };
+      r.armR = { sh: [7, -33.6], el: [9.2, -27.6], hd: [5.6, -22.4], hide: true };
+      r.head = 'down';
+      r.mouth = 'line';
+      r.brow = 'down';
+      break;
+    }
+    case 'drink': {
+      const up = f === 0;
+      r.armR = up ? { sh: [7, -33.6], el: [9.6, -30.4], hd: [3.4, -39.2], over: true } : { sh: [7, -33.6], el: [9.4, -28.6], hd: [8.4, -25.6] };
+      r.glass = up ? [3.4, -40.4] : [8.8, -27];
+      r.armL = { sh: [-7, -33.6], el: [-9.2, -27.6], hd: [-5.6, -22.4], hide: true };
+      r.mouth = up ? 'sip' : 'smirk';
+      break;
+    }
+    case 'putt': {
+      // Lining up a putt: hands together low, head down, the club swinging.
+      const sw = [0, -1.6, 0, 1.4][f];
+      r.head = 'down';
+      r.armL = { sh: [-7, -33.6], el: [-5.6, -27.4], hd: [-0.8 + sw * 0.2, -22.6] };
+      r.armR = { sh: [7, -33.6], el: [5.6, -27.4], hd: [0.8 + sw * 0.2, -22.4] };
+      r.putter = { grip: [sw * 0.2, -22.4], head: sw * 2.2 };
+      r.mouth = 'line';
+      r.brow = 'down';
+      break;
+    }
+    case 'call': {
+      // On the phone, standing.
+      r.armR = { sh: [7, -33.6], el: [10.4, -32.8], hd: [6.4, -43.4], over: true };
+      r.phone = true;
+      const g = [0, 1, 2, 1][f];
+      r.armL = g === 2 ? { sh: [-7, -33.6], el: [-11, -35.8], hd: [-10.4, -42], fist: true } : { sh: [-7, -33.6], el: [-9.4, -28], hd: [-6, -22.4], hide: true };
+      r.mouth = f % 2 ? 'talk' : 'smirk';
+      r.brow = f === 2 ? 'down' : 'cocky';
+      break;
+    }
     case 'slump': {
       // Head in hand, staring at a red screen.
       seated();
@@ -541,7 +770,13 @@ function drawArm(p: Painter, b: Body, arm: Arm, front: boolean) {
   const ux = dx / len;
   const uy = dy / len;
   if (!rolled) p.part(capsule(a.hd[0] - ux * 1.3, a.hd[1] - uy * 1.3, a.hd[0] - ux * 0.6, a.hd[1] - uy * 0.6, 1.5), c.shirt, { shade: c.shirtS });
-  if (look.watch && arm.sh[0] < 0) p.part(capsule(a.hd[0] - ux * 2.1, a.hd[1] - uy * 2.1, a.hd[0] - ux * 1.6, a.hd[1] - uy * 1.6, 1.25), c.gold, { shade: c.goldS });
+  if (look.watch && arm.sh[0] < 0) {
+    // A thin band across the wrist, with a face.
+    const wx = a.hd[0] - ux * 1.5;
+    const wy = a.hd[1] - uy * 1.5;
+    p.part(capsule(wx - uy * 1.25, wy + ux * 1.25, wx + uy * 1.25, wy - ux * 1.25, 0.42), c.gold, { shade: c.goldS });
+    p.part(ellipse(wx, wy, 0.62, 0.62), c.goldS);
+  }
   const hr = a.fist ? 1.75 : 1.6;
   p.part(ellipse(a.hd[0] + ux * 0.5, a.hd[1] + uy * 0.5, hr, hr * 1.08), c.skin, { shade: c.skinS, hi: c.skinH });
   if (a.fist) p.line(a.hd[0] - 0.8, a.hd[1] + 0.2, a.hd[0] + 0.8, a.hd[1] + 0.2, c.skinS, 0.25);
@@ -837,7 +1072,7 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
   const H = { back: shift(hs.back), cap: shift(hs.cap), top: shift(hs.top) };
   const hairOpts = { shade: c.hairS, hi: c.hairH };
   const shaved = hs.shaved ? mix(c.hair, c.skin, 0.45) : c.hair;
-  const detailed = pn.s >= 1.4;
+  const detailed = pn.fs >= 1.4;
 
   if (r.facing === 'back') {
     pn.part(ellipse(cx - 6.1, cy + 0.6, 1.2, 1.8), c.skin, { shade: c.skinS });
@@ -1012,6 +1247,8 @@ const LEAF_S = rgba('#3f6a42');
 export interface FigureOpts {
   scale?: number;
   glasses?: boolean;
+  /** Supersampling factor for smooth edges (1 = hard pixels). */
+  ss?: number;
 }
 
 const HEAD_SCALE = 1.15;
@@ -1024,9 +1261,10 @@ export const lookKey = (l: Look) =>
 
 export function renderFigure(look: Look, pose: Pose, frame: number, opts: FigureOpts = {}): SpriteImage {
   const s = opts.scale ?? 1;
+  const ss = Math.max(1, Math.round(opts.ss ?? 1));
   const w = Math.ceil(W_UNITS * s) + 2;
   const h = Math.ceil(H_UNITS * s) + 2;
-  const pn = new Painter(w, h, w / 2, h - 1 - 0.5 * s, s);
+  const pn = new Painter(w * ss, h * ss, (w / 2) * ss, (h - 1 - 0.5 * s) * ss, s * ss, undefined, ss);
   const partner = !!opts.glasses;
   const lk: Look = partner ? { ...look, eyes: look.eyes ?? 2 } : look;
   const b: Body = {
@@ -1075,18 +1313,44 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
     pn.part(poly([[x - 1.45, y - 2.4], [x + 1.45, y - 2.4], [x + 1.4, y - 1.7], [x - 1.4, y - 1.7]]), c.tie);
     pn.part(poly([[x - 1.2, y - 0.4], [x + 1.2, y - 0.4], [x + 1.1, y + 0.6], [x - 1.1, y + 0.6]]), c.cupS);
   }
+  if (r.mobile) {
+    const [x, y] = [X(b, r.mobile[0]), Yb(b, r.mobile[1])];
+    pn.part(poly([[x - 1.6, y - 1.2], [x + 1.6, y - 1.2], [x + 1.4, y + 1.6], [x - 1.4, y + 1.6]]), c.phone, { hi: mix(c.phone, 0xffffffff, 0.3) });
+    pn.part(poly([[x - 1.2, y - 0.9], [x + 1.2, y - 0.9], [x + 1.05, y + 1.2], [x - 1.05, y + 1.2]]), rgba('#8fc8f0'));
+    // Thumbs over the screen.
+    pn.part(ellipse(x - 1.3, y + 0.6, 0.8, 0.7), c.skin, { shade: c.skinS });
+    pn.part(ellipse(x + 1.3, y + 0.4, 0.8, 0.7), c.skin, { shade: c.skinS });
+  }
+  if (r.food) {
+    const [x, y] = [X(b, r.food[0]), Yb(b, r.food[1])];
+    pn.part(poly([[x - 2, y - 0.8], [x + 2, y - 1.2], [x + 2, y + 0.2], [x - 2, y + 0.6]]), rgba('#e2b877'), { shade: rgba('#b88a4c') });
+    pn.part(poly([[x - 2, y - 0.1], [x + 2, y - 0.5], [x + 2, y - 0.1], [x - 2, y + 0.3]]), rgba('#6ea865'));
+    pn.part(poly([[x - 2, y + 0.3], [x + 2, y - 0.1], [x + 2, y + 1], [x - 2, y + 1.4]]), rgba('#e2b877'), { shade: rgba('#b88a4c') });
+  }
+  if (r.glass) {
+    const [x, y] = [X(b, r.glass[0]), Yb(b, r.glass[1])];
+    pn.part(poly([[x - 1.2, y - 1.4], [x + 1.2, y - 1.4], [x + 1.1, y + 1.4], [x - 1.1, y + 1.4]]), rgba('#dcebf2'), { shade: rgba('#a9c0cc') });
+    pn.part(poly([[x - 1.1, y], [x + 1.1, y], [x + 1.05, y + 1.3], [x - 1.05, y + 1.3]]), rgba('#c07a2c'), { shade: rgba('#8a5418') });
+  }
+  if (r.putter) {
+    const [gx, gy] = [X(b, r.putter.grip[0]), Yb(b, r.putter.grip[1])];
+    const hx2 = r.putter.head + 1.4;
+    pn.line(gx, gy, hx2, -0.9, rgba('#9aa2ab'), 0.3);
+    pn.part(poly([[hx2 - 0.4, -1.8], [hx2 + 2.2, -1.8], [hx2 + 2.2, -0.2], [hx2 - 0.4, -0.2]]), rgba('#3a3d44'), { hi: rgba('#b7bcc3') });
+    pn.part(ellipse(r.putter.head + 6.5, -0.5, 0.7, 0.6), rgba('#ffffff'), { shade: rgba('#cfcfcf') });
+  }
   if (r.box && !front) {
     pn.part(capsule(-7, -33.6 + r.bob, -8.6, -26 + r.bob, 2), c.suit, { shade: c.suitS });
     pn.part(capsule(7, -33.6 + r.bob, 8.6, -26 + r.bob, 2), c.suit, { shade: c.suitS });
   }
   pn.outline(c.ink);
-  return { w, h, px: pn.px };
+  return pn.image();
 }
 
 /** Head and shoulders, square, for headshots. */
-export function renderBust(look: Look, size: number, glasses = false): SpriteImage {
+export function renderBust(look: Look, size: number, glasses = false, ss = 1): SpriteImage {
   const s = size / 30;
-  const full = renderFigure(look, 'stand', 0, { scale: s, glasses });
+  const full = renderFigure(look, 'stand', 0, { scale: s, glasses, ss });
   const cx = full.w / 2;
   const hf = [0.93, 1, 1.07][look.height ?? 1];
   const top = full.h - 1 - 0.5 * s - (38.2 * hf + 17.5) * s;

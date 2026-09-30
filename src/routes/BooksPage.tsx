@@ -8,11 +8,10 @@ export default function BooksPage() {
         <p className="label">The books</p>
         <h1 className="hero-title">
           every trade,
-          <em>in pencil.</em>
+          <em>written down.</em>
         </h1>
         <p className="prose">
-          The full notebook. Each entry carries the reason given at the time and the rule it was filed under.{' '}
-          {PARTNER_NAME} reads all of it.
+          Every trade the desks have made, with a note on why and the rule behind it. {PARTNER_NAME} reads all of it.
         </p>
       </header>
       <Books showHead={false} filters />

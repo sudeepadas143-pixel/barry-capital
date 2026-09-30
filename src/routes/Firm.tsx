@@ -10,12 +10,12 @@ import { capTable, splitProRata, toLamports, toSol } from '../sim/payout';
 import type { CoinPhase, FirmState, FloorId, Trade } from '../sim/types';
 
 const PHASE_WORDS: Record<CoinPhase, string> = {
-  launch: 'just listed',
+  launch: 'new on the board',
   pump: 'going up',
-  chop: 'sideways',
-  bleed: 'leaking',
-  run: 'running again',
-  rug: 'under review',
+  chop: 'going sideways',
+  bleed: 'slowly falling',
+  run: 'going up again',
+  rug: 'crashed',
   delisted: 'gone',
 };
 
@@ -57,8 +57,8 @@ function Office({ s, now }: { s: FirmState; now: number }) {
         ]}
       />
       <p className="prose muted small-prose">
-        On bonus day a share of profit above the high-water mark is split pro rata across simulated holders, to the
-        lamport.
+        Once a day, a fifth of any profit above the previous high goes into the bonus pool and is split between
+        holders in proportion to their balance, down to the lamport.
       </p>
       {split && (
         <table className="table" style={{ marginTop: 12 }}>
@@ -170,7 +170,7 @@ function Compliance({ s, now }: { s: FirmState; now: number }) {
                     <span className="mini-name">
                       {tr?.name} <span className="ticker">{t.side === 'BUY' ? 'bought' : 'sold'} ${t.ticker}</span>
                     </span>
-                    <span className="mini-sub">“{t.reason}”</span>
+                    <span className="mini-sub">{t.reason}</span>
                   </span>
                   <span className={`mini-res num mono ${t.pnlPct !== undefined ? pctClass(t.pnlPct) : ''}`}>
                     {t.pnlPct !== undefined ? fmtPct(t.pnlPct) : `${fmtSol(t.sizeSol, 2)}`}
@@ -194,7 +194,7 @@ function HR({ s }: { s: FirmState }) {
         rows={[
           ['employee files open', String(s.traders.length)],
           ['waiting for a desk', String(s.waiting.length)],
-          ['escorted out this season', String(s.counts.fired)],
+          ['let go this season', String(s.counts.fired)],
           ['hired this season', String(s.counts.hired)],
         ]}
       />
@@ -221,9 +221,9 @@ function Server({ s, now }: { s: FirmState; now: number }) {
       rows={[
         ['feed', s.feedStale ? 'stale' : 'current', s.feedStale ? 'neg' : ''],
         ['board last read', agoWords(now - s.boardReadAt)],
-        ['quiet spells this season', String(s.counts.outages)],
-        ['last one', s.counts.lastOutageAt ? agoWords(now - s.counts.lastOutageAt) : 'none yet'],
-        ['minute', fmtInt(Math.max(0, s.tick))],
+        ['feed outages this season', String(s.counts.outages)],
+        ['last outage', s.counts.lastOutageAt ? agoWords(now - s.counts.lastOutageAt) : 'none yet'],
+        ['minutes into the season', fmtInt(Math.max(0, s.tick))],
       ]}
     />
   );
@@ -233,11 +233,11 @@ function Lobby({ s }: { s: FirmState }) {
   return (
     <KV
       rows={[
-        ['pitched this season', fmtInt(s.counts.pitched)],
-        ['in the lobby now', fmtInt(s.lobby)],
-        ['listed on the board', fmtInt(s.counts.listed)],
-        ['passed on', fmtInt(s.passedOn)],
-        ['the shredder', fmtInt(s.shredder)],
+        ['coins pitched this season', fmtInt(s.counts.pitched)],
+        ['waiting in the lobby', fmtInt(s.lobby)],
+        ['added to the board', fmtInt(s.counts.listed)],
+        ['turned down', fmtInt(s.passedOn)],
+        ['pitches shredded', fmtInt(s.shredder)],
       ]}
     />
   );
@@ -269,10 +269,10 @@ export default function Firm() {
         <p className="label">Inside the firm</p>
         <h1 className="hero-title">
           six floors,
-          <em>one elevator.</em>
+          <em>one lift.</em>
         </h1>
         <p className="prose">
-          A floor-by-floor account of {FIRM_NAME}, as of this minute. {PARTNER_NAME} is somewhere in here.
+          What’s going on at {FIRM_NAME} right now, floor by floor. {PARTNER_NAME} is on one of them.
         </p>
       </header>
       <div className="floors-grid">

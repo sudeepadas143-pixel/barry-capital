@@ -7,55 +7,43 @@ import { numWord } from './format';
 
 export const HERO = {
   kicker: [FIRM_NAME, SEASON_LABEL] as const,
-  lead: 'serious suits.',
-  accent: 'unserious coins.',
-  body: `${FIRM_NAME} employs ${numWord(DESK_COUNT)} AI traders in good suits, each with a memecoin method of its own. ${P} reads the numbers every hour and decides who keeps a desk.`,
+  lead: 'a trading floor',
+  accent: 'for memecoins.',
+  body: `${FIRM_NAME} has ${numWord(DESK_COUNT)} SI traders working the memecoin market from a tower on Wall Street. Each one trades their own way. Every hour ${P} goes through the numbers and decides who keeps their desk.`,
   cta: 'hire a trader',
   secondary: 'meet the traders',
 };
 
 export const FLOORS: { id: FloorId; name: string; blurb: string; floor: string }[] = [
-  { id: 'office', name: 'the corner office', floor: 'sixth floor', blurb: `Where ${P} keeps the treasury, and a second copy of the treasury.` },
-  { id: 'terminal', name: 'the terminal', floor: 'fifth floor', blurb: 'Every coin the firm is watching, on one board. Some of them leave. More arrive.' },
-  { id: 'compliance', name: 'compliance', floor: 'fourth floor', blurb: 'Each trade is read back to the trader who made it. Nobody enjoys this.' },
-  { id: 'hr', name: 'HR', floor: 'third floor', blurb: 'Headshots, employee files, and one cardboard box kept flat behind the door.' },
-  { id: 'server', name: 'the server room', floor: 'basement', blurb: `When the board goes quiet, ${P} comes down here and waits for it to speak again.` },
-  { id: 'lobby', name: 'the lobby', floor: 'ground floor', blurb: 'Coins come in through the revolving door. Most go out the same way.' },
+  { id: 'office', name: 'the corner office', floor: 'sixth floor', blurb: `${P}’s office. The treasury lives in the safe by the window.` },
+  { id: 'terminal', name: 'the terminal', floor: 'fifth floor', blurb: 'Every coin the desks are watching, on one wall of screens.' },
+  { id: 'compliance', name: 'compliance', floor: 'fourth floor', blurb: 'Every trade gets checked here after it happens.' },
+  { id: 'hr', name: 'HR', floor: 'third floor', blurb: 'Hiring, firing, and the headshots you see on the traders page.' },
+  { id: 'server', name: 'the server room', floor: 'basement', blurb: `Where the price feed comes in. When it stops, ${P} comes down here to wait for it.` },
+  { id: 'lobby', name: 'the lobby', floor: 'ground floor', blurb: 'Security, the front desk, and a bronze bull that everyone touches on the way in.' },
 ];
 
 export const PARTNER_AT: Record<FloorId | 'review', string[]> = {
-  office: [`${P} is in the corner office, putting.`, `${P} is in the corner office, counting the treasury twice.`],
-  terminal: [`${P} is on the terminal floor, telling a junior to size up.`, `${P} is at the terminal, reading tickers aloud, badly.`],
-  compliance: [`${P} is in compliance, asking a trade to explain itself.`, `${P} is in compliance, feeding the shredder.`],
-  hr: [`${P} is in HR, ordering more boxes.`, `${P} is in HR, approving a headshot.`],
-  server: [`${P} is in the server room, yelling at a stale feed.`],
-  lobby: [`${P} is in the lobby, patting the bull for luck.`, `${P} is in the lobby, turning down a coin named after a sandwich.`],
-  review: [`${P} is on the terminal floor, doing performance reviews. Nobody is making eye contact.`],
+  office: [`${P} is up in the corner office, practising putts.`, `${P} is in the corner office with a drink.`],
+  terminal: [`${P} is on the fifth floor, watching the terminal.`, `${P} is at the terminal, on the phone.`],
+  compliance: [`${P} is in compliance, going back over this morning’s trades.`, `${P} is down in compliance.`],
+  hr: [`${P} is in HR, on a call about the next hire.`, `${P} is in HR.`],
+  server: [`${P} is in the server room, waiting for the feed to come back.`],
+  lobby: [`${P} is in the lobby, chatting to security.`, `${P} is in the lobby by the bull.`],
+  review: [`${P} is walking the fifth floor doing reviews. It’s quiet up there.`],
 };
-
-/** Things traders say out loud. Shown in speech bubbles over the building. */
-export const SAYS = {
-  phone: ['Buy it all.', 'Size up. Now.', "Who's selling?!", 'I said market order.', 'Get me more.', "Don't tell me the risk.", 'Send it.', 'Call me when it’s up.'],
-  win: ['Printed.', 'Too easy.', 'Called it.', 'Bonus season.', 'Ring the bell!', "Who's buying lunch? Not you."],
-  smug: ["I don't lose. I learn.", 'Paper hands everywhere.', "I'm the liquidity.", 'Watch and learn.', 'Wake me at +50.', "Relax. I've got a model."],
-  loss: ["It's a dip.", "Not a loss till I sell.", "Market's wrong.", 'Averaging down.', 'Temporary.', 'Who moved my stop?'],
-  point: ['Look at that candle!', 'There. Right there.', "That's a breakout.", 'Told you.'],
-  coffee: ['Fourth espresso.', 'Sleep is for index funds.', 'I trade better caffeinated.'],
-  partner: ['Size up or ship out.', "Nobody leaves till we're green.", 'Somebody ring the bell.', 'My office. Now.', 'Who bought this?', 'Bonus day is a state of mind.'],
-};
-
 
 export const CORNER = {
   label: 'your corner of the firm',
   title: 'Take a seat.',
   link: 'hire a trader',
-  body: `Hired traders and followed desks are kept in this browser. Nobody else sees them, including ${P}.`,
+  body: `Anyone you hire or follow is saved in this browser only. ${P} can’t see them.`,
 };
 
 export const SINCE = {
   label: 'since the last visit',
-  empty: 'Follow a trader and the minutes are kept here. Next time, you get only what changed.',
+  empty: 'Follow a trader and we’ll keep track of what they do. Next time you’re back, you’ll see what changed.',
 };
 
-export const NOTE = `${SEASON_LABEL} · simulated balances, trades and prices. No funds deposited or withdrawn.`;
-export const FOOTER_NOTE = 'Simulated. Not financial advice.';
+/** The only disclaimer on the site. */
+export const FOOTER_NOTE = 'Prices, balances and trades on this site aren’t real. Not financial advice.';

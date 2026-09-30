@@ -62,7 +62,7 @@ export function YourCorner() {
               key={t.id}
               t={t}
               onClick={() => open(t.id)}
-              sub={t.status === 'escorted' ? 'escorted out' : t.status === 'waiting' ? 'waiting for a desk' : `desk ${pad2(t.desk ?? 0)} · followed`}
+              sub={t.status === 'escorted' ? 'let go' : t.status === 'waiting' ? 'waiting for a desk' : `desk ${pad2(t.desk ?? 0)} · followed`}
             />
           ))}
         </ul>
@@ -75,7 +75,7 @@ function summary(prev: VisitSnap, fired: number, hired: number, treasury: number
   const out: string[] = [];
   const f = fired - prev.fired;
   const h = hired - prev.hired;
-  if (f > 0) out.push(`${f} escorted out`);
+  if (f > 0) out.push(`${f} let go`);
   if (h > 0) out.push(`${h} hired`);
   const dt = treasury - prev.treasury;
   if (Math.abs(dt) >= 0.001) out.push(`treasury ${fmtSignedSol(dt)} SOL`);
@@ -107,7 +107,7 @@ export function SinceLastVisit() {
       {worth && (
         <p className="prose since-summary">
           Last here {agoWords(away)}.{' '}
-          {lines.length ? `Since then: ${lines.join(', ')}.` : 'Nothing worth mentioning. That is also news.'}
+          {lines.length ? `Since then: ${lines.join(', ')}.` : 'Not much has changed.'}
         </p>
       )}
       {followed.length ? (
@@ -120,14 +120,14 @@ export function SinceLastVisit() {
                     <span className="avatar" />
                     <span className="mini-main">
                       <span className="mini-name">{f.name}</span>
-                      <span className="mini-sub">left the building some time ago</span>
+                      <span className="mini-sub">no longer with the firm</span>
                     </span>
                   </div>
                 </li>
               );
             const was = prev?.traders[t.id];
             let sub: string;
-            if (t.status === 'escorted') sub = was && was.status !== 'escorted' ? 'escorted out with a box since you were here' : 'escorted out with a box';
+            if (t.status === 'escorted') sub = was && was.status !== 'escorted' ? 'let go since your last visit' : 'let go';
             else if (was && worth) {
               const d = t.resultPct - was.resultPct;
               const n = t.trades - was.trades;

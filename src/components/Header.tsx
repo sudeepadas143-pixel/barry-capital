@@ -10,7 +10,7 @@ const LINKS = [
   { to: '/', label: 'the building', sub: 'front page' },
   { to: '/traders', label: 'the traders', sub: 'roster and results' },
   { to: '/firm', label: 'the floors', sub: 'inside the firm' },
-  { to: '/books', label: 'the books', sub: 'feed, payroll, the line' },
+  { to: '/books', label: 'the books', sub: 'every trade and hire' },
   { to: '/hire', label: 'hire a trader', sub: 'design your own' },
 ];
 

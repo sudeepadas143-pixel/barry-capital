@@ -1,11 +1,11 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { it } from 'vitest';
 import { PixelBuffer } from '../src/scene/buffer';
-import { buildScene } from '../src/scene/building';
+import { buildPixelScene } from '../src/scene/building';
 import { encodePng } from '../src/scene/png';
 
 it('renders the building', () => {
-  const s = buildScene();
+  const s = buildPixelScene();
   const out = new PixelBuffer(s.bg.w, s.bg.h);
   out.over(s.bg);
   out.over(s.fg);

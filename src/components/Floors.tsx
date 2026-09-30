@@ -19,10 +19,10 @@ export function floorStatus(id: FloorId, s: FirmState, now: number): string {
       return 'headshots and employee files';
     case 'server':
       return s.feedStale
-        ? `${PARTNER_NAME} is down here now · feed ${Math.round((now - s.boardReadAt) / 60000)} min old`
-        : `where ${PARTNER_NAME} waits out a stale feed`;
+        ? `${PARTNER_NAME} is down here · feed ${Math.round((now - s.boardReadAt) / 60000)} min old`
+        : 'price feed is live';
     case 'lobby':
-      return `${fmtInt(s.lobby)} waiting · ${fmtInt(s.passedOn)} passed on`;
+      return `${fmtInt(s.lobby)} coins waiting · ${fmtInt(s.passedOn)} turned down`;
   }
 }
 

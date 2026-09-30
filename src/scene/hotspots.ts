@@ -5,6 +5,7 @@
  */
 import { Iso } from './iso';
 import { PixelBuffer } from './buffer';
+import { PixelSurface } from './surface';
 import { BAY_X, DESKS, H, INTERIOR, OX, OY, W, Y, floorZ, PARTNER_SPOTS } from './layout';
 
 export type Pt = [number, number];
@@ -41,7 +42,7 @@ function hull(points: Pt[]): Pt[] {
 }
 
 export function proceduralHotspots(): Hotspots {
-  const iso = new Iso(new PixelBuffer(1, 1), OX, OY);
+  const iso = new Iso(new PixelSurface(new PixelBuffer(1, 1)), OX, OY);
   const desks = DESKS.map((d) => {
     const cx = BAY_X[d.bay];
     const zf = floorZ(d.level);

@@ -26,10 +26,13 @@ Reference files, generated from the procedural art with `npm run art`:
 ## The building
 
 **`building.png`** is the scene at native resolution, with a transparent background (the
-page colour shows through). The procedural building is 948×1680, three pixels per world
-unit. Any size works as long as `hotspots.json` gives the same `width` and `height`. The
-site fits the image to the device's pixels: exact whole-number scales stay pixel-exact,
-and other scales are resampled smoothly, so painted or anti-aliased art is fine.
+page colour shows through). The procedural building is laid out on a 948×1680 grid,
+three units per world unit, and drawn as vector shapes at the screen's resolution. The
+reference PNGs in `docs/` come from the same drawing code run through a pixel buffer, so
+their edges are hard and their lettering uses a small pixel font; the site itself is
+smooth and uses real fonts. Any size works as long as `hotspots.json` gives the same
+`width` and `height`. The site stretches the image to the screen's pixels with smooth
+resampling, so painted or anti-aliased art is fine.
 
 Keep the look in the site's palette: a glass-and-steel tower with a travertine and walnut
 banking-hall lobby, charcoal carpet tiles, black desks, gold trim and LED ticker bands.
@@ -81,18 +84,21 @@ no walk.
 
 By default the traders aren't sprite sheets at all. `src/art/figure.ts` draws them from
 shaded shapes (face, hair, jacket and lapels, shirt, tie, arms, legs) and adds a thin
-selective outline, so they render cleanly at any size: about 85px tall standing in the
-building (frames are 60×96 at scale 1.5), larger on the hire page, and as busts for
-headshots.
+selective outline, supersampled so edges stay smooth at any size: about 85 grid units
+tall standing in the building (drawn at the screen's own resolution), larger on the hire
+page, and as busts for headshots.
 
 Each trader is dressed by `src/art/traits.ts`: build, height, one of 14 haircuts, facial
 hair, outfit (suit, pinstripe, fleece vest, shirtsleeves and braces, waistcoat,
 turtleneck and blazer, double-breasted), shirt colour, neckwear, eyewear or headset, and
 a watch. The eleven founding traders are dressed by hand in the `ROSTER` table; anyone
 hired later is dressed from their seed and method, so the same trader always looks the
-same. At their desks, traders cycle through moods (typing, on the phone, leaning back,
-pointing at a chart, espresso, celebrating, slumped), weighted by method and by how
-their day is going (`mood()` in `src/scene/actors.ts`). Changing a haircut, an outfit or
+same. At their desks, traders cycle through habits (typing, on the phone, leaning back,
+pointing at a chart, espresso, stretching, rubbing their eyes, thumbing a phone, lunch,
+loosening the tie, chatting to the next desk, standing with hands on hips or arms
+folded, celebrating, slumped), weighted by method, the time of day and how their day is
+going (`mood()` in `src/scene/actors.ts`). The partner's routines (drink, watch,
+putting, standing calls) are in `ROUTINES` in the same file. Changing a haircut, an outfit or
 a pose means editing `figure.ts`.
 
 ### Replacing poses with hand-drawn sheets
@@ -133,8 +139,9 @@ hire-page figure always use the procedural renderer.
 Sprites anchor at the **bottom centre** of the frame. Seated poses are shorter, so leave
 the top rows transparent and keep the seat at the bottom row. A standing trader is about
 85px tall, a little under two-thirds of a floor's interior height (132px). Hand-drawn
-sheets only cover the original eight poses; the mood poses (`phone`, `leanback`, `point`,
-`coffee`) stay procedural.
+sheets only cover the original eight poses; the habit poses (`phone`, `leanback`,
+`point`, `coffee`, `stretch`, `rub`, `mobile`, `eat`, `tie`, `chat`, `hips`, `arms`,
+`watch`, `drink`, `putt`, `call`) stay procedural.
 
 ### Key colours
 
@@ -163,10 +170,11 @@ suits the artist better.
 | --- | --- |
 | `src/art/figure.ts` | The character renderer: shapes, poses, shading, outline, busts |
 | `src/art/traits.ts` | Who wears what: the hand-dressed roster and the seeded wardrobe |
-| `src/art/props.ts` | Plants, the cat, the bronze bull and the helicopter, drawn the same way |
+| `src/art/props.ts` | Plants, the cat, the bronze bull, globe, camera, bell and helicopter, drawn the same way |
 | `src/scene/layout.ts` | The building as data: scale, dimensions, floors, desk positions, partner spots |
 | `src/scene/building.ts` | Walls, floors, furniture, the tower above, facade and street |
-| `src/scene/props.ts` | Remaining grid props still in use: the globe and the security camera |
+| `src/scene/surface.ts` | Where drawing goes: canvas paths in the browser, a pixel buffer in Node |
+| `src/scene/renderer.ts` | Layer order, caching and the per-frame composite |
 | `src/scene/sprites.ts` | Sprite cache and the loader for hand-drawn sheets |
 | `src/scene/colors.ts` | Scene palette |
 

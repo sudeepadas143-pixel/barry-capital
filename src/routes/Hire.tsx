@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { DESK_COUNT, PARTNER_NAME } from '../../firm.config';
+import { DESK_COUNT, accountUrl } from '../../firm.config';
+import { checkWallet, shortAddress, traderFromWallet } from '../wallet';
 import { Figure, Headshot } from '../components/Sprite';
 import { Strikes, TradeRow } from '../components/Books';
 import {
@@ -90,7 +91,7 @@ const cleanName = (s: string) =>
     .slice(0, 16);
 
 function EmployeeFile() {
-  const { state, now, removeHire, msForTick } = useFirm();
+  const { state, now, removeHire, msForTick, hires } = useFirm();
   const { open } = usePanel();
   const t = state.mine[0];
   const [confirm, setConfirm] = useState(false);
@@ -98,10 +99,11 @@ function EmployeeFile() {
   if (!t) return null;
   const a = ARCHETYPES[t.archetype];
   const trades = t.recent.filter((x) => x.at <= now);
+  const wallet = hires.find((h) => h.id === t.id)?.wallet;
   return (
     <div className="two-col">
       <section className="section" style={{ borderTop: '2px solid var(--ink)' }} aria-labelledby="file-title">
-        <p className="label">Employee file · desk {pad2(DESK_COUNT + 1)}, pencilled in</p>
+        <p className="label">Employee file · desk {pad2(DESK_COUNT + 1)}</p>
         <div className="file-id">
           <div className="portrait portrait-tall">
             <Figure look={t.look} pose={reduced ? 'stand' : 'walk'} animate={!reduced} height={132} label={`${t.name}, standing`} />
@@ -146,9 +148,19 @@ function EmployeeFile() {
           <dd>
             <Strikes n={0} /> exempt
           </dd>
+          {wallet && (
+            <>
+              <dt>built from</dt>
+              <dd>
+                <a className="textlink mono" href={accountUrl(wallet)} target="_blank" rel="noreferrer" title={wallet}>
+                  {shortAddress(wallet)} <span aria-hidden="true">↗</span>
+                </a>
+              </dd>
+            </>
+          )}
         </dl>
         <p className="prose muted" style={{ fontSize: 17, marginTop: 18 }}>
-          Only this browser can see {t.name}. {PARTNER_NAME} has agreed not to ask.
+          Only this browser can see {t.name}, and their results don’t count toward the firm’s.
         </p>
         <div className="panel-actions">
           <button type="button" className="btn-black follow-btn" onClick={() => open(t.id)}>
@@ -162,7 +174,7 @@ function EmployeeFile() {
             <span className="confirm">
               <span className="muted">Sure?</span>{' '}
               <button type="button" className="textlink" onClick={() => removeHire(t.id)}>
-                yes, hand over the box
+                yes, let them go
               </button>{' '}
               <button type="button" className="textlink" onClick={() => setConfirm(false)}>
                 no
@@ -204,12 +216,21 @@ export default function Hire() {
   const [patience, setPatience] = useState(50);
   const [look, setLook] = useState<Look>(START);
   const [touched, setTouched] = useState(false);
+  const [wallet, setWallet] = useState('');
+  const [walletNote, setWalletNote] = useState<{ text: string; bad: boolean } | null>(null);
+  const [walletSeed, setWalletSeed] = useState<number | undefined>(undefined);
+  const keepTemper = useRef(false);
+  const walletName = useRef('');
   const set = (k: keyof Look) => (i: number) => setLook((l) => ({ ...l, [k]: i }));
   const setFlag = (k: 'fem' | 'watch') => (i: number) => setLook((l) => ({ ...l, [k]: i === 1, ...(k === 'fem' && i === 1 ? { face: 0 } : {}) }));
   const reduced = useReducedMotion();
 
-  // Default the sliders to the method's temperament.
+  // Default the sliders to the method's temperament (unless a wallet just set them).
   useEffect(() => {
+    if (keepTemper.current) {
+      keepTemper.current = false;
+      return;
+    }
     setRisk(Math.round(ARCHETYPES[arch].risk * 100));
     setPatience(Math.round(ARCHETYPES[arch].patience * 100));
   }, [arch]);
@@ -218,12 +239,51 @@ export default function Hire() {
   const clean = cleanName(name).trim();
   const error = !clean ? 'A surname, please.' : taken.has(clean) ? 'That name is already on a desk.' : null;
   const hired = state.mine[0];
+  const walletCheck = checkWallet(wallet);
+
+  /** Paste a wallet, get a trader. Secrets are refused and cleared straight away. */
+  const onWallet = (value: string) => {
+    const c = checkWallet(value);
+    if (c.kind === 'secret') {
+      setWallet('');
+      setWalletSeed(undefined);
+      setWalletNote({ text: c.message, bad: true });
+      return;
+    }
+    setWallet(value);
+    if (c.kind === 'ok') {
+      const w = traderFromWallet(c.address);
+      if (w.archetype !== arch) keepTemper.current = true;
+      setArch(w.archetype);
+      setRisk(Math.round(w.risk * 100));
+      setPatience(Math.round(w.patience * 100));
+      setLook(w.look);
+      if (!clean || clean === walletName.current) setName(w.name);
+      walletName.current = w.name;
+      setWalletSeed(w.seed);
+      setWalletNote({ text: 'Built from your wallet. You can still change anything below.', bad: false });
+    } else {
+      setWalletSeed(undefined);
+      setWalletNote(c.kind === 'invalid' && value.trim().length >= 32 ? { text: c.message, bad: true } : null);
+    }
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
     if (error) return;
-    addHire({ name: clean, archetype: arch, look, risk: risk / 100, patience: patience / 100 });
+    if (walletCheck.kind === 'invalid') {
+      setWalletNote({ text: walletCheck.message, bad: true });
+      return;
+    }
+    addHire({
+      name: clean,
+      archetype: arch,
+      look,
+      risk: risk / 100,
+      patience: patience / 100,
+      ...(walletCheck.kind === 'ok' ? { wallet: walletCheck.address, seed: walletSeed } : {}),
+    });
     window.scrollTo(0, 0);
   };
 
@@ -253,13 +313,13 @@ export default function Hire() {
       <header className="page-head">
         <p className="label">Hiring</p>
         <h1 className="hero-title">
-          one desk,
-          <em>pencilled in.</em>
+          one spare desk,
+          <em>yours to fill.</em>
         </h1>
         <p className="prose">
           {hired
-            ? `${hired.name} has the spare desk on this browser. One hire at a time; the budget is what it is.`
-            : 'Design a trader. They take the spare desk on this browser and trade the same board as everyone else, with a paper book of their own.'}
+            ? `${hired.name} has the spare desk on this browser. You can have one hire at a time.`
+            : 'Design a trader yourself, or build one from your wallet. They get the spare desk on this browser and trade the same coins as everyone else, with a book of their own.'}
         </p>
       </header>
       {hired ? (
@@ -267,6 +327,33 @@ export default function Hire() {
       ) : (
         <form className="two-col" onSubmit={submit} noValidate>
           <div className="section" style={{ borderTop: '2px solid var(--ink)' }}>
+            <div className="field wallet-field">
+              <label className="label" htmlFor="wallet">
+                Solana wallet <span className="muted">· optional</span>
+              </label>
+              <input
+                id="wallet"
+                className="input mono"
+                value={wallet}
+                autoComplete="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                inputMode="text"
+                placeholder="your public address"
+                aria-invalid={!!walletNote?.bad}
+                aria-describedby="wallet-help wallet-note"
+                onChange={(e) => onWallet(e.target.value)}
+                onBlur={() => walletCheck.kind === 'invalid' && setWalletNote({ text: walletCheck.message, bad: true })}
+              />
+              <p id="wallet-help" className="field-help">
+                Paste a public wallet address and we’ll build a trader from it: the look, the method and a name. The same
+                wallet always makes the same trader. The address stays in this browser, and nothing is connected or
+                signed. Never paste a private key or recovery phrase here, or anywhere else.
+              </p>
+              <span id="wallet-note" className={walletNote?.bad ? 'field-err' : 'field-ok'} role={walletNote?.bad ? 'alert' : 'status'}>
+                {walletNote?.text ?? ''}
+              </span>
+            </div>
             <label className="field">
               <span className="label">Surname</span>
               <input

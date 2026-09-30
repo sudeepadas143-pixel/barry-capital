@@ -244,7 +244,7 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
     s.outageLeft = 3 + or.int(7);
     s.c.outages++;
     s.c.lastOutageTick = tick;
-    event('stale', `The board went quiet. ${PARTNER_NAME} is in the server room, yelling at a rack.`);
+    event('stale', `The price feed stopped updating. ${PARTNER_NAME} went down to the server room.`);
   }
   const stale = s.outageLeft > 0;
 
@@ -293,7 +293,7 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
 
   for (const c of s.board.rugged) {
     const drop = c.hist.length > 1 ? (1 - c.price / c.hist[c.hist.length - 2]) * 100 : 0;
-    if (heldBy.get(c.id)) event('rug', `$${c.ticker} fell ${Math.round(drop)}% in a minute. Nobody on the desk admits to owning it.`);
+    if (heldBy.get(c.id)) event('rug', `$${c.ticker} dropped ${Math.round(drop)}% in a minute. ${heldBy.get(c.id) === 1 ? 'One desk was' : `${heldBy.get(c.id)} desks were`} holding it.`);
   }
 
   // Coins that left the board settle at their last price.
@@ -323,7 +323,7 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
     s.traders.push(t);
     s.traders.sort((a, b) => (a.desk ?? 0) - (b.desk ?? 0));
     s.c.hired++;
-    event('hired', `${t.name} took desk ${String(v.desk).padStart(2, '0')}. Already asked where the helipad is.`, t.id);
+    event('hired', `${t.name} started at desk ${String(v.desk).padStart(2, '0')} today.`, t.id);
     while (s.waiting.length < SIM.WAITING_LEN) s.waiting.push(candidate(s, hr));
     return false;
   });
@@ -350,11 +350,11 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
       s.traders = s.traders.filter((x) => x !== t);
       s.alumni.unshift(t);
       s.c.fired++;
-      event('escorted', `${t.name} was escorted out with a box. Still says it was a good trade. Desk ${String(t.desk).padStart(2, '0')} is being cleaned.`, t.id);
+      event('escorted', `${t.name} was let go after a third bad review. Desk ${String(t.desk).padStart(2, '0')} is being cleared.`, t.id);
     }
     if (s.alumni.length > SIM.ALUMNI_KEEP) s.alumni.length = SIM.ALUMNI_KEEP;
     if (below.length && !leaving.length) {
-      event('review', below.length === 1 ? `Reviews done. ${below[0]} is below the line and blaming the market.` : `Reviews done. ${below.length} below the line, all blaming the market.`);
+      event('review', below.length === 1 ? `Hourly reviews are done. ${below[0]} is below the line.` : `Hourly reviews are done. ${below.length} traders are below the line.`);
     }
     // A share of profit above the high-water mark goes into the bonus pool.
     const profit = treasury(s) - s.c.lastReviewTreasury;
@@ -377,7 +377,7 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
     s.c.lastBonusHolders = holders;
     s.c.bonusDays++;
     s.c.pool = 0;
-    event('bonus', `Bonus day. ${paid.toFixed(3)} SOL split across ${groupThousands(holders)} holders. Somebody ring the bell.`);
+    event('bonus', `Bonus day: ${paid.toFixed(3)} SOL split between ${groupThousands(holders)} holders.`);
   }
 
   // Creator fees from the firm's own token, simulated.

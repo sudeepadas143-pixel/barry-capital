@@ -10,6 +10,7 @@ import { HAIRS, SKINS, SUITS, TIES, shade } from '../art/palette';
 import { rgba } from './buffer';
 import { lookKey, renderFigure } from '../art/figure';
 import { S } from './layout';
+import type { SpriteSrc } from './surface';
 
 export interface SpriteImage {
   w: number;
@@ -17,7 +18,6 @@ export interface SpriteImage {
   px: Uint32Array;
 }
 
-const cache = new Map<string, SpriteImage>();
 
 export const SPR_W = 15;
 export const SPR_H = 25;
@@ -101,7 +101,6 @@ let overrides: Map<Pose, string[][]> | null = null;
 /** Replace procedural grids with frames loaded from custom sprite sheets. */
 export function setSpriteOverrides(m: Map<Pose, string[][]>) {
   overrides = m;
-  cache.clear();
 }
 
 /** Build the grid for a pose and frame. All grids are SPR_W wide; heights vary (seated poses are shorter). */
@@ -240,26 +239,40 @@ function paletteFor(look: Look): Record<string, number> {
 }
 
 
-export function sprite(look: Look, pose: Pose, frame: number, glasses = false): SpriteImage {
-  const key = `${lookKey(look)}|${pose}|${frame}|${glasses ? 1 : 0}`;
-  const hit = cache.get(key);
-  if (hit) return hit;
-  let img: SpriteImage;
-  if (overrides?.get(pose)?.length) {
-    // Hand-drawn sheets, palette-swapped from their key colours.
-    const grid = poseGrid(pose, frame, look.hairStyle, glasses);
-    const pal = paletteFor(look);
-    const w = grid[0].length;
-    const h = grid.length;
-    const px = new Uint32Array(w * h);
-    for (let y = 0; y < h; y++)
-      for (let x = 0; x < w; x++) {
-        const c = pal[grid[y][x]];
-        if (c) px[y * w + x] = c;
-      }
-    img = { w, h, px };
-  } else img = renderFigure(look, pose, frame, { glasses, scale: S / 2 });
-  if (cache.size > 800) cache.clear();
-  cache.set(key, img);
-  return img;
+/** Nearest-neighbour resize, for hand-drawn sheets drawn at native size. */
+export function scaleNearest(img: SpriteImage, k: number): SpriteImage {
+  if (Math.abs(k - 1) < 1e-3) return img;
+  const w = Math.max(1, Math.round(img.w * k));
+  const h = Math.max(1, Math.round(img.h * k));
+  const px = new Uint32Array(w * h);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) px[y * w + x] = img.px[Math.min(img.h - 1, Math.floor(y / k)) * img.w + Math.min(img.w - 1, Math.floor(x / k))];
+  return { w, h, px };
+}
+
+function sheetSprite(look: Look, pose: Pose, frame: number, glasses: boolean): SpriteImage {
+  const grid = poseGrid(pose, frame, look.hairStyle, glasses);
+  const pal = paletteFor(look);
+  const w = grid[0].length;
+  const h = grid.length;
+  const px = new Uint32Array(w * h);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const c = pal[grid[y][x]];
+      if (c) px[y * w + x] = c;
+    }
+  return { w, h, px };
+}
+
+/** A trader or the partner in a pose, drawn smooth at whatever resolution the surface asks for. */
+export function figureSrc(look: Look, pose: Pose, frame: number, glasses = false): SpriteSrc {
+  const id = `fig:${lookKey(look)}|${pose}|${frame}|${glasses ? 1 : 0}`;
+  return {
+    id,
+    render: (k) => {
+      if (overrides?.get(pose)?.length) return scaleNearest(sheetSprite(look, pose, frame, glasses), k * (S / 2));
+      const scale = (S / 2) * k;
+      return renderFigure(look, pose, frame, { glasses, scale, ss: 2 });
+    },
+  };
 }

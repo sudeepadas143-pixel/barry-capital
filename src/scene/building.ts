@@ -6,11 +6,11 @@
 import { FIRM_NAME } from '../../firm.config';
 import { PixelBuffer, mixColor } from './buffer';
 import { renderBust } from '../art/figure';
-import { blitAt, renderBull, renderCat, renderPlant } from '../art/props';
+import { renderBell, renderBull, renderCamera, renderGlobe, renderPlant, type PlantKind } from '../art/props';
 import { PARTNER_LOOK } from '../art/partner';
 import { C } from './colors';
-import { drawText, textWidth } from './font';
 import { Iso, type BoxColors } from './iso';
+import { PixelSurface, type Pt, type SpriteSrc, type Surface, type TextOpts } from './surface';
 import {
   BAY_X,
   DESK,
@@ -33,15 +33,25 @@ import {
   floorZ,
   type Level,
 } from './layout';
-import { CAMERA, GLOBE, stampAt } from './props';
 
+/** Supersampling for painted props: more samples when the pixels are coarse. */
+export const ssFor = (scale: number) => (scale >= 6 ? 2 : 3);
+
+const plant = (kind: PlantKind): SpriteSrc => ({ id: `plant:${kind}`, render: (k) => renderPlant(kind, S * k, ssFor(S * k)) });
 const PLANTS = {
-  palm: renderPlant('palm', S),
-  fern: renderPlant('fern', S),
-  succulent: renderPlant('succulent', S),
-  shrub: renderPlant('shrub', S),
-  flowers: renderPlant('flowers', S),
+  palm: plant('palm'),
+  fern: plant('fern'),
+  succulent: plant('succulent'),
+  shrub: plant('shrub'),
+  flowers: plant('flowers'),
 };
+const BULL: SpriteSrc = { id: 'bull', render: (k) => renderBull(S * 1.35 * k, ssFor(S * k)) };
+const GLOBE: SpriteSrc = { id: 'globe', render: (k) => renderGlobe(S * k, ssFor(S * k)) };
+const CAMERA: SpriteSrc = { id: 'camera', render: (k) => renderCamera(S * k, ssFor(S * k)) };
+const BELL: SpriteSrc = { id: 'bell', render: (k) => renderBell(S * k, ssFor(S * k)) };
+const PORTRAIT: SpriteSrc = { id: 'portrait', render: (k) => renderBust(PARTNER_LOOK, Math.round(13 * S * k), true, ssFor(S * k)) };
+
+const MONO = (size: number, color: number, weight = 600): TextOpts => ({ font: 'mono', size, color, weight, align: 'center' });
 
 export interface ScreenSpec {
   kind: 'desk' | 'side' | 'terminal' | 'crt';
@@ -58,15 +68,12 @@ export interface ScreenSpec {
 }
 
 export interface Built {
-  bg: PixelBuffer;
-  fg: PixelBuffer;
-  front: PixelBuffer;
   screens: ScreenSpec[];
   ticker: { y: number; x0: number; x1: number; z0: number; z1: number };
   /** LED ticker strips along the cut edge of each floor. */
   bands: { level: number; z0: number }[];
-  /** Pixel indices of each server LED. */
-  leds: number[][];
+  /** Screen quads of each server LED. */
+  leds: Pt[][];
   steam: [number, number][];
   cat: [number, number];
   antenna: [number, number];
@@ -95,13 +102,6 @@ function line3(iso: Iso, a: [number, number, number], b: [number, number, number
   const [ax, ay] = iso.p(...a);
   const [bx, by] = iso.p(...b);
   iso.buf.poly([[ax, ay], [bx, by], [bx, by + th], [ax, ay + th]], c);
-}
-function textY(iso: Iso, y: number, x0: number, zTop: number, s: string, c: number) {
-  drawText(s, (dx, dy) => iso.onY(y, x0 + dx, zTop - dy, c));
-}
-/** Text drawn on an x-plane, reading left to right on screen (so along −y). */
-function textX(iso: Iso, x: number, y0: number, zTop: number, s: string, c: number, cell = 1) {
-  drawText(s, (dx, dy) => iso.faceX(x, y0 - (dx + 1) * cell, y0 - dx * cell, zTop - (dy + 1) * cell, zTop - dy * cell, c));
 }
 function vline(iso: Iso, x: number, y: number, z0: number, z1: number, c: number, w = 1) {
   const sx = Math.floor(iso.sx(x, y));
@@ -232,6 +232,17 @@ function floorSurface(iso: Iso, l: Level) {
     for (let y = 0; y < Y; y += 6) iso.top(x, y, Math.min(X, x + 6), Math.min(Y, y + 6), zf, ((x + y) / 6) % 2 ? C.carpetT : C.carpetT2);
 }
 
+/** Soft shade where the floor meets the back and end walls. */
+function occlusion(iso: Iso, zf: number) {
+  const steps = [0.16, 0.1, 0.06, 0.03];
+  steps.forEach((a, i) => {
+    iso.top(0, i * 0.9, X, (i + 1) * 0.9, zf, C.shadow, a);
+    iso.top(i * 0.9, 0, (i + 1) * 0.9, Y, zf, C.shadow, a * 0.8);
+  });
+  // And a darker band on the wall just above the floor.
+  iso.faceY(0.05, 0, X, zf, zf + 0.8, C.shadow, 0.12);
+}
+
 /** The cut edge of each floor: an LED ticker between steel trims, or granite at the base. */
 function slabBand(iso: Iso, l: Level, out: Built) {
   const zb = base(l.index);
@@ -260,9 +271,7 @@ function elevator(iso: Iso, l: Level) {
   for (let y = y0 + 1; y < y1; y += 1.5) iso.faceX(0, y, y + 0.2, zf + 1, zf + 26, mixColor(C.steelHi, C.white, 0.35));
   // Floor indicator.
   iso.faceX(0, mid - 3, mid + 4, zf + 29.5, zf + 35.5, C.ledKey);
-  const label = l.label;
-  const w = textWidth(label);
-  textX(iso, 0, mid + Math.ceil(w / 2) + 0.5, zf + 34.5, label, C.amber);
+  iso.textX(0, mid + 0.5, zf + 30.7, l.label, MONO(6, C.amber));
 }
 
 // ---------------------------------------------------------------- furniture
@@ -308,7 +317,7 @@ function desk(iso: Iso, fg: Iso, cx: number, zf: number, n: number, pencilled: b
   const label = String(n).padStart(2, '0');
   fg.faceY(y1, cx - 4.5, cx + 4.5, zf + 0.8, zf + 6, C.goldLo);
   fg.faceY(y1, cx - 4, cx + 4, zf + 1.2, zf + 5.6, C.gold);
-  textY(fg, y1, cx - 3, zf + 5.2, label, C.walnutLo);
+  fg.textY(y1, cx, zf + 2, label, MONO(4.6, C.walnutLo));
   // Keyboard, mouse, a phone turret with lit keys.
   fg.box(cx - 5, y0 + 2, zf + h, cx + 4, y0 + 4, zf + h + 0.6, { top: rgba2('#2c2f36'), left: rgba2('#1c1e23'), right: rgba2('#15171b') });
   for (let x = cx - 4.5; x < cx + 3.5; x += 1) fg.top(x, y0 + 2.4, x + 0.6, y0 + 3.6, zf + h + 0.6, rgba2('#454a54'));
@@ -324,7 +333,7 @@ function desk(iso: Iso, fg: Iso, cx: number, zf: number, n: number, pencilled: b
     fg.box(cx + 7.4, y0 + 2.2, zf + h + 1, cx + 8.2, y0 + 3.2, zf + h + 2.4, { top: C.goldHi, left: C.gold, right: C.goldLo });
   } else {
     const [sx, sy] = fg.at(cx + 9, y0 + 3, zf + h);
-    blitAt(fg.buf, PLANTS.succulent, sx, sy + S);
+    fg.buf.sprite(PLANTS.succulent, sx, sy + S);
   }
   // Monitors: a pair on the left, angled to face the trader (screens visible),
   // and a pair on the right with their backs to us.
@@ -378,7 +387,7 @@ function hr(iso: Iso, zf: number, out: Built) {
   // Headshot corner.
   iso.faceY(0.2, 202, 213, zf, zf + 20, C.steelHi);
   const [sx, sy] = iso.at(206, 16, zf);
-  stampAt(iso.buf, CAMERA, sx, sy);
+  iso.buf.sprite(CAMERA, sx, sy);
 }
 
 function compliance(iso: Iso, zf: number) {
@@ -414,11 +423,8 @@ function terminalWall(iso: Iso, zf: number, out: Built) {
   // The bell. Rung on bonus day, and sometimes for no reason.
   iso.box(150, 18, zf, 152, 20, zf + 14, { top: C.goldHi, left: C.gold, right: C.goldLo });
   iso.box(147, 18.4, zf + 14, 155, 19.6, zf + 15, walnut);
-  const [bx, by] = iso.at(151, 19, zf + 20);
-  for (let k = 0; k < 7 * S; k++) {
-    const w = Math.round(2 * S + k * 0.55);
-    iso.buf.rect(bx - w, by + k, w * 2, 1, k > 5.5 * S ? C.goldLo : k < 2 ? C.goldHi : C.gold);
-  }
+  const [bx, by] = iso.at(151, 19, zf + 15);
+  iso.buf.sprite(BELL, bx, by);
 }
 
 function office(iso: Iso, zf: number, out: Built) {
@@ -432,27 +438,24 @@ function office(iso: Iso, zf: number, out: Built) {
   // The safe (the treasury).
   iso.box(82, 1, zf, 96, 9, zf + 16, { top: C.screenOff, left: C.bezel, right: C.screen });
   const [dx, dy] = iso.at(89, 9, zf + 9);
-  for (let a = 0; a < 16; a++) {
-    const ang = (a / 16) * Math.PI * 2;
-    iso.buf.rect(Math.round(dx + Math.cos(ang) * 2.2 * S), Math.round(dy + Math.sin(ang) * 2.2 * S), 2, 2, C.gold);
-  }
-  iso.buf.rect(dx - 1, dy - 1, 3, 3, C.goldHi);
+  iso.buf.ellipse(dx, dy, 2.8 * S, 2.8 * S, C.goldLo);
+  iso.buf.ellipse(dx, dy, 2.4 * S, 2.4 * S, C.gold);
+  iso.buf.ellipse(dx, dy, 1.6 * S, 1.6 * S, C.bezel);
+  iso.buf.ellipse(dx, dy, 0.7 * S, 0.7 * S, C.goldHi);
+  // Handle.
+  iso.faceY(9, 91.5, 94, zf + 8.6, zf + 9.4, C.steelHi);
   iso.hlineY(9, 83, 95, zf + 15, C.bezelHi);
   // Portrait of the partner, sheared to sit flat on the glass... on an easel of walnut.
   iso.faceY(0.3, 102, 118, zf + 4, zf + 20, C.gold);
   iso.faceY(0.3, 103, 117, zf + 5, zf + 19, C.walnutLo);
   {
-    const bust = renderBust(PARTNER_LOOK, 13 * S, true);
-    const [px, py] = iso.at(103.5, 0.3, zf + 18.5);
-    for (let j = 0; j < bust.h; j++)
-      for (let i = 0; i < bust.w; i++) {
-        const c = bust.px[j * bust.w + i];
-        if (c) iso.buf.set(px + i, py + j + Math.floor(i / 2), c);
-      }
+    // Painted flat on the wall: sheared to follow the plane.
+    const [px, py] = iso.p(103.5, 0.3, zf + 18.5);
+    iso.buf.sprite(PORTRAIT, 0, 0, { a: 1, b: 0.5, c: 0, d: 1, e: px, f: py });
   }
   // Globe bar.
   const [gx, gy] = iso.at(78, 16, zf);
-  stampAt(iso.buf, GLOBE, gx, gy);
+  iso.buf.sprite(GLOBE, gx, gy);
   // Partner's desk: a slab of walnut, a green leather inlay, a banker's lamp, a decanter.
   iso.box(124, 1.6, zf + 5, 136, 8, zf + 7.5, leather);
   iso.box(124, 0.4, zf + 7.5, 136, 2.6, zf + 24, leather);
@@ -473,20 +476,21 @@ function office(iso: Iso, zf: number, out: Built) {
   iso.box(164.6, 11, zf, 166.6, 20, zf + 9, leather);
   iso.box(205.6, 11, zf, 207.6, 20, zf + 9, leather);
   const [fx, fy] = iso.at(214, 18, zf);
-  blitAt(iso.buf, PLANTS.palm, fx, fy);
+  iso.buf.sprite(PLANTS.palm, fx, fy);
   out.pendulum = [0, 0];
 }
 
 function lobby(iso: Iso, zf: number, out: Built) {
   // Brass lettering on the walnut wall.
   const name = FIRM_NAME.toUpperCase();
-  const tw = textWidth(name);
-  const x0 = 112 - Math.floor(tw / 2);
+  const sign: TextOpts = { font: 'serif', size: 7.6, color: C.goldHi, weight: 500, align: 'center', spacing: 1.1 };
+  const tw = iso.buf.measure(name, sign);
   // Black granite fascia so the brass reads against the travertine.
-  iso.faceY(0.15, x0 - 4, x0 + tw + 3, zf + 12.2, zf + 20.8, C.gold);
-  iso.faceY(0.18, x0 - 3.6, x0 + tw + 2.6, zf + 12.6, zf + 20.4, C.marbleK);
-  textY(iso, 0.2, x0, zf + 19, name, C.goldHi);
-  textY(iso, 0.1, x0 + 0.3, zf + 18.7, name, C.goldLo);
+  const z0 = zf + 6.5;
+  iso.faceY(0.15, 112 - tw / 2 - 4.4, 112 + tw / 2 + 4.4, z0 - 0.4, z0 + 8.6, C.gold);
+  iso.faceY(0.18, 112 - tw / 2 - 4, 112 + tw / 2 + 4, z0, z0 + 8.2, C.marbleK);
+  iso.textY(0.2, 112 + 0.25, z0 + 1.6, name, { ...sign, color: C.goldLo });
+  iso.textY(0.2, 112, z0 + 1.9, name, sign);
   // Security desk in white marble, with the ticker running along its front.
   iso.box(160, 3, zf, 198, 10, zf + 10, marbleWhite);
   iso.box(159, 2, zf + 10, 199, 11, zf + 11, { top: C.deskTop, left: C.graniteD, right: C.graniteD, hi: C.gold });
@@ -504,13 +508,13 @@ function lobby(iso: Iso, zf: number, out: Built) {
   iso.box(14, 3, zf, 60, 14, zf + 3, granite);
   iso.faceY(14, 28, 46, zf + 0.8, zf + 2.2, C.gold);
   const [bx, by] = iso.at(38, 8.5, zf + 3);
-  blitAt(iso.buf, renderBull(S * 1.35), bx, by);
+  iso.buf.sprite(BULL, bx, by);
   for (const [x, y] of [
     [64, 21],
-    [214, 20],
+    [224, 20],
   ]) {
     const [sx, sy] = iso.at(x, y, zf);
-    blitAt(iso.buf, PLANTS.palm, sx, sy);
+    iso.buf.sprite(PLANTS.palm, sx, sy);
   }
 }
 
@@ -525,9 +529,7 @@ function server(iso: Iso, zf: number, out: Built) {
       for (let k = 0; k < 4; k++) {
         const x = x0 + 1.6 + k * 2.2;
         iso.faceY(7, x, x + 0.8, z, z + 0.8, C.ledOff);
-        const cell: number[] = [];
-        iso.buf.polyEach([iso.p(x, 7, z + 0.8), iso.p(x + 0.8, 7, z + 0.8), iso.p(x + 0.8, 7, z), iso.p(x, 7, z)], (px, py) => cell.push(py * iso.buf.w + px));
-        out.leds.push(cell);
+        out.leds.push(iso.quadY(7, x, x + 0.8, z, z + 0.8));
       }
     }
   }
@@ -552,7 +554,7 @@ function foundation(iso: Iso) {
 }
 
 /** The rest of the tower, rising past the top of the frame. */
-function tower(iso: Iso, fr: Iso, out: Built) {
+function tower(iso: Iso, out: Built) {
   const z0 = ROOF_Z;
   const z1 = ROOF_Z + TOWER_H;
   // Front glass (the floors above aren't ours, so they're not cut open).
@@ -572,39 +574,31 @@ function tower(iso: Iso, fr: Iso, out: Built) {
   iso.faceY(Y, -5, X, z0, z0 + ST, C.ledKey);
   iso.faceY(Y, -5, X, z0 + ST - 0.5, z0 + ST, C.ledTrim);
   out.bands.push({ level: 6, z0: z0 + 0.4 });
-  // Fade the tower out as it rises. Work out, column by column, which world
-  // height each pixel sits at on the tower's faces, and fade by height.
   out.towerTop = Math.floor(iso.sy(0, 0, z1));
-  const fadeStart = z0 + 16;
+}
+
+/**
+ * Fade the tower out as it rises. On a vertical plane, world height is a
+ * linear function of screen position, so a straight gradient along the
+ * direction of increasing z fades by height exactly.
+ */
+function fadeTower(bg: Iso, fr: Iso) {
+  const z1 = ROOF_Z + TOWER_H;
+  const zs = ROOF_Z + 16;
+  const s = bg.s;
+  const grad = (p: Pt, gx: number, gy: number, dz: number): [Pt, Pt] => {
+    // Screen offset that raises z by dz along the gradient (gx, gy).
+    const n2 = gx * gx + gy * gy;
+    return [p, [p[0] + (gx * dz) / n2, p[1] + (gy * dz) / n2]];
+  };
+  // Front glass: plane y = Y. z = (sx − ox)/(2s) + Y − (sy − oy)/s.
+  const [fa, fb] = grad(bg.p(0, Y, z1), 1 / (2 * s), -1 / s, zs - z1);
+  bg.buf.fade(bg.quadY(Y, -6, X + 0.5, zs, z1 + 60), fa, fb);
+  // The facade layer: the steel edge on the front plane and the glass end wall (plane x = xo).
   const xo = X + 6;
-  const fx0 = Math.floor(iso.sx(-5, Y));
-  const fx1 = Math.ceil(iso.sx(X, Y));
-  const ex1 = Math.ceil(iso.sx(xo, 0));
-  for (const buf of [iso.buf, fr.buf]) {
-    for (let c = fx0; c <= ex1; c++) {
-      if (c < 0 || c >= buf.w) continue;
-      let rowOf: (z: number) => number;
-      let zOf: (row: number) => number;
-      if (c <= fx1) {
-        const x = (c - iso.ox) / S + Y;
-        rowOf = (z) => iso.oy + ((x + Y) / 2 - z) * S;
-        zOf = (row) => (x + Y) / 2 - (row - iso.oy) / S;
-      } else {
-        const y = xo - (c - iso.ox) / S;
-        rowOf = (z) => iso.oy + ((xo + y) / 2 - z) * S;
-        zOf = (row) => (xo + y) / 2 - (row - iso.oy) / S;
-      }
-      const last = Math.min(buf.h - 1, Math.floor(rowOf(fadeStart)));
-      for (let row = 0; row <= last; row++) {
-        const i = row * buf.w + c;
-        const col = buf.data[i];
-        if (!col) continue;
-        const a = Math.max(0, Math.min(1, (z1 - zOf(row)) / (z1 - fadeStart)));
-        const eased = a * a;
-        buf.data[i] = ((Math.round(((col >>> 24) & 255) * eased) << 24) | (col & 0xffffff)) >>> 0;
-      }
-    }
-  }
+  fr.buf.fade(fr.quadY(Y, X - 0.5, xo + 0.5, zs, z1 + 60), fa, fb);
+  const [ea, eb] = grad(fr.p(xo, 0, z1), -1 / (2 * s), -1 / s, zs - z1);
+  fr.buf.fade(fr.quadX(xo, -1, Y + 1, zs, z1 + 60), ea, eb);
 }
 
 function facade(iso: Iso, out: Built) {
@@ -615,7 +609,6 @@ function facade(iso: Iso, out: Built) {
   iso.faceX(xo, 0, Y, bottom, top, C.glassD);
   iso.faceY(Y, X, xo, bottom, top, C.steel);
   iso.faceY(Y, X, X + 0.6, bottom, top, C.steelHi);
-  iso.top(X, 0, xo, Y, top, C.steelHi);
   for (let z = 0; z < top; z += FH / 2) {
     iso.faceX(xo, 0, Y, z, z + 2.2, C.glassD);
     iso.hlineX(xo, 0, Y, z + 2.2, C.mull);
@@ -642,7 +635,7 @@ function facade(iso: Iso, out: Built) {
   out.door = { x: xo, y0, y1, z0: zf, z1: zf + 26 };
   iso.box(xo, y0 - 3, zf + 28, xo + 9, y1 + 3, zf + 31, { top: rgba2('#1f2c45'), left: rgba2('#1f2c45'), right: rgba2('#141c2e') });
   iso.hlineX(xo + 9, y0 - 3, y1 + 3, zf + 28.6, C.gold);
-  textX(iso, xo + 9, y1 + 1.8, zf + 30.6, 'BC', C.goldHi, 0.5);
+  iso.textX(xo + 9, (y0 + y1) / 2, zf + 28.8, 'BC', { font: 'serif', size: 3, color: C.goldHi, weight: 500, align: 'center', spacing: 0.3 });
 }
 
 function street(iso: Iso) {
@@ -675,18 +668,20 @@ function street(iso: Iso) {
   ]) {
     iso.box(x - 4, y - 2, 0, x + 4, y + 3, 3, granite);
     const [sx, sy] = iso.at(x, y + 0.5, 3);
-    blitAt(iso.buf, PLANTS.shrub, sx, sy);
+    iso.buf.sprite(PLANTS.shrub, sx, sy);
   }
   for (let x = 250; x < 272; x += 5) iso.box(x, road - 2, 0, x + 1, road - 1, 4, chrome);
   // A street sign and a lamp.
   const [lx, ly] = iso.at(268, 12, 0);
-  iso.buf.rect(lx - 1, ly - 34 * S, 3, 34 * S, C.iron);
+  iso.buf.rect(lx - 1.2, ly - 34 * S, 2.4, 34 * S, C.iron);
   iso.buf.rect(lx - 3 * S, ly - 34 * S, 6 * S, S, C.iron);
-  iso.buf.rect(lx - 3 * S, ly - 33 * S, 6 * S, S, C.amber);
-  const sign = 'WALL ST';
-  const sw = textWidth(sign);
-  iso.buf.rect(lx - Math.ceil((sw * 2 + 6) / 2), ly - 24 * S, sw * 2 + 6, 5 * 2 + 6, C.signGreen);
-  drawText(sign, (dx, dy) => iso.buf.rect(lx - Math.ceil((sw * 2 + 6) / 2) + 3 + dx * 2, ly - 24 * S + 3 + dy * 2, 2, 2, C.paint));
+  iso.buf.rect(lx - 2.6 * S, ly - 33 * S, 5.2 * S, S * 0.8, C.amber);
+  // Street sign, square to the viewer like the real ones on corners.
+  const label: TextOpts = { font: 'sans', size: 12, color: C.paint, weight: 600, align: 'center', spacing: 0.6 };
+  const sw = iso.buf.measure('WALL ST', label) + 12;
+  iso.buf.rect(lx - sw / 2 - 1, ly - 24 * S - 1, sw + 2, 20, C.paint);
+  iso.buf.rect(lx - sw / 2, ly - 24 * S, sw, 18, C.signGreen);
+  iso.buf.text('WALL ST', { a: 1, b: 0, c: 0, d: 1, e: lx, f: ly - 24 * S + 13.5 }, label);
   // The shredder bin by the curb.
   iso.box(240, 20, 0, 247, 26, 10, { top: C.binLo, left: C.bin, right: C.binLo, hi: C.binHi });
   iso.box(239, 19, 10, 248, 27, 11, { top: C.binHi, left: C.bin, right: C.binLo });
@@ -720,14 +715,16 @@ function cab(iso: Iso, x: number, y: number) {
   iso.faceX(x + L, y + Wd - 2.4, y + Wd - 1, 3.4, 4.4, C.amber);
 }
 
-export function buildScene(): Built {
-  const bg = new PixelBuffer(W, H);
-  const fg = new PixelBuffer(W, H);
-  const front = new PixelBuffer(W, H);
+/** Surfaces the building draws into, back to front. */
+export interface Layers {
+  bg: Surface;
+  fg: Surface;
+  front: Surface;
+}
+
+/** Draw the building into three layers and return what the animation pass needs. */
+export function buildScene(layers: Layers): Built {
   const out: Built = {
-    bg,
-    fg,
-    front,
     screens: [],
     ticker: { y: 0, x0: 0, x1: 0, z0: 0, z1: 0 },
     bands: [],
@@ -739,15 +736,16 @@ export function buildScene(): Built {
     door: { x: 0, y0: 0, y1: 0, z0: 0, z1: 0 },
     towerTop: 0,
   };
-  const b = new Iso(bg, OX, OY);
-  const f = new Iso(fg, OX, OY);
-  const fr = new Iso(front, OX, OY);
+  const b = new Iso(layers.bg, OX, OY);
+  const f = new Iso(layers.fg, OX, OY);
+  const fr = new Iso(layers.front, OX, OY);
 
   foundation(b);
   for (const l of LEVELS) {
     const zf = floorZ(l.index);
     walls(b, l);
     floorSurface(b, l);
+    occlusion(b, zf);
     elevator(b, l);
     if (l.kind === 'desks') {
       l.desks.forEach((d, bay) => {
@@ -758,7 +756,7 @@ export function buildScene(): Built {
         } else {
           b.faceY(0.2, cx - 19, cx - 9, zf + 9, zf + 16, C.cream);
           b.hlineY(0.2, cx - 19, cx - 9, zf + 15.6, C.goldLo);
-          textY(b, 0.2, cx - 17, zf + 14.6, '12', C.goldLo);
+          b.textY(0.2, cx - 14, zf + 10.6, '12', { font: 'serif', size: 7, color: C.goldLo, weight: 500, align: 'center' });
         }
         desk(b, f, cx, zf, d, d === 0, d + l.index, out);
       });
@@ -768,7 +766,7 @@ export function buildScene(): Built {
       if (l.feature === 'compliance') compliance(b, zf);
       if (l.feature === 'terminal') terminalWall(b, zf, out);
       const [sx, sy] = b.at(26, 20, zf);
-      blitAt(bg, PLANTS.fern, sx, sy);
+      layers.bg.sprite(PLANTS.fern, sx, sy);
     }
     if (l.kind === 'office') office(b, zf, out);
     if (l.kind === 'lobby') lobby(b, zf, out);
@@ -776,9 +774,17 @@ export function buildScene(): Built {
     slabBand(b, l, out);
   }
   facade(fr, out);
-  tower(b, fr, out);
+  tower(b, out);
   street(fr);
-  // The cat sits in the static art; anim.ts only flicks its tail.
-  void renderCat;
+  fadeTower(b, fr);
   return out;
+}
+
+/** The whole building rendered into pixel buffers (Node scripts, tests, hotspots). */
+export function buildPixelScene(): { built: Built; bg: PixelBuffer; fg: PixelBuffer; front: PixelBuffer } {
+  const bg = new PixelBuffer(W, H);
+  const fg = new PixelBuffer(W, H);
+  const front = new PixelBuffer(W, H);
+  const built = buildScene({ bg: new PixelSurface(bg), fg: new PixelSurface(fg), front: new PixelSurface(front) });
+  return { built, bg, fg, front };
 }

@@ -454,75 +454,6 @@ main {
   border-radius: 6px;
   white-space: nowrap;
 }
-.scene-say {
-  position: absolute;
-  transform: translate(-18%, -100%);
-  pointer-events: none;
-  max-width: 44%;
-  background: #fffdf7;
-  color: var(--ink);
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: clamp(9px, 1.5vw, 12px);
-  line-height: 1.2;
-  letter-spacing: -0.005em;
-  padding: 3px 7px 4px;
-  border-radius: 8px;
-  border: 1px solid rgba(26, 26, 23, 0.55);
-  box-shadow: 0 1px 0 rgba(26, 26, 23, 0.18);
-  white-space: nowrap;
-  animation: say-in 180ms ease-out;
-}
-.scene-say::after {
-  content: '';
-  position: absolute;
-  left: 16%;
-  bottom: -5px;
-  width: 8px;
-  height: 8px;
-  background: inherit;
-  border-right: inherit;
-  border-bottom: inherit;
-  transform: rotate(45deg);
-}
-.scene-say--left {
-  transform: translate(-82%, -100%);
-}
-.scene-say--left::after {
-  left: auto;
-  right: 16%;
-}
-.scene-say--buy {
-  background: #eef4ff;
-}
-.scene-say--win {
-  background: #e9f6ec;
-  color: var(--live-ink);
-}
-.scene-say--loss {
-  background: #fbecea;
-  color: #8a3527;
-}
-.scene-say--partner {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
-  font-family: var(--serif);
-  font-style: italic;
-  font-weight: 500;
-  font-size: clamp(10px, 1.7vw, 13px);
-}
-@keyframes say-in {
-  from {
-    opacity: 0;
-    margin-top: 4px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .scene-say {
-    animation: none;
-  }
-}
 .scene-caption {
   text-align: center;
   margin: 10px 0 0;
@@ -1431,6 +1362,25 @@ button.mini:hover .mini-name {
   width: 104px;
   height: 148px;
   align-items: center;
+}
+.field-help {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted);
+  max-width: 46ch;
+}
+.field-ok {
+  display: block;
+  min-height: 1.3em;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--live-ink);
+}
+.wallet-field .input {
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: -0.01em;
 }
 .field-err {
   display: block;

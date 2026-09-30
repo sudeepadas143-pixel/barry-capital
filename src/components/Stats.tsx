@@ -1,5 +1,4 @@
 import { DESK_COUNT } from '../../firm.config';
-import { NOTE } from '../copy';
 import { useFirm } from '../hooks/useFirm';
 import { agoWords, fmtSol } from '../format';
 
@@ -31,7 +30,6 @@ export function Stats() {
           </div>
         </div>
       </div>
-      <blockquote className="note">{NOTE}</blockquote>
       <p className="read-at">board read {agoWords(now - state.boardReadAt)}</p>
     </>
   );

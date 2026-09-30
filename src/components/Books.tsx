@@ -22,7 +22,7 @@ const EVENT_CHIP: Record<EventKind, string> = {
   bonus: 'BONUS',
   review: 'REVIEW',
   stale: 'FEED',
-  rug: 'RUG',
+  rug: 'DROP',
 };
 
 export function Strikes({ n, of = SIM.STRIKES_TO_FIRE }: { n: number; of?: number }) {
@@ -252,7 +252,7 @@ export function Books({ limit, showHead = true, filters = false }: { limit?: num
             The books
           </h2>
           <Link to="/books" className="textlink">
-            notebook <span aria-hidden="true">→</span>
+            everything <span aria-hidden="true">→</span>
           </Link>
         </div>
       ) : (

@@ -15,14 +15,14 @@ export function StatusLine() {
       </p>
       <p className="status-stats">
         <Link to="/firm#lobby" className="u">
-          the shredder: <b className="num">{fmtInt(state.shredder)}</b>
+          <b className="num">{fmtInt(state.shredder)}</b> pitches shredded
         </Link>
         {' · '}
         <Link to="/firm#lobby" className="u">
-          <b className="num">{fmtInt(state.lobby)}</b> in the lobby
+          <b className="num">{fmtInt(state.lobby)}</b> waiting in the lobby
         </Link>
         {' · '}
-        <b className="num">{fmtInt(state.underWater)}</b> under water
+        <b className="num">{fmtInt(state.underWater)}</b> positions under water
       </p>
     </div>
   );

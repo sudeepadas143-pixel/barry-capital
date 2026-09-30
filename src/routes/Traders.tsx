@@ -65,8 +65,8 @@ export default function Traders() {
           <em>one line.</em>
         </h1>
         <p className="prose">
-          {PARTNER_NAME} reviews every desk on the hour. Below {fmtPct(SIM.REVIEW_LINE_PCT, 0)} at {numWord(SIM.STRIKES_TO_FIRE)} reviews in a row,
-          a trader leaves with a box and the next name in line sits down.
+          {PARTNER_NAME} reviews every desk on the hour. Anyone below {fmtPct(SIM.REVIEW_LINE_PCT, 0)} at {numWord(SIM.STRIKES_TO_FIRE)} reviews in a row
+          is let go, and the next person in line gets their desk.
         </p>
       </header>
       <section className="section" style={{ borderTop: 0, paddingTop: 0 }} aria-labelledby="seated-title">
@@ -93,12 +93,12 @@ export default function Traders() {
         </section>
         <section className="section" aria-labelledby="out-title">
           <h2 id="out-title" className="label" style={{ marginBottom: 14 }}>
-            Escorted out
+            Let go
           </h2>
           {state.alumni.length ? (
             <RosterList traders={state.alumni} lead={() => '—'} />
           ) : (
-            <p className="prose muted">Nobody yet. The box is still flat.</p>
+            <p className="prose muted">Nobody yet.</p>
           )}
           <p style={{ marginTop: 24 }}>
             <Link to="/hire" className="textlink">

@@ -52,12 +52,12 @@ export function TraderPanel() {
   const a = ARCHETYPES[t.archetype];
   const trades = t.recent.filter((x) => x.at <= now).slice(0, 5);
   const where = t.local
-    ? 'desk 12, pencilled in'
+    ? 'desk 12, yours'
     : t.status === 'seated'
       ? `desk ${pad2(t.desk!)}`
       : t.status === 'waiting'
         ? 'waiting for a desk'
-        : 'escorted out';
+        : 'no longer here';
 
   return (
     <>
@@ -160,11 +160,13 @@ export function TraderPanel() {
               <span className="muted" style={{ fontSize: 14 }}>
                 {t.status === 'seated'
                   ? t.strikes
-                    ? `${t.strikes} ${t.strikes === 1 ? 'strike' : 'strikes'}. ${PARTNER_NAME} has noticed.`
-                    : 'In good standing.'
+                    ? t.strikes === 1
+                      ? `One strike. ${PARTNER_NAME} will be watching the next review.`
+                      : `${t.strikes} strikes. One more and they’re out.`
+                    : 'No strikes.'
                   : t.status === 'waiting'
                     ? 'In line for the next desk.'
-                    : 'Left with a box.'}
+                    : 'No longer with the firm.'}
               </span>
             </>
           )}

@@ -1,6 +1,6 @@
 /**
- * Invented names only. Trader surnames are ordinary and generic; coin names are
- * word combinations, deliberately avoiding any well-known real token.
+ * Trader surnames are ordinary and generic, not references to anyone. Coin
+ * tickers are real Solana memecoins; their prices here are not.
  */
 
 export const STARTING_ROSTER = [
@@ -29,28 +29,53 @@ export const SURNAMES = [
   'ashworth', 'delgado', 'onyango', 'redgrave', 'kapoor', 'lowell', 'marchetti', 'obi', 'hollis', 'strand',
 ];
 
-export type Theme = 'animal' | 'food' | 'weather' | 'office' | 'household';
-export const THEMES: Theme[] = ['animal', 'food', 'weather', 'office', 'household'];
+export type Theme = 'dogs' | 'cats' | 'critters' | 'agents' | 'culture';
+export const THEMES: Theme[] = ['dogs', 'cats', 'critters', 'agents', 'culture'];
 export const THEME_LABEL: Record<Theme, string> = {
-  animal: 'animals',
-  food: 'food',
-  weather: 'weather',
-  office: 'office supplies',
-  household: 'things in a drawer',
+  dogs: 'dog coins',
+  cats: 'cat coins',
+  critters: 'other animals',
+  agents: 'agent coins',
+  culture: 'internet culture',
 };
 
-export const NOUNS: Record<Theme, string[]> = {
-  animal: ['goose', 'toad', 'moth', 'newt', 'crab', 'otter', 'badger', 'heron', 'snail', 'pigeon', 'hamster', 'walrus', 'eel', 'llama', 'sloth', 'gecko', 'beetle', 'possum', 'ferret', 'puffin', 'mole', 'tapir', 'yak', 'lobster'],
-  food: ['loaf', 'gravy', 'crumb', 'beans', 'pickle', 'waffle', 'noodle', 'toast', 'custard', 'biscuit', 'soup', 'prawn', 'muffin', 'turnip', 'crouton', 'scone', 'relish', 'dumpling', 'kipper', 'trifle'],
-  weather: ['drizzle', 'fog', 'sleet', 'puddle', 'gust', 'hail', 'mist', 'squall', 'monsoon', 'breeze', 'frost', 'rainbow', 'cloud', 'dew'],
-  office: ['stapler', 'memo', 'binder', 'fax', 'lanyard', 'toner', 'inkjet', 'folder', 'postit', 'rolodex', 'shredder', 'swivel', 'cubicle', 'ledger'],
-  household: ['sock', 'spoon', 'bucket', 'slipper', 'kazoo', 'kettle', 'spork', 'doily', 'teapot', 'mop', 'button', 'thimble', 'candle', 'hanger', 'sponge', 'plunger'],
-};
-
-export const ADJECTIVES = [
-  'damp', 'tiny', 'big', 'lil', 'grumpy', 'sleepy', 'loyal', 'brave', 'honest', 'soggy', 'gentle', 'frank',
-  'humble', 'silent', 'legal', 'certified', 'retired', 'local', 'spare', 'quiet', 'official', 'senior', 'wet',
-  'baby', 'king', 'sir', 'captain', 'lucky', 'wobbly', 'chunky', 'polite', 'moist', 'haunted', 'vintage',
+/**
+ * Real Solana memecoins the desks watch. Only the tickers and names are real:
+ * every price, chart and trade on the site is made up. Coins named after real
+ * people are left out on purpose.
+ */
+export const COINS: { ticker: string; name: string; theme: Theme }[] = [
+  { ticker: 'BONK', name: 'Bonk', theme: 'dogs' },
+  { ticker: 'WIF', name: 'dogwifhat', theme: 'dogs' },
+  { ticker: 'DOG', name: 'Dog', theme: 'dogs' },
+  { ticker: 'SAMO', name: 'Samoyedcoin', theme: 'dogs' },
+  { ticker: 'BERT', name: 'Bertram the Pomeranian', theme: 'dogs' },
+  { ticker: 'MYRO', name: 'Myro', theme: 'dogs' },
+  { ticker: 'POPCAT', name: 'Popcat', theme: 'cats' },
+  { ticker: 'MEW', name: 'cat in a dogs world', theme: 'cats' },
+  { ticker: 'MICHI', name: 'michi', theme: 'cats' },
+  { ticker: 'PENGU', name: 'Pudgy Penguins', theme: 'critters' },
+  { ticker: 'PNUT', name: 'Peanut the Squirrel', theme: 'critters' },
+  { ticker: 'MOODENG', name: 'Moo Deng', theme: 'critters' },
+  { ticker: 'FWOG', name: 'Fwog', theme: 'critters' },
+  { ticker: 'PONKE', name: 'Ponke', theme: 'critters' },
+  { ticker: 'SLERF', name: 'Slerf', theme: 'critters' },
+  { ticker: 'GOAT', name: 'Goatseus Maximus', theme: 'agents' },
+  { ticker: 'ZEREBRO', name: 'Zerebro', theme: 'agents' },
+  { ticker: 'ACT', name: 'Act I', theme: 'agents' },
+  { ticker: 'PIPPIN', name: 'Pippin', theme: 'agents' },
+  { ticker: 'FARTCOIN', name: 'Fartcoin', theme: 'agents' },
+  { ticker: 'USELESS', name: 'Useless Coin', theme: 'culture' },
+  { ticker: 'GIGA', name: 'Gigachad', theme: 'culture' },
+  { ticker: 'VINE', name: 'Vine', theme: 'culture' },
+  { ticker: 'UFD', name: 'Unicorn Fart Dust', theme: 'culture' },
+  { ticker: 'CHILLHOUSE', name: 'Chill House', theme: 'culture' },
+  { ticker: 'CHILLGUY', name: 'Just a chill guy', theme: 'culture' },
+  { ticker: 'SIGMA', name: 'Sigma', theme: 'culture' },
+  { ticker: 'NOBODY', name: 'Nobody Sausage', theme: 'culture' },
+  { ticker: 'USDUC', name: 'Unstable Coin', theme: 'culture' },
+  { ticker: 'BOME', name: 'Book of Meme', theme: 'culture' },
+  { ticker: 'PEPECOIN', name: 'PepeCoin', theme: 'culture' },
 ];
 
 export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

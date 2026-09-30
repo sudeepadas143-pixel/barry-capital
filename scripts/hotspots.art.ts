@@ -2,13 +2,13 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { it } from 'vitest';
 import { proceduralHotspots } from '../src/scene/hotspots';
 import { PixelBuffer } from '../src/scene/buffer';
-import { buildScene } from '../src/scene/building';
+import { buildPixelScene } from '../src/scene/building';
 import { encodePng } from '../src/scene/png';
 
 it('writes the example hotspots and a reference render for artists', () => {
   mkdirSync('docs', { recursive: true });
   writeFileSync('docs/hotspots.example.json', JSON.stringify(proceduralHotspots(), null, 2) + '\n');
-  const s = buildScene();
+  const s = buildPixelScene();
   const out = new PixelBuffer(s.bg.w, s.bg.h);
   out.over(s.bg);
   out.over(s.fg);

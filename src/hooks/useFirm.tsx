@@ -31,7 +31,7 @@ interface FirmCtx {
   now: number;
   byId: Map<string, Trader>;
   hires: HireRecord[];
-  addHire: (h: Omit<HireRecord, 'hiredTick' | 'id' | 'seed'>) => HireRecord;
+  addHire: (h: Omit<HireRecord, 'hiredTick' | 'id' | 'seed'> & { seed?: number }) => HireRecord;
   removeHire: (id: string) => void;
   tickFor: (ms: number) => number;
   msForTick: (tick: number) => number;
@@ -108,13 +108,13 @@ export function FirmProvider({ children }: { children: ReactNode }) {
   }, [e, e.state.tick]);
 
   const addHire = useCallback(
-    (h: Omit<HireRecord, 'hiredTick' | 'id' | 'seed'>) => {
+    (h: Omit<HireRecord, 'hiredTick' | 'id' | 'seed'> & { seed?: number }) => {
       const hiredTick = Math.max(0, e.state.tick);
       const rec: HireRecord = {
         ...h,
         id: `mine-${Date.now().toString(36)}`,
         hiredTick,
-        seed: (Date.now() ^ Math.floor(Math.random() * 0x7fffffff)) >>> 0,
+        seed: h.seed ?? (Date.now() ^ Math.floor(Math.random() * 0x7fffffff)) >>> 0,
       };
       const next = [...hires, rec];
       setHires(next);

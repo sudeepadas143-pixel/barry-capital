@@ -19,6 +19,8 @@ export interface HireRecord {
   patience: number;
   hiredTick: number;
   seed: number;
+  /** A public Solana address the visitor chose to build the trader from. Kept in this browser only. */
+  wallet?: string;
 }
 
 export function localTrader(h: HireRecord): TraderState {

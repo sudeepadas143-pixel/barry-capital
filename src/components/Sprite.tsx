@@ -32,7 +32,7 @@ export function Headshot({ look, size = 32, glasses, className, label }: Props) 
   const key = `${lookKey(look)}|${px}|${glasses ? 1 : 0}`;
   let img = bustCache.get(key);
   if (!img) {
-    img = renderBust(look, px, glasses);
+    img = renderBust(look, px, glasses, px < 120 ? 3 : 2);
     if (bustCache.size > 300) bustCache.clear();
     bustCache.set(key, img);
   }
@@ -84,7 +84,7 @@ export function Figure({
   const key = `${lookKey(look)}|${pose}|${frame}|${Math.round(scale * 100)}|${glasses ? 1 : 0}`;
   let img = figCache.get(key);
   if (!img) {
-    img = renderFigure(look, pose, frame, { scale, glasses });
+    img = renderFigure(look, pose, frame, { scale, glasses, ss: 2 });
     if (figCache.size > 120) figCache.clear();
     figCache.set(key, img);
   }

@@ -1,11 +1,11 @@
 /**
  * Paper traders. Each archetype has its own entry, exit, hold time and sizing.
- * Every trade carries a deadpan reason and the rule that fired. None of it is advice.
+ * Every trade carries a short desk note and the rule that fired.
  */
 import { PARTNER_NAME } from '../../firm.config';
 import { ARCHETYPES } from './archetypes';
 import { change1h, ma, maxHist, type CoinState } from './coins';
-import { THEMES, type Theme } from './names';
+import { THEME_LABEL, THEMES, type Theme } from './names';
 import { SIM } from './params';
 import type { Rng } from './prng';
 import type { ArchetypeId, Look, Rule, Side, Trade } from './types';
@@ -79,72 +79,72 @@ type RuleKey = 'entry' | 'tp' | 'sl' | 'time' | 'signal' | 'delist' | 'add' | 'i
 
 const RULES: Record<ArchetypeId, Partial<Record<RuleKey, Rule>> & { entry: Rule }> = {
   permabull: {
-    entry: { code: '1.1', text: 'If it is going up, buy it. If it is going sideways, it is about to go up.' },
-    tp: { code: '1.4', text: 'Sell half of nothing at plus one hundred percent. In practice, sell.' },
-    time: { code: '1.9', text: 'After fifteen hours, admit the position has become a personality and close it.' },
+    entry: { code: '1.1', text: 'Buy coins that are going up. Sideways counts as about to go up.' },
+    tp: { code: '1.4', text: 'Sell at +100%.' },
+    time: { code: '1.9', text: 'Close anything held longer than fifteen hours.' },
   },
   trend: {
-    entry: { code: '2.1', text: 'Buy the coin up the most in the last hour, provided it is up at least twenty-five percent.' },
-    signal: { code: '2.2', text: 'When the hour turns red, leave. Do not say goodbye.' },
-    tp: { code: '2.4', text: 'Take profit at plus sixty. The floor will be talking about something else by then.' },
-    sl: { code: '2.5', text: 'Out at minus twenty. Trends are not personal.' },
-    time: { code: '2.6', text: 'Two hours is a long time to agree with everyone.' },
+    entry: { code: '2.1', text: 'Buy the coin that is up the most in the last hour, if it is up at least 25%.' },
+    signal: { code: '2.2', text: 'Sell when the hourly change turns negative.' },
+    tp: { code: '2.4', text: 'Take profit at +60%.' },
+    sl: { code: '2.5', text: 'Stop out at −20%.' },
+    time: { code: '2.6', text: 'Close after two hours.' },
   },
   dip: {
-    entry: { code: '3.1', text: 'Buy anything thirty percent below its high for the hour. A discount is a discount.' },
-    tp: { code: '3.2', text: 'Sell the bounce at plus twenty.' },
-    sl: { code: '3.3', text: 'At minus forty, concede that it was not a dip. It was the floor.' },
-    time: { code: '3.5', text: 'If the bounce has not come in seven hours, it is not coming.' },
+    entry: { code: '3.1', text: 'Buy anything 30% or more below its high for the hour.' },
+    tp: { code: '3.2', text: 'Sell the bounce at +20%.' },
+    sl: { code: '3.3', text: 'Cut it at −40%.' },
+    time: { code: '3.5', text: 'If it hasn’t bounced in seven hours, sell.' },
   },
   sniper: {
-    entry: { code: '4.1', text: 'Enter any coin within two minutes of listing. Read the name afterwards.' },
-    tp: { code: '4.2', text: 'Out at plus fifty. The first minute pays for the rest.' },
-    sl: { code: '4.3', text: 'Out at minus thirty. Somebody was faster.' },
-    time: { code: '4.4', text: 'Nothing is held past eighteen minutes. Lunch is at noon.' },
+    entry: { code: '4.1', text: 'Buy within two minutes of a coin going up on the board.' },
+    tp: { code: '4.2', text: 'Sell at +50%.' },
+    sl: { code: '4.3', text: 'Stop out at −30%.' },
+    time: { code: '4.4', text: 'Never hold anything longer than eighteen minutes.' },
   },
   diamond: {
-    entry: { code: '5.1', text: 'Buy young coins. Do not sell them.' },
-    delist: { code: '5.9', text: 'A position is closed only when the coin is. This is not an exception.' },
+    entry: { code: '5.1', text: 'Buy coins that have been on the board for less than two hours.' },
+    delist: { code: '5.9', text: 'Only sell when the coin drops off the board.' },
   },
   fiver: {
-    entry: { code: '6.1', text: 'Buy a coin that is moving, but not so much that anyone has noticed.' },
-    tp: { code: '6.2', text: 'Sell at plus five. Do not look at it again.' },
-    sl: { code: '6.3', text: 'At minus twenty-five, sell, and have a quiet word with yourself.' },
-    time: { code: '6.4', text: 'Ten hours without five percent is a sign.' },
+    entry: { code: '6.1', text: 'Buy coins moving a little: between −5% and +20% on the hour.' },
+    tp: { code: '6.2', text: 'Sell at +5%.' },
+    sl: { code: '6.3', text: 'Stop out at −25%.' },
+    time: { code: '6.4', text: 'Close after ten hours.' },
   },
   intern: {
-    entry: { code: 'INT-1', text: 'Use judgement.' },
-    intern: { code: 'INT-2', text: `Sell when it feels right. Ask someone if unsure. Do not ask ${PARTNER_NAME}.` },
+    entry: { code: 'INT-1', text: 'Use your judgement.' },
+    intern: { code: 'INT-2', text: `Sell when it feels right. If you’re not sure, ask someone (not ${PARTNER_NAME}).` },
   },
   quant: {
-    entry: { code: 'Q-1', text: 'Buy when the five-minute average crosses above the twenty-minute average.' },
-    signal: { code: 'Q-2', text: 'Sell when it crosses back. The model does not have feelings, and neither should you.' },
-    tp: { code: 'Q-3', text: 'Take profit at plus eighty. The model has never seen this. Nobody has.' },
-    sl: { code: 'Q-4', text: 'Out at minus twenty-five. Recalibrate on Monday.' },
-    time: { code: 'Q-5', text: 'Four hours is outside the backtest.' },
+    entry: { code: 'Q-1', text: 'Buy when the 5-minute average crosses above the 20-minute average.' },
+    signal: { code: 'Q-2', text: 'Sell when it crosses back below.' },
+    tp: { code: 'Q-3', text: 'Take profit at +80%.' },
+    sl: { code: 'Q-4', text: 'Stop out at −25%.' },
+    time: { code: 'Q-5', text: 'Close after four hours.' },
   },
   stops: {
-    entry: { code: 'R-1', text: 'Buy strength above ten percent. Protect it immediately.' },
-    tp: { code: 'R-2', text: 'Take plus twelve. Nobody was ever fired for plus twelve.' },
-    sl: { code: 'R-3', text: 'Hard stop at minus six. No exceptions, no second looks, no lunch.' },
-    time: { code: 'R-4', text: 'Two hours of exposure is plenty of exposure.' },
+    entry: { code: 'R-1', text: 'Buy coins up more than 10% on the hour, with a stop in straight away.' },
+    tp: { code: 'R-2', text: 'Take profit at +12%.' },
+    sl: { code: 'R-3', text: 'Hard stop at −6%. No exceptions.' },
+    time: { code: 'R-4', text: 'Close after two hours.' },
   },
   narrative: {
-    entry: { code: 'N-1', text: 'Buy coins that fit today’s theme. The chart is a detail.' },
-    tp: { code: 'N-2', text: 'Sell at plus forty, when the story is fully priced in.' },
-    sl: { code: 'N-3', text: 'At minus thirty-five, the story has changed. Change with it.' },
-    time: { code: 'N-4', text: 'A story told for five hours is no longer a story.' },
+    entry: { code: 'N-1', text: 'Buy coins that fit today’s theme.' },
+    tp: { code: 'N-2', text: 'Sell at +40%.' },
+    sl: { code: 'N-3', text: 'Stop out at −35%.' },
+    time: { code: 'N-4', text: 'Close after five hours.' },
   },
   averager: {
-    entry: { code: 'A-1', text: 'Buy a red coin. Red is where the value is.' },
-    add: { code: 'A-2', text: 'Every further twenty percent down, buy the same again. Conviction compounds.' },
-    tp: { code: 'A-3', text: 'At plus ten on the average, sell everything and mention it at lunch.' },
+    entry: { code: 'A-1', text: 'Buy coins that are down on the hour.' },
+    add: { code: 'A-2', text: 'Buy the same again every 20% further down, up to three times.' },
+    tp: { code: 'A-3', text: 'Sell everything at +10% on the average price.' },
   },
   contrarian: {
-    entry: { code: 'C-1', text: 'Buy only what no one else on the floor owns.' },
-    tp: { code: 'C-2', text: 'Sell at plus thirty, ideally while someone else is buying.' },
-    sl: { code: 'C-3', text: 'At minus thirty, accept that the room may have had a point.' },
-    time: { code: 'C-4', text: 'Six hours alone with a coin is enough.' },
+    entry: { code: 'C-1', text: 'Only buy coins no other desk is holding.' },
+    tp: { code: 'C-2', text: 'Sell at +30%.' },
+    sl: { code: 'C-3', text: 'Stop out at −30%.' },
+    time: { code: 'C-4', text: 'Close after six hours.' },
   },
 };
 
@@ -155,33 +155,61 @@ export function rulesFor(a: ArchetypeId): Rule[] {
   return order.map((k) => r[k]).filter((x): x is Rule => !!x);
 }
 
-const DELIST_RULE: Rule = { code: 'F-0', text: 'When a coin leaves the board, the position leaves with it, at whatever the last price was.' };
-const ESCORT_RULE: Rule = { code: 'HR-3', text: 'On a third strike, positions are closed at market before the box is handed over.' };
+const DELIST_RULE: Rule = { code: 'F-0', text: 'If a coin drops off the board, close the position at the last price.' };
+const ESCORT_RULE: Rule = { code: 'HR-3', text: 'When a trader is let go, everything is closed at market first.' };
 
-const BUY_REASONS: Record<ArchetypeId, string[]> = {
-  permabull: ['Up only. Loaded the boat.', 'Bears are poor. Buying.', 'Sized up. Obviously.', 'This is the bottom. Every price is the bottom.', 'Adding. Tell me when it stops going up.'],
-  trend: ['Whole floor is in it. So am I.', 'Top of the board. I only buy winners.', 'Chasing? I prefer "leading".', 'The trend is my friend. My only friend.'],
-  dip: ['Blood in the streets. My favourite colour.', 'Down thirty. I call that a sale.', 'You panic, I buy. Circle of life.', 'Caught the knife. With one hand.'],
-  sniper: ['In before you blinked.', 'Listed a minute ago. I was here at second four.', "Didn't read the name. Didn't need to.", 'Fastest hands on the floor. Check the tape.'],
-  diamond: ['Buying. Selling is for tourists.', 'Long-term position. Very long. Forever.', 'Diamond hands. Look it up.', 'My grandchildren will thank me.'],
-  fiver: ['Five percent before your coffee cools.', 'Quick one. Watch this.', "In and out. Nobody's getting hurt."],
-  intern: ['Told the desk I had a guy. I do not have a guy.', 'Bought it. Hope that was okay.', 'Saw it trending. Sort of. On my phone.', 'Big day for me.'],
-  quant: ['The model says yes. The model is never wrong.', 'Signal fired. Emotions are for retail.', 'Two lines crossed. That is science.'],
-  stops: ['Risk managed. Ego intact.', 'In, with a stop tighter than my collar.', 'Calculated. Everything is calculated.'],
-  narrative: ["I don't read charts. Charts read me.", 'The story sells itself. So do I.', 'Vibes are immaculate. Buying.', 'Narrative is alpha. Write that down.'],
-  averager: ['Buying red. Red is a discount.', 'Starting small. I will not stay small.', 'Conviction, first tranche.'],
-  contrarian: ['Everyone hates it. Perfect.', 'The floor is wrong again. Buying.', "I'm early. I'm always early."],
-};
+const pctText = (v: number) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(0)}%`;
 
-const SELL_REASONS: Record<'tp' | 'sl' | 'time' | 'signal' | 'delist' | 'intern' | 'escort', string[]> = {
-  tp: ['Printed. Next.', 'Called it. You saw.', "Took profit. You're welcome.", 'Ring the bell.', 'Booked. Drinks on me. Not really.'],
-  sl: ['Market is wrong. Leaving anyway.', 'Tactical retreat.', 'Stopped. Irrelevant.', "That wasn't a loss. That was tuition."],
-  time: ['Bored. Out.', 'Too slow for this desk.', 'Clock ran out. The chart will regret it.'],
-  signal: ['Trend flipped. I flipped first.', 'Model said out. The model is never wrong.', 'Saw it coming. Obviously.'],
-  delist: ['Coin died. I did not.', 'Held to the end. Legends do.', "Closed at the last print. It's fine. Totally fine."],
-  intern: ['Sold. Was that right?', 'Someone yelled "sell". I think at me.', 'Panicked. Professionally.', 'Took a profit. Or a loss. Checking.'],
-  escort: ['Closing on the way out. Still a good trade.', 'Liquidated. Security was very polite.'],
-};
+/** A short desk note explaining a buy, from the numbers that triggered it. */
+function buyNote(t: TraderState, c: CoinState, ctx: TradeCtx, r: Rng): string {
+  const hour = change1h(c);
+  const age = ctx.tick - c.listedTick;
+  switch (t.archetype) {
+    case 'permabull':
+      return hour > 20 ? `Up ${pctText(hour)} on the hour and still going.` : `Going up (${pctText(hour)} on the hour).`;
+    case 'trend':
+      return `Biggest gainer this hour, ${pctText(hour)}.`;
+    case 'dip':
+      return `${Math.round((1 - c.price / Math.max(c.price, maxHist(c))) * 100)}% below the hour’s high.`;
+    case 'sniper':
+      return age < 1 ? 'Bought the minute it went up on the board.' : `Bought ${age} min after it went up on the board.`;
+    case 'diamond':
+      return `New to the board (${age} min). Long hold.`;
+    case 'fiver':
+      return `Steady, ${pctText(hour)} on the hour.`;
+    case 'intern':
+      return r.pick(['No reason given.', 'Saw it trending.', 'Asked the next desk.', 'Liked the name.']);
+    case 'quant':
+      return '5-min average crossed above the 20-min.';
+    case 'stops':
+      return `Up ${pctText(hour)}. Stop at −${Math.round((params(t).sl ?? 0.06) * 100)}%.`;
+    case 'narrative':
+      return `Fits today’s theme (${THEME_LABEL[c.theme]}).`;
+    case 'averager':
+      return `Down ${pctText(hour).slice(1)} on the hour. First buy.`;
+    case 'contrarian':
+      return 'No other desk holds it.';
+  }
+}
+
+function sellNote(key: 'tp' | 'sl' | 'time' | 'signal' | 'delist' | 'intern' | 'escort', a: ArchetypeId, r: Rng): string {
+  switch (key) {
+    case 'tp':
+      return 'Hit the profit target.';
+    case 'sl':
+      return 'Stop-loss hit.';
+    case 'time':
+      return 'Held as long as the rules allow.';
+    case 'signal':
+      return a === 'quant' ? 'Averages crossed back.' : 'Hourly change turned negative.';
+    case 'delist':
+      return 'Dropped off the board. Closed at the last price.';
+    case 'intern':
+      return r.pick(['Sold. No reason given.', 'Got nervous and sold.', 'Sold after asking around.']);
+    case 'escort':
+      return 'Closed out on the way out.';
+  }
+}
 
 export function themeOfDay(seed: number, tick: number): Theme {
   const day = Math.floor(tick / 1440);
@@ -379,7 +407,7 @@ export function actTrader(t: TraderState, ctx: TradeCtx, r: Rng) {
     if (a === 'averager') {
       if (pr.tp !== null && gain >= pr.tp) key = 'tp';
       else if (gain <= -0.2 * (p.adds + 1) && p.adds < 3 && t.cash > p.cost / (p.adds + 1)) {
-        buy(t, c, Math.min(t.cash, SIM.MAX_TRADE_SOL, p.cost / (p.adds + 1)), ctx, r, ruleFor(a, 'add'), r.pick(['Down twenty. Added.', 'Averaged down. Again.', 'Conviction, topped up.']));
+        buy(t, c, Math.min(t.cash, SIM.MAX_TRADE_SOL, p.cost / (p.adds + 1)), ctx, r, ruleFor(a, 'add'), `Down ${Math.round(-gain * 100)}% from entry. Added.`);
         continue;
       }
     } else if (a === 'intern') {
@@ -393,7 +421,7 @@ export function actTrader(t: TraderState, ctx: TradeCtx, r: Rng) {
     }
     if (key) {
       const rule = key === 'intern' ? ruleFor(a, 'intern') : ruleFor(a, key);
-      sell(t, p, c.price, c, ctx, r, rule, r.pick(SELL_REASONS[key]));
+      sell(t, p, c.price, c, ctx, r, rule, sellNote(key, a, r));
     }
   }
 
@@ -404,7 +432,7 @@ export function actTrader(t: TraderState, ctx: TradeCtx, r: Rng) {
   if (size < t.book0 * 0.01) return;
   const c = pickEntry(t, ctx, r);
   if (!c) return;
-  buy(t, c, size, ctx, r, ruleFor(a, 'entry'), r.pick(BUY_REASONS[a]));
+  buy(t, c, size, ctx, r, ruleFor(a, 'entry'), buyNote(t, c, ctx, r));
 }
 
 /** Close a position whose coin left the board. */
@@ -412,14 +440,14 @@ export function settleDeparted(t: TraderState, c: CoinState, ctx: TradeCtx, r: R
   for (const p of [...t.positions]) {
     if (p.coinId !== c.id) continue;
     const rule = t.archetype === 'diamond' ? ruleFor('diamond', 'delist') : DELIST_RULE;
-    sell(t, p, c.price, c, ctx, r, rule, r.pick(SELL_REASONS.delist));
+    sell(t, p, c.price, c, ctx, r, rule, sellNote('delist', t.archetype, r));
   }
 }
 
 export function liquidate(t: TraderState, ctx: TradeCtx, r: Rng) {
   for (const p of [...t.positions]) {
     const c = ctx.byId.get(p.coinId);
-    sell(t, p, c ? c.price : 0, c, ctx, r, ESCORT_RULE, r.pick(SELL_REASONS.escort));
+    sell(t, p, c ? c.price : 0, c, ctx, r, ESCORT_RULE, sellNote('escort', t.archetype, r));
   }
 }
 

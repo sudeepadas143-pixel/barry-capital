@@ -1,14 +1,16 @@
 # Barry Capital
 
-A static website for a fictional memecoin desk staffed by eleven AI traders in suits,
-run by a managing partner who reviews everyone on the hour. It has an isometric
-pixel-art office building, a leaderboard, a live-feeling feed, payroll, bonus days,
-and a trader you can hire yourself.
+A static website for a fictional Wall Street memecoin desk staffed by eleven SI traders,
+run by a managing partner who reviews everyone on the hour. It has an illustrated
+isometric office tower, a leaderboard, a live feed, payroll, bonus days, and a trader
+you can hire yourself (or build from a Solana wallet address).
 
 **Everything is simulated.** Balances, trades, prices, fees and bonuses come from a
-seeded simulation that runs in the browser. There is no wallet connection, no signing,
-no payout code, and no network call that could move funds. The only requests the site
-makes are for its own static files.
+seeded simulation that runs in the browser. The coin tickers are real Solana memecoins,
+but their prices on the site are not. The footer says so in one line. There is no
+wallet connection, no signing, no payout code, and no network call that could move
+funds. A wallet address typed on the hire page is only used to generate a trader and
+is kept in that browser. The only requests the site makes are for its own static files.
 
 ## Run it
 
@@ -66,6 +68,7 @@ Every brand and network string is in [`firm.config.ts`](firm.config.ts):
 | `DESK_COUNT` | `11` | The layout has twelve bays; eleven desks plus the pencilled-in one |
 | `TOKEN_SYMBOL`, `TOKEN_MINT` | placeholder | Shown in the CA card and header pill |
 | `EXPLORER_URL` | `https://solscan.io/token/{address}` | `{address}` is replaced with the mint |
+| `ACCOUNT_URL` | `https://solscan.io/account/{address}` | Read-only link to a hire's wallet |
 | `X_URL` | `https://x.com/` | |
 | `SEASON_START` | `2026-09-21T13:00:00Z` | The simulation's minute zero |
 | `TICK_SECONDS` | `60` | One simulation step |
@@ -82,17 +85,17 @@ maths uses only `+ − × ÷` and `sqrt`, which every JavaScript engine rounds t
 A test fails if anyone adds `Math.exp`, `Math.log`, `Math.pow` or `**`. So every visitor on
 every device sees the same firm at the same minute, with no server.
 
-- **Coins** launch, maybe pump, chop, then bleed out, run again, or rug (an 80–95% drop in
-  a minute). Returns are fat-tailed, coins leave the board, and new ones arrive from the
-  lobby. Prices sit behind a `PriceSource` interface, so a read-only live feed can be
-  added later.
+- **Coins** are real Solana memecoin tickers (`COINS` in `src/sim/names.ts`, no coins
+  named after real people) with made-up prices. Each one comes onto the board, maybe
+  pumps, chops, then bleeds out, runs again, or crashes (an 80–95% drop in a minute).
+  Returns are fat-tailed, coins leave the board, and others take their place. Prices sit
+  behind a `PriceSource` interface, so a read-only live feed can be added later.
 - **Traders** paper-trade the board using one of twelve methods, each with its own entry,
   exit, holding time and sizing. They pay 1% a side in costs, plus extra slippage for
-  buying in a coin's first two minutes. Every trade records a deadpan reason and the rule
-  that triggered it.
-- **Reviews** run on the hour. Three reviews in a row below −35% and the trader is
-  escorted out with a box, the desk is cleaned for four minutes, and the next name in
-  line sits down.
+  buying in a coin's first two minutes. Every trade records a short note built from the
+  numbers that triggered it, and the rule behind it.
+- **Reviews** run on the hour. Three reviews in a row below −35% and the trader is let
+  go, the desk is cleared for four minutes, and the next person in line sits down.
 - **Money:** creator fees are a share of the firm's own token's simulated volume. The
   treasury moves with the traders. A fifth of profit above the high-water mark goes into
   a bonus pool, which is split pro rata, to the lamport, across a simulated cap table
@@ -101,12 +104,22 @@ every device sees the same firm at the same minute, with no server.
 **The page** reads the state once a second. Each minute's trades are stamped across the
 following minute, so the feed fills in gradually rather than all at once.
 
-**The building** (`src/scene/`) is drawn into a 948×1680 pixel buffer (three pixels per world unit) with a small
-isometric rasterizer (no WebGL). The canvas matches the device's pixels: exact
-whole-number scales stay pixel-exact, and anything else is resampled smoothly.
+**The building** (`src/scene/`) is drawn with the 2D canvas API (no WebGL) as vector
+shapes at the screen's own resolution, so edges are anti-aliased and signs and tickers
+use the site's real fonts. The scene is laid out on a 948×1680 grid (three units per
+world unit). The static building is drawn once into three offscreen layers (background,
+desks, facade); charts are cached until the data changes; each frame composites the
+layers with the moving parts (tickers, lights, people, the helicopter). The same drawing
+code can also target a plain pixel buffer (`PixelSurface`), which the Node art scripts
+and hotspot generator use.
 
 **The traders** (`src/art/figure.ts`) are drawn from shaded shapes (face, hair, jacket,
-lapels, tie, arms, legs) with a thin selective outline. One body is palette-swapped per
+lapels, tie, arms, legs), supersampled for smooth edges, with a thin selective outline.
+At their desks they cycle through habits (typing, calls, leaning back, stretching,
+rubbing their eyes, lunch, checking their phone, chatting to the next desk), weighted by
+method, the time of day and how their day is going. Now and then one goes for a coffee
+or takes the lift. The partner has a routine on each floor (a drink and some putting in
+the office, calls by the terminal, walking the desks at review time). One body is palette-swapped per
 trader and dressed with their own build, haircut, outfit, neckwear and accessories
 (`src/art/traits.ts`). The same renderer draws the figures in the building, the large hire-page
 portrait and the headshots, each at the screen's own pixel density. Plants and the office
@@ -115,7 +128,9 @@ hand-drawn art.
 
 **Your own hire** runs on the same board with its own random stream. It never touches
 the shared state, and it lives only in your browser (`localStorage`), along with follows
-and the "since the last visit" snapshot.
+and the "since the last visit" snapshot. Pasting a public Solana address builds the
+trader from a hash of it (`src/wallet.ts`), so the same wallet always makes the same
+trader. Private keys and recovery phrases are recognised, refused and cleared.
 
 ## Layout
 

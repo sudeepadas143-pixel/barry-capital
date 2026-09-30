@@ -34,8 +34,8 @@ export function DeskBoard({ hot, onHover }: Props) {
               <li key={d} className="desk">
                 <div className="desk-btn">
                   <span className="desk-no">{pad2(d)}</span>
-                  <span className="desk-name muted">vacant</span>
-                  <span className="desk-res zero">being cleaned</span>
+                  <span className="desk-name muted">empty</span>
+                  <span className="desk-res zero">being cleared</span>
                 </div>
               </li>
             );
@@ -79,8 +79,8 @@ export function DeskBoard({ hot, onHover }: Props) {
           ) : (
             <Link to="/hire" className="desk-btn" style={{ textDecoration: 'none' }}>
               <span className="desk-no">{pad2(DESK_COUNT + 1)}</span>
-              <span className="desk-name">pencilled in</span>
-              <span className="desk-res">the next trader’s desk</span>
+              <span className="desk-name">spare desk</span>
+              <span className="desk-res">hire someone for it</span>
             </Link>
           )}
         </li>

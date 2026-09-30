@@ -46,7 +46,7 @@ function NotFound() {
       <p className="label">404</p>
       <h1 className="hero-title">
         wrong floor.
-        <em>happens.</em>
+        <em>try the lift.</em>
       </h1>
       <Link to="/" className="textlink">
         back to the lobby <span aria-hidden="true">→</span>

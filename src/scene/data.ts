@@ -29,6 +29,7 @@ export function sceneData(s: FirmState): SceneData {
       };
     });
   return {
+    version: s.tick,
     deskSeries,
     sideSeries,
     terminalSeries: movers.map((c) => c.hist),

@@ -3,7 +3,7 @@
  * so bump VERSION when you do (it invalidates cached snapshots).
  */
 export const SIM = {
-  VERSION: 13,
+  VERSION: 14,
 
   /** Firm capital at the start of the season, SOL. */
   TREASURY_START_SOL: 100,
@@ -25,12 +25,12 @@ export const SIM = {
   MAX_COIN_AGE: 2880,
   WARMUP_TICKS: 240,
 
-  /** Performance reviews. */
+  /** Performance reviews: at each one, the worst result since hire is let go. */
   REVIEW_EVERY: 60,
-  REVIEW_LINE_PCT: -35,
-  /** New hires skip reviews for this many ticks. */
+  /** New hires skip reviews for this many ticks, so they're judged on more than a few trades. */
   REVIEW_GRACE: 180,
-  STRIKES_TO_FIRE: 3,
+  /** No firing unless at least this many desks are up for review. */
+  REVIEW_MIN: 3,
   /** Desk sits empty while it's cleaned. */
   VACANT_TICKS: 4,
   WAITING_LEN: 5,

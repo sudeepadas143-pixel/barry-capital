@@ -4,15 +4,16 @@ import { PARTNER_NAME } from '../../firm.config';
 import { useFollows } from '../hooks/useLocal';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
-import { dayTime, fmtPct, fmtSol, pad2, pctClass } from '../format';
+import { dayTime, fmtPct, fmtSol, pad2, pctClass, until } from '../format';
 import { rulesFor } from '../sim/traders';
 import { ARCHETYPES } from '../sim/archetypes';
-import { Strikes, TradeRow } from './Books';
+import { TradeRow } from './Books';
+import { Standing } from './Standing';
 import { Headshot } from './Sprite';
 
 export function TraderPanel() {
   const { openId, close } = usePanel();
-  const { now, byId, msForTick } = useFirm();
+  const { now, byId, msForTick, state } = useFirm();
   const t = openId ? byId.get(openId) : undefined;
   const ref = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
@@ -104,9 +105,16 @@ export function TraderPanel() {
             </div>
           </div>
           <div className="stat">
-            <p className="label">Strikes</p>
+            <p className="label">Standing</p>
             <div className="stat-val">
-              <Strikes n={t.strikes} />
+              {t.rank ? (
+                <span className="num">
+                  {t.rank}
+                  <small>of {state.reviewed}</small>
+                </span>
+              ) : (
+                <Standing t={t} />
+              )}
             </div>
           </div>
         </div>
@@ -159,11 +167,15 @@ export function TraderPanel() {
               </button>
               <span className="muted" style={{ fontSize: 14 }}>
                 {t.status === 'seated'
-                  ? t.strikes
-                    ? t.strikes === 1
-                      ? `One strike. ${PARTNER_NAME} will be watching the next review.`
-                      : `${t.strikes} strikes. One more and they’re out.`
-                    : 'No strikes.'
+                  ? t.nextOut
+                    ? `Bottom of the board. If nothing changes, ${PARTNER_NAME} lets them go at the next review, in ${until(state.nextReviewAt - now)}.`
+                    : t.rank === 1
+                      ? 'Top of the board.'
+                      : t.rank
+                        ? `${state.reviewed - t.rank} ${state.reviewed - t.rank === 1 ? 'desk' : 'desks'} below them right now.`
+                        : t.firstReviewTick !== undefined
+                          ? `New here. First review ${dayTime(msForTick(t.firstReviewTick))}.`
+                          : ''
                   : t.status === 'waiting'
                     ? 'In line for the next desk.'
                     : 'No longer with the firm.'}

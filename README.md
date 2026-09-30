@@ -94,8 +94,9 @@ every device sees the same firm at the same minute, with no server.
   exit, holding time and sizing. They pay 1% a side in costs, plus extra slippage for
   buying in a coin's first two minutes. Every trade records a short note built from the
   numbers that triggered it, and the rule behind it.
-- **Reviews** run on the hour. Three reviews in a row below −35% and the trader is let
-  go, the desk is cleared for four minutes, and the next person in line sits down.
+- **Reviews** run on the hour. The trader with the worst result since hire is let go,
+  everyone else keeps their desk, the empty desk is cleared for four minutes, and the
+  next person in line sits down. New hires get three hours before their first review.
 - **Money:** creator fees are a share of the firm's own token's simulated volume. The
   treasury moves with the traders. A fifth of profit above the high-water mark goes into
   a bonus pool, which is split pro rata, to the lamport, across a simulated cap table

@@ -35,7 +35,6 @@ export interface TraderState {
   book0: number;
   cash: number;
   positions: Position[];
-  strikes: number;
   trades: number;
   wins: number;
   losses: number;
@@ -473,7 +472,6 @@ export function newTrader(
     book0: book,
     cash: book,
     positions: [],
-    strikes: 0,
     trades: 0,
     wins: 0,
     losses: 0,

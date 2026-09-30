@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DESK_COUNT, PARTNER_NAME } from '../../firm.config';
-import { Strikes } from '../components/Books';
+import { Standing } from '../components/Standing';
 import { Headshot } from '../components/Sprite';
 import { useFirm } from '../hooks/useFirm';
 import { useFollows } from '../hooks/useLocal';
@@ -36,7 +36,7 @@ function RosterList({ traders, lead }: { traders: Trader[]; lead: (t: Trader, i:
                 {t.status === 'seated' && !t.local && (
                   <>
                     {' · '}
-                    {t.trades} trades · <Strikes n={t.strikes} />
+                    {t.trades} trades · <Standing t={t} />
                   </>
                 )}
               </span>
@@ -65,8 +65,9 @@ export default function Traders() {
           <em>one line.</em>
         </h1>
         <p className="prose">
-          {PARTNER_NAME} reviews every desk on the hour. Anyone below {fmtPct(SIM.REVIEW_LINE_PCT, 0)} at {numWord(SIM.STRIKES_TO_FIRE)} reviews in a row
-          is let go, and the next person in line gets their desk.
+          Every hour {PARTNER_NAME} reviews the desks. The trader with the worst result is let go and the next person in
+          line takes the desk. Everyone else keeps their seat. New hires get {numWord(SIM.REVIEW_GRACE / 60)} hours before
+          their first review.
         </p>
       </header>
       <section className="section" style={{ borderTop: 0, paddingTop: 0 }} aria-labelledby="seated-title">

@@ -34,14 +34,22 @@ Decisions made along the way, and the things worth a second look.
   days took 1.3–2 s in headless Chromium. The browser also saves a snapshot to
   `localStorage`, so repeat visits are instant. **Rebuild daily**
   (`.github/workflows/redeploy.yml`) to keep first visits fast.
-- **Calibration.** Over a simulated fortnight, `SEASON_START` defaults give about four
-  firings a day, a treasury drifting gently up on fee income, a bonus day most days, and
-  leaderboard results mostly between −40% and +100%. Most traders are below zero most of
+- **Calibration.** Under the worst-goes rule a simulated week gives 24 firings a day (one
+  per review), top traders who keep their desks for three or four days, and a treasury
+  that drifts between about 90 and 115 SOL, because every firing closes the worst book
+  at a loss. Leaderboard results run from about −40% to +200%. Most traders are below zero most of
   the time. That's the memecoin premise, not a bug. To make the board greener, lower
   `TRADE_COST` or raise chop drift in `coins.ts`, then bump `VERSION`.
-- **Firing rule.** Below −35% since hire, at three consecutive hourly reviews, with a
-  three-hour grace period after hiring. The desk sits empty for four minutes, then the
-  first name in line is seated. HR prefers methods the floor doesn't already have, so the
+- **Firing rule (owner's concept).** Every hourly review, the trader with the worst result
+  since hire is let go and everyone else keeps their desk, so the best performers stay
+  as long as they stay ahead of someone. New hires skip reviews for their first three
+  hours, so they're judged on more than a handful of trades, and nobody is fired unless
+  at least three desks are up for review (`REVIEW_MIN`). The worst performer goes even
+  if they're up; it's a ranking, not a threshold. Ties go against the smaller book. This
+  replaced the earlier "−35% at three reviews in a row" rule and its strikes. The desk
+  sits empty for four minutes, then the first name in line is seated. The desk list,
+  payroll and trader files show who's top, who's next out and when the next review is.
+  `SIM.VERSION` is 14. HR prefers methods the floor doesn't already have, so the
   floor doesn't converge on a single strategy (in early tuning it became all snipers).
 - **Bonus day** uses a high-water mark: a fifth of profit *above the previous peak*
   moves into the pool at each review, and the pool pays out daily. The split is exact

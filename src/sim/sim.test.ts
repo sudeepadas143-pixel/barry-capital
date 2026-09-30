@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { DESK_COUNT } from '../../firm.config';
 import { newCoin, stepCoin, type BoardState } from './coins';
 import { Engine, clone, type HireRecord } from './engine';
-import { genesis, step, treasury, type SimState } from './firm';
+import { genesis, rankForReview, step, treasury, type SimState } from './firm';
 import { SIM } from './params';
 import { splitProRata, capTable, toLamports } from './payout';
 import { rng } from './prng';
@@ -151,57 +151,73 @@ describe('coins', () => {
 });
 
 describe('reviews, firing and hiring', () => {
-  it('a trader below the line for three reviews is escorted out and replaced', () => {
-    const s = run(SIM.REVIEW_GRACE + SIM.REVIEW_EVERY - 5);
+  /** Step until the next tick is a review. */
+  const toEveOfReview = (s: ReturnType<typeof genesis>) => {
+    while ((s.tick + 2) % SIM.REVIEW_EVERY !== 0) step(s);
+  };
+  const sink = (t: ReturnType<typeof genesis>['traders'][number], k: number) => {
+    t.cash = t.book0 * k;
+    t.positions = [];
+    t.equity = t.cash;
+  };
+
+  it('at each review the worst performer is let go and replaced, and everyone else stays', () => {
+    const s = run(SIM.REVIEW_GRACE + SIM.REVIEW_EVERY);
+    toEveOfReview(s);
     const victim = s.traders[3];
     const desk = victim.desk!;
-    // Sink the book and freeze it there.
-    const sink = () => {
-      victim.cash = victim.book0 * 0.3;
-      victim.positions = [];
-      victim.equity = victim.cash;
-    };
-    const firedAt = (() => {
-      for (let i = 0; i < SIM.REVIEW_EVERY * 4; i++) {
-        sink();
-        step(s);
-        if (victim.status === 'escorted') return s.tick;
-      }
-      return -1;
-    })();
-    expect(firedAt).toBeGreaterThan(0);
+    const before = s.traders.map((t) => t.id);
+    sink(victim, 0.2);
+    const fired = s.c.fired;
+    step(s); // the review
     const lineAtFiring = s.waiting.map((t) => t.id);
-    expect(victim.strikes).toBe(SIM.STRIKES_TO_FIRE);
-    expect(s.alumni.some((a) => a.id === victim.id)).toBe(true);
-    expect(s.traders.find((t) => t.id === victim.id)).toBeUndefined();
-    expect(s.feed.some((f) => f.type === 'event' && f.kind === 'escorted' && f.traderId === victim.id)).toBe(true);
-    // Desk is empty while it's cleaned...
+    expect(victim.status).toBe('escorted');
+    expect(s.c.fired).toBe(fired + 1);
+    // Exactly one person went; the rest kept their desks.
+    expect(before.filter((id) => !s.traders.some((t) => t.id === id))).toEqual([victim.id]);
+    expect(s.alumni[0].id).toBe(victim.id);
+    const ev = s.feed.find((f) => f.type === 'event' && f.kind === 'escorted' && f.traderId === victim.id);
+    expect(ev && ev.type === 'event' && ev.text).toMatch(/let .* go: last of \d+/);
+    // Desk is empty while it's cleared...
     expect(s.traders.length + s.vacant.length).toBe(DESK_COUNT);
     expect(s.vacant.some((v) => v.desk === desk)).toBe(true);
+    const firedAt = s.tick;
     for (let i = 0; i < SIM.VACANT_TICKS; i++) step(s);
     // ...then the first name in line takes it.
-    expect(s.vacant.some((v) => v.desk === desk)).toBe(false);
     const hire = s.traders.find((t) => t.desk === desk)!;
     expect(lineAtFiring.slice(0, 2)).toContain(hire.id);
     expect(hire.hiredTick).toBe(firedAt + SIM.VACANT_TICKS);
     expect(s.waiting.length).toBe(SIM.WAITING_LEN);
   });
 
-  it('a trader back above the line has strikes cleared', () => {
-    const s = genesis(START, 60);
-    // Stop just before the first review that counts.
-    while (s.tick < SIM.REVIEW_GRACE || (s.tick + 2) % SIM.REVIEW_EVERY !== 0) step(s);
-    const t = s.traders[0];
-    t.cash = t.book0 * 0.5;
-    t.positions = [];
-    step(s); // review
-    expect(t.strikes).toBe(1);
-    for (let i = 0; i < SIM.REVIEW_EVERY; i++) {
-      t.cash = t.book0 * 1.5;
-      t.positions = [];
-      step(s);
-    }
-    expect(t.strikes).toBe(0);
+  it('the best performer keeps their desk, even when everyone is down', () => {
+    const s = run(SIM.REVIEW_GRACE + SIM.REVIEW_EVERY);
+    toEveOfReview(s);
+    const ranked = rankForReview(s.traders, s.tick + 1);
+    expect(ranked.length).toBeGreaterThanOrEqual(SIM.REVIEW_MIN);
+    ranked.forEach((t, i) => sink(t, 0.9 - i * 0.02));
+    const best = ranked[0];
+    const worst = ranked[ranked.length - 1];
+    step(s);
+    expect(best.status).toBe('seated');
+    expect(worst.status).toBe('escorted');
+  });
+
+  it('new hires are not reviewed during their grace period', () => {
+    const s = run(SIM.REVIEW_GRACE + SIM.REVIEW_EVERY);
+    toEveOfReview(s);
+    const victim = s.traders[0];
+    sink(victim, 0.2);
+    step(s);
+    for (let i = 0; i < SIM.VACANT_TICKS; i++) step(s);
+    const rookie = s.traders.find((t) => t.hiredTick === s.tick)!;
+    expect(rookie).toBeDefined();
+    // The rookie tanks straight away, but someone else goes at the next review.
+    toEveOfReview(s);
+    sink(rookie, 0.05);
+    step(s);
+    expect(rookie.status).toBe('seated');
+    expect(s.alumni[0].id).not.toBe(rookie.id);
   });
 
   it('desks stay at the configured count over a long run, and names stay unique', () => {

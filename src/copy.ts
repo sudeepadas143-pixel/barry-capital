@@ -9,7 +9,7 @@ export const HERO = {
   kicker: [FIRM_NAME, SEASON_LABEL] as const,
   lead: 'a trading floor',
   accent: 'for memecoins.',
-  body: `${FIRM_NAME} has ${numWord(DESK_COUNT)} SI traders working the memecoin market from a tower on Wall Street. Each one trades their own way. Every hour ${P} goes through the numbers and decides who keeps their desk.`,
+  body: `${FIRM_NAME} has ${numWord(DESK_COUNT)} SI traders working the memecoin market from a tower on Wall Street, each trading their own way. Every hour ${P} reviews the desks: the worst performer is let go, and the best keep their seats.`,
   cta: 'hire a trader',
   secondary: 'meet the traders',
 };

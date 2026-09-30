@@ -196,7 +196,7 @@ const frameFor = (pose: Pose, t: number, into: number, desk: number): number => 
 
 /** What a seated trader is doing right now. */
 function mood(tr: Trader, desk: number, t: number, hour: number, reduced: boolean, isTop: boolean, isBottom: boolean): { pose: Pose; frame: number } {
-  if (reduced) return { pose: isBottom && tr.resultPct < -5 ? 'slump' : isTop && tr.resultPct > 0 ? 'leanback' : 'sit', frame: 0 };
+  if (reduced) return { pose: isBottom ? 'slump' : isTop ? 'leanback' : 'sit', frame: 0 };
   const w: Partial<Record<Pose, number>> = { ...BASE };
   for (const [k, v] of Object.entries(BY_METHOD[tr.archetype] ?? {})) w[k as Pose] = Math.max(0, (w[k as Pose] ?? 0) + (v as number));
   // Lunch at the desk; the long afternoon.
@@ -209,14 +209,23 @@ function mood(tr: Trader, desk: number, t: number, hour: number, reduced: boolea
   }
   // How the day is going.
   if (tr.resultPct > 5) w.leanback = (w.leanback ?? 0) + 1.5;
-  if (isTop && tr.resultPct > 0) w.celebrate = 1.8;
+  if (isTop) {
+    w.celebrate = 1.8;
+    w.leanback = (w.leanback ?? 0) + 1.5;
+  }
   if (tr.resultPct < -5) {
     w.phone = (w.phone ?? 0) + 0.8;
     w.hips = (w.hips ?? 0) + 0.6;
     w.leanback = Math.max(0, (w.leanback ?? 0) - 1);
   }
-  if (isBottom && tr.resultPct < -5) w.slump = 4;
-  else if (tr.resultPct < -15) w.slump = 1.5;
+  // Next out, and knows it.
+  if (isBottom) {
+    w.slump = 3;
+    w.rub = (w.rub ?? 0) + 1;
+    w.phone = (w.phone ?? 0) + 1;
+    w.leanback = 0;
+    w.celebrate = 0;
+  } else if (tr.resultPct < -15) w.slump = 1.5;
   const len = 7 + (desk % 4);
   const phase = (desk * 1.7) % len;
   const slot = Math.floor((t + phase) / len);
@@ -420,9 +429,8 @@ export class Director {
     // Seated traders: each one's habits rotate, weighted by method, the hour and how the day is going.
     const hour = new Date(state.at).getHours();
     const seated = state.traders.filter((x) => x.desk);
-    const ranked = [...seated].sort((a, b) => b.resultPct - a.resultPct);
-    const top = ranked[0];
-    const bottom = ranked[ranked.length - 1];
+    const top = seated.find((x) => x.id === state.topId);
+    const bottom = seated.find((x) => x.id === state.nextOutId);
     const sitters: Trader[] = [...seated];
     if (state.mine[0]) sitters.push({ ...state.mine[0], desk: DESK_COUNT + 1 });
     for (const tr of sitters) {

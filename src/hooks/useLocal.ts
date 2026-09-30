@@ -64,7 +64,6 @@ export interface TraderSnap {
   name: string;
   resultPct: number;
   trades: number;
-  strikes: number;
   status: Trader['status'];
 }
 
@@ -81,7 +80,7 @@ export interface VisitSnap {
 function snap(s: FirmState, ids: Set<string>): VisitSnap {
   const traders: Record<string, TraderSnap> = {};
   for (const t of [...s.traders, ...s.alumni, ...s.mine])
-    if (ids.has(t.id) || t.local) traders[t.id] = { name: t.name, resultPct: t.resultPct, trades: t.trades, strikes: t.strikes, status: t.status };
+    if (ids.has(t.id) || t.local) traders[t.id] = { name: t.name, resultPct: t.resultPct, trades: t.trades, status: t.status };
   return {
     at: s.at,
     tick: s.tick,

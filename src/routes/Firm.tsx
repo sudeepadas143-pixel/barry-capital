@@ -144,6 +144,11 @@ function underReview(s: FirmState): Trade[] {
   return out;
 }
 
+function nameOf(s: FirmState, id?: string): string {
+  const t = id ? s.traders.find((x) => x.id === id) : undefined;
+  return t ? `${t.name} · ${fmtPct(t.resultPct)}` : 'nobody yet';
+}
+
 function Compliance({ s, now }: { s: FirmState; now: number }) {
   const { byId } = useFirm();
   const { open } = usePanel();
@@ -156,6 +161,9 @@ function Compliance({ s, now }: { s: FirmState; now: number }) {
           ['positions under water', fmtInt(s.underWater)],
           ['last performance review', s.lastReviewAt ? agoWords(now - s.lastReviewAt) : 'not yet'],
           ['next performance review', `in ${until(s.nextReviewAt - now)}`],
+          ['up for review', `${s.reviewed} of ${s.traders.length} desks`],
+          ['bottom of the board', nameOf(s, s.nextOutId)],
+          ['top of the board', nameOf(s, s.topId)],
         ]}
       />
       {rows.length > 0 && (

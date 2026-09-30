@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { DESK_COUNT } from '../../firm.config';
 import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
-import { fmtPct, pad2, pctClass } from '../format';
+import { fmtPct, pad2, pctClass, until } from '../format';
+import { PARTNER_NAME } from '../../firm.config';
 
 interface Props {
   hot?: number | null;
@@ -50,11 +51,16 @@ export function DeskBoard({ hot, onHover }: Props) {
                 onMouseLeave={() => onHover?.(null)}
                 onFocus={() => onHover?.(d)}
                 onBlur={() => onHover?.(null)}
-                aria-label={`Desk ${d}, ${t.name}, ${fmtPct(t.resultPct)}`}
+                aria-label={`Desk ${d}, ${t.name}, ${fmtPct(t.resultPct)}${t.rank === 1 ? ', top of the board' : t.nextOut ? ', next out' : t.firstReviewTick !== undefined ? ', new' : ''}`}
               >
                 <span className="desk-no">{pad2(d)}</span>
                 <span className="desk-name">{t.name}</span>
-                <span className={`desk-res num ${pctClass(t.resultPct)}`}>{fmtPct(t.resultPct)}</span>
+                <span className={`desk-res num ${pctClass(t.resultPct)}`}>
+                  {fmtPct(t.resultPct)}
+                  {t.rank === 1 && <span className="chip chip-top">TOP</span>}
+                  {t.nextOut && <span className="chip chip-out">NEXT OUT</span>}
+                  {t.firstReviewTick !== undefined && <span className="chip">NEW</span>}
+                </span>
               </button>
             </li>
           );
@@ -85,6 +91,27 @@ export function DeskBoard({ hot, onHover }: Props) {
           )}
         </li>
       </ul>
+      <ReviewNote />
     </section>
+  );
+}
+
+/** The rule, in one line, with who it applies to right now. */
+function ReviewNote() {
+  const { state, now } = useFirm();
+  const out = state.traders.find((t) => t.id === state.nextOutId);
+  const top = state.traders.find((t) => t.id === state.topId);
+  return (
+    <p className="review-note" aria-live="polite">
+      Every hour {PARTNER_NAME} lets the worst performer go and keeps the rest. New hires get three hours before
+      their first review. Next review in{' '}
+      <b className="num">{until(state.nextReviewAt - now)}</b>.
+      {out && top && (
+        <>
+          {' '}
+          Right now <b>{out.name}</b> would go ({fmtPct(out.resultPct)}) and <b>{top.name}</b> is top ({fmtPct(top.resultPct)}).
+        </>
+      )}
+    </p>
   );
 }

@@ -5,9 +5,9 @@ import { useFirm } from '../hooks/useFirm';
 import { usePanel } from '../hooks/usePanel';
 import { ago, fmtPct, fmtSignedSol, fmtSol, pad2, pctClass } from '../format';
 import { ARCHETYPES } from '../sim/archetypes';
-import { SIM } from '../sim/params';
 import type { EventKind, FeedItem, FirmEvent, Trade, Trader } from '../sim/types';
 import { Headshot } from './Sprite';
+import { Standing } from './Standing';
 
 type Tab = 'feed' | 'payroll' | 'waiting';
 const TABS: { id: Tab; label: string }[] = [
@@ -24,14 +24,6 @@ const EVENT_CHIP: Record<EventKind, string> = {
   stale: 'FEED',
   rug: 'DROP',
 };
-
-export function Strikes({ n, of = SIM.STRIKES_TO_FIRE }: { n: number; of?: number }) {
-  return (
-    <span className="strikes" aria-label={`${n} of ${of} strikes`}>
-      {Array.from({ length: of }, (_, i) => (i < n ? '●' : '○')).join('')}
-    </span>
-  );
-}
 
 export function TradeRow({ trade, trader, now }: { trade: Trade; trader?: Trader; now: number }) {
   const [open, setOpen] = useState(false);
@@ -170,7 +162,7 @@ function Payroll() {
             P&amp;L SOL
           </th>
           <th scope="col" className="r">
-            Strikes
+            Standing
           </th>
         </tr>
       </thead>
@@ -191,7 +183,9 @@ function Payroll() {
               </div>
             </td>
             <td className={`r mono num ${pctClass(t.pnlSol, 3)}`}>{fmtSignedSol(t.pnlSol)}</td>
-            <td className="r">{t.local ? <span className="muted">—</span> : <Strikes n={t.strikes} />}</td>
+            <td className="r">
+              <Standing t={t} />
+            </td>
           </tr>
         ))}
       </tbody>

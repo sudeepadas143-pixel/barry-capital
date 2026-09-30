@@ -218,6 +218,16 @@ function pushFeed(list: FeedItem[], items: FeedItem[], keep: number) {
   if (list.length > keep) list.length = keep;
 }
 
+/**
+ * Traders up for review at `tick`, best first. New hires inside their grace
+ * period are left out. Ties go against whoever has the smaller book.
+ */
+export function rankForReview(traders: TraderState[], tick: number): TraderState[] {
+  return traders
+    .filter((t) => !t.local && t.status === 'seated' && tick - t.hiredTick >= SIM.REVIEW_GRACE)
+    .sort((a, b) => resultPct(b) - resultPct(a) || b.equity - a.equity || (a.desk ?? 0) - (b.desk ?? 0));
+}
+
 export function step(s: SimState, source: PriceSource = SimulatedPriceSource): SimState {
   const tick = s.tick + 1;
   s.tick = tick;
@@ -328,18 +338,11 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
     return false;
   });
 
-  // Performance reviews, on the hour.
+  // Performance reviews, on the hour: the worst performer is let go, everyone else stays.
   if ((tick + 1) % SIM.REVIEW_EVERY === 0) {
-    const below: string[] = [];
-    const leaving: TraderState[] = [];
-    for (const t of s.traders) {
-      if (tick - t.hiredTick < SIM.REVIEW_GRACE) continue;
-      if (resultPct(t) < SIM.REVIEW_LINE_PCT) {
-        t.strikes++;
-        below.push(t.name);
-        if (t.strikes >= SIM.STRIKES_TO_FIRE) leaving.push(t);
-      } else t.strikes = 0;
-    }
+    const ranked = rankForReview(s.traders, tick);
+    const leaving: TraderState[] = ranked.length >= SIM.REVIEW_MIN ? [ranked[ranked.length - 1]] : [];
+    const best = ranked[0];
     for (const t of leaving) {
       liquidate(t, ctx, tickRng(s.seed, tick, t.seed));
       markEquity(t, byId);
@@ -350,12 +353,14 @@ export function step(s: SimState, source: PriceSource = SimulatedPriceSource): S
       s.traders = s.traders.filter((x) => x !== t);
       s.alumni.unshift(t);
       s.c.fired++;
-      event('escorted', `${t.name} was let go after a third bad review. Desk ${String(t.desk).padStart(2, '0')} is being cleared.`, t.id);
+      const pct = (v: number) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)}%`;
+      event(
+        'escorted',
+        `${PARTNER_NAME} let ${t.name} go: last of ${ranked.length} at ${pct(resultPct(t))}. Desk ${String(t.desk).padStart(2, '0')} is being cleared. ${best.name} stays top at ${pct(resultPct(best))}.`,
+        t.id,
+      );
     }
     if (s.alumni.length > SIM.ALUMNI_KEEP) s.alumni.length = SIM.ALUMNI_KEEP;
-    if (below.length && !leaving.length) {
-      event('review', below.length === 1 ? `Hourly reviews are done. ${below[0]} is below the line.` : `Hourly reviews are done. ${below.length} traders are below the line.`);
-    }
     // A share of profit above the high-water mark goes into the bonus pool.
     const profit = treasury(s) - s.c.lastReviewTreasury;
     if (profit > 0) {

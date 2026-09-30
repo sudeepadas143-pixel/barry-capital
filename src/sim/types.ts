@@ -123,7 +123,12 @@ export interface Trader {
   pnlSol: number;
   bookSol: number;
   /** Consecutive reviews below the line. */
-  strikes: number;
+  /** Place on the board among desks up for review, 1 = best. Undefined while new. */
+  rank?: number;
+  /** Bottom of the board: this trader goes at the next review if nothing changes. */
+  nextOut?: boolean;
+  /** Tick of this trader's first review, while they're still new. */
+  firstReviewTick?: number;
   openPositions: number;
   underWater: number;
   trades: number;
@@ -173,6 +178,11 @@ export interface FirmState {
   feedStale: boolean;
   partnerFloor: FloorId | 'review';
   nextReviewAt: number;
+  /** Desks up for review at the next one. */
+  reviewed: number;
+  /** Bottom of the board right now: goes at the next review if nothing changes. */
+  nextOutId?: string;
+  topId?: string;
   lastReviewAt: number | null;
   theme: string;
   season: { start: number; tick: number; seed: number };

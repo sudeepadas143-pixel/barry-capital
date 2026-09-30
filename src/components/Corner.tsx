@@ -132,7 +132,7 @@ export function SinceLastVisit() {
               const d = t.resultPct - was.resultPct;
               const n = t.trades - was.trades;
               sub = `${d >= 0 ? 'up' : 'down'} ${Math.abs(d).toFixed(1)} pts · ${n} ${n === 1 ? 'trade' : 'trades'} since`;
-              if (t.strikes > was.strikes) sub += ` · ${t.strikes === 1 ? 'a strike' : `${t.strikes} strikes`}`;
+              if (t.nextOut) sub += ' · bottom of the board';
             } else {
               const d = t.resultPct - f.startPct;
               sub = `${d >= 0 ? 'up' : 'down'} ${Math.abs(d).toFixed(1)} pts since you followed`;

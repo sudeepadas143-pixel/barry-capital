@@ -9,7 +9,7 @@ import { SIM } from './params';
 import { holderCount } from './payout';
 import { mix } from './prng';
 import { resultPct, themeOfDay, type TraderState } from './traders';
-import { treasury, type SimState } from './firm';
+import { rankForReview, treasury, type SimState } from './firm';
 import type { Coin, FeedItem, FirmState, FloorId, Trader } from './types';
 
 const ROTATION: FloorId[] = ['office', 'terminal', 'compliance', 'hr', 'lobby', 'terminal', 'lobby'];
@@ -32,7 +32,6 @@ export function toTrader(t: TraderState, s: SimState): Trader {
     resultPct: resultPct(t),
     pnlSol: t.equity - t.book0,
     bookSol: t.equity,
-    strikes: t.strikes,
     openPositions: t.positions.length,
     underWater,
     trades: t.trades,
@@ -54,7 +53,23 @@ function nextBoundary(tick: number, every: number): number {
 export function toView(s: SimState, now: number): FirmState {
   const T = s.tickMs;
   const endOf = (tick: number) => s.startMs + (tick + 1) * T;
-  const traders = s.traders.map((t) => toTrader(t, s));
+  // Who'd go if the next review happened now, and where everyone stands.
+  const reviewTick = nextBoundary(s.tick, SIM.REVIEW_EVERY);
+  const ranked = rankForReview(s.traders, reviewTick);
+  const rankOf = new Map(ranked.map((t, i) => [t.id, i + 1]));
+  const nextOut = ranked.length >= SIM.REVIEW_MIN ? ranked[ranked.length - 1].id : undefined;
+  const traders = s.traders.map((t) => {
+    const v = toTrader(t, s);
+    v.rank = rankOf.get(t.id);
+    v.nextOut = t.id === nextOut || undefined;
+    if (v.rank === undefined && !t.local && t.hiredTick >= 0) {
+      // First review: the first boundary at least REVIEW_GRACE ticks after hire.
+      let k = nextBoundary(t.hiredTick + SIM.REVIEW_GRACE - 1, SIM.REVIEW_EVERY);
+      if (k - t.hiredTick < SIM.REVIEW_GRACE) k += SIM.REVIEW_EVERY;
+      v.firstReviewTick = k;
+    }
+    return v;
+  });
   const holders = new Map<number, number>();
   for (const t of s.traders) for (const p of t.positions) holders.set(p.coinId, (holders.get(p.coinId) ?? 0) + 1);
 
@@ -120,6 +135,9 @@ export function toView(s: SimState, now: number): FirmState {
     feedStale: stale,
     partnerFloor,
     nextReviewAt: endOf(nextBoundary(tick, SIM.REVIEW_EVERY)),
+    reviewed: ranked.length,
+    nextOutId: nextOut,
+    topId: ranked[0]?.id,
     lastReviewAt: s.c.lastReviewTick >= 0 ? endOf(s.c.lastReviewTick) : null,
     theme: THEME_LABEL[themeOfDay(s.seed, Math.max(0, tick))],
     season: { start: s.startMs, tick, seed: s.seed },

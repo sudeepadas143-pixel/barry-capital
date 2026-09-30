@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { DESK_COUNT, accountUrl } from '../../firm.config';
 import { checkWallet, shortAddress, traderFromWallet } from '../wallet';
 import { Figure, Headshot } from '../components/Sprite';
-import { Strikes, TradeRow } from '../components/Books';
+import { TradeRow } from '../components/Books';
 import {
   BUILD_NAMES,
   EYES_NAMES,
@@ -145,9 +145,7 @@ function EmployeeFile() {
             {t.wins} / {t.losses}
           </dd>
           <dt>reviews</dt>
-          <dd>
-            <Strikes n={0} /> exempt
-          </dd>
+          <dd>not reviewed: your hire can’t be let go</dd>
           {wallet && (
             <>
               <dt>built from</dt>

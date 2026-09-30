@@ -177,8 +177,8 @@ Decisions made along the way, and the things worth a second look.
 
 ## Open risks and things not done
 
-- **Not deployed.** This session had no Vercel or Git remote access. `vercel.json` and
-  the README steps are ready, but no deploy has been run.
+- **Deploys.** The GitHub repository is linked to the Vercel project `barry-capital-3`
+  (barry-capital-3.vercel.app). Every push to `main` builds and publishes the site.
 - **Placeholder mint** (`BarryCapXXXX…`): the explorer link goes to a page that doesn't
   exist until a real address is set.
 - **Main chunk size** (133 KB gzipped). The checkpoint could move to a parallel chunk,

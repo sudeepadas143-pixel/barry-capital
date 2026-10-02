@@ -234,9 +234,9 @@ export default function Hire() {
     setPatience(Math.round(ARCHETYPES[arch].patience * 100));
   }, [arch]);
 
-  const taken = useMemo(() => new Set([...state.traders, ...state.waiting].map((t) => t.name)), [state.traders, state.waiting]);
+  const taken = useMemo(() => new Set([...state.traders, ...state.waiting].map((t) => t.name.toLowerCase())), [state.traders, state.waiting]);
   const clean = cleanName(name).trim();
-  const error = !clean ? 'A surname, please.' : taken.has(clean) ? 'That name is already on a desk.' : null;
+  const error = !clean ? 'A surname, please.' : taken.has(clean.toLowerCase()) ? 'That name is already on a desk.' : null;
   const hired = state.mine[0];
   const walletCheck = checkWallet(wallet);
 
@@ -257,8 +257,10 @@ export default function Hire() {
       setRisk(Math.round(w.risk * 100));
       setPatience(Math.round(w.patience * 100));
       setLook(w.look);
-      if (!clean || clean === walletName.current) setName(w.name);
-      walletName.current = w.name;
+      // Names are shared with the floor; if the wallet's pick is taken, add a suffix.
+      const pick = taken.has(w.name) ? `${w.name.slice(0, 13)} ii` : w.name;
+      if (!clean || clean === walletName.current) setName(pick);
+      walletName.current = pick;
       setWalletSeed(w.seed);
       setWalletNote({ text: 'Built from your wallet. You can still change anything below.', bad: false });
     } else {

@@ -45,4 +45,4 @@ export const SINCE = {
 };
 
 /** The only disclaimer on the site. */
-export const FOOTER_NOTE = 'Prices, balances and trades on this site aren’t real. Not financial advice.';
+export const FOOTER_NOTE = 'Illustrative figures. Not financial advice.';

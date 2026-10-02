@@ -12,9 +12,9 @@ import { ArrowRight } from './Icons';
 
 type Tab = 'feed' | 'payroll' | 'waiting';
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'feed', label: 'the feed' },
+  { id: 'feed', label: 'trades' },
   { id: 'payroll', label: 'payroll' },
-  { id: 'waiting', label: 'waiting for a desk' },
+  { id: 'waiting', label: 'the bench' },
 ];
 
 const EVENT_CHIP: Record<EventKind, string> = {
@@ -244,18 +244,18 @@ export function Books({ limit, showHead = true, filters = false }: { limit?: num
       {showHead ? (
         <div className="section-head">
           <h2 id={`${base}-title`} className="label">
-            The books
+            The tape
           </h2>
           <Link to="/books" className="textlink">
-            everything <ArrowRight />
+            full tape <ArrowRight />
           </Link>
         </div>
       ) : (
         <h2 id={`${base}-title`} className="sr-only">
-          The books
+          The tape
         </h2>
       )}
-      <div className="tabs" role="tablist" aria-label="The books" onKeyDown={onKey}>
+      <div className="tabs" role="tablist" aria-label="The tape" onKeyDown={onKey}>
         {TABS.map((t) => (
           <button
             key={t.id}

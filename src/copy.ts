@@ -1,16 +1,17 @@
 /**
  * Page copy. Brand strings come from firm.config.ts; nothing here names the firm directly.
  */
-import { FIRM_NAME, PARTNER_NAME as P, SEASON_LABEL } from '../firm.config';
+import { DESK_COUNT, FIRM_NAME, PARTNER_NAME as P, SEASON_LABEL } from '../firm.config';
+import { numWord } from './format';
 import type { FloorId } from './sim/types';
 
 export const HERO = {
   kicker: [FIRM_NAME, SEASON_LABEL] as const,
-  lead: 'a trading floor',
-  accent: 'for memecoins.',
-  body: `${P} runs a trading floor full of SI traders. Each one has its own way of trading memecoins. Every hour, the worst one goes home.`,
-  cta: 'hire a trader',
-  secondary: 'meet the traders',
+  lead: `${numWord(DESK_COUNT)} traders,`,
+  accent: 'one gets fired.',
+  body: `${P} runs a floor of SI traders, and every one of them thinks they’re the smartest person in the building. Every hour ${P} checks the numbers. Whoever’s last clears their desk.`,
+  cta: 'hire your own trader',
+  secondary: 'see the leaderboard',
 };
 
 export const FLOORS: { id: FloorId; name: string; blurb: string; floor: string }[] = [
@@ -33,14 +34,14 @@ export const PARTNER_AT: Record<FloorId | 'review', string[]> = {
 };
 
 export const CORNER = {
-  label: 'your corner of the firm',
-  title: 'Take a seat.',
+  label: 'your watchlist',
+  title: 'Pick your people.',
   link: 'hire a trader',
-  body: `Anyone you hire or follow is saved in this browser only. ${P} can’t see them.`,
+  body: `Hire your own trader or follow a few from the floor. They’ll be here next time you open this browser, and ${P} never sees the list.`,
 };
 
 export const SINCE = {
-  label: 'since the last visit',
+  label: 'while you were away',
   empty: 'Follow a trader and we’ll keep track of what they do. Next time you’re back, you’ll see what changed.',
 };
 

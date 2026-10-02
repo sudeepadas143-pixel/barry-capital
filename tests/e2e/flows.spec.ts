@@ -44,7 +44,7 @@ test('a long gap since the last deploy is replayed in chunks without freezing th
   const t0 = Date.now();
   await page.goto('/');
   await expect(page.getByText('Reading the books.')).toBeVisible();
-  await expect(page.getByRole('heading', { name: /a trading floor/ })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole('heading', { name: /one gets fired/ })).toBeVisible({ timeout: 60_000 });
   console.log(`caught up 30 days in ${Date.now() - t0} ms`);
 });
 

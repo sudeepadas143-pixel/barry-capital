@@ -33,10 +33,10 @@ export function Floors() {
     <section aria-labelledby="floors-title">
       <div className="section-head">
         <h2 id="floors-title" className="label">
-          {PARTNER_NAME}’s floors
+          The building
         </h2>
         <Link to="/firm" className="textlink">
-          inside the firm <ArrowRight />
+          floor guide <ArrowRight />
         </Link>
       </div>
       <ul className="rows">

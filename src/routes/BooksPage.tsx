@@ -5,7 +5,7 @@ export default function BooksPage() {
   return (
     <div className="wrap">
       <header className="page-head">
-        <p className="label">The books</p>
+        <p className="label">The tape</p>
         <h1 className="hero-title">
           every trade,
           <em>written down.</em>

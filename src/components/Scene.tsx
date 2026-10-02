@@ -242,8 +242,11 @@ export function Scene({ hot = null, onHover }: Props) {
         )}
       </div>
       <figcaption className="scene-caption">
-        <button hidden={reduced} type="button" onClick={() => director.current.replay(state, performance.now() / 1000)}>
-          replay arrival
+        <button hidden={reduced} type="button" className="replay" onClick={() => director.current.replay(state, performance.now() / 1000)}>
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M13.5 8a5.5 5.5 0 1 1-1.7-4M13.5 2v3.2h-3.2" />
+          </svg>
+          ring the opening bell
         </button>
       </figcaption>
     </figure>

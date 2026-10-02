@@ -54,7 +54,7 @@ export function Header() {
           aria-controls={menuId}
           onClick={() => setOpen((o) => !o)}
         >
-          {open ? 'close' : 'menu'} <span className="burger" aria-hidden="true" />
+          <span className="menu-word">{open ? 'close' : 'menu'}</span> <span className="burger" aria-hidden="true" />
         </button>
       </div>
       <span className="sr-only" aria-live="polite">

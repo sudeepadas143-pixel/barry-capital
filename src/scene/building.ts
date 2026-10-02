@@ -635,7 +635,7 @@ function facade(iso: Iso, out: Built) {
   out.door = { x: xo, y0, y1, z0: zf, z1: zf + 26 };
   iso.box(xo, y0 - 3, zf + 28, xo + 9, y1 + 3, zf + 31, { top: rgba2('#1f2c45'), left: rgba2('#1f2c45'), right: rgba2('#141c2e') });
   iso.hlineX(xo + 9, y0 - 3, y1 + 3, zf + 28.6, C.gold);
-  iso.textX(xo + 9, (y0 + y1) / 2, zf + 28.8, 'BC', { font: 'serif', size: 3, color: C.goldHi, weight: 500, align: 'center', spacing: 0.3 });
+  iso.textX(xo + 9, (y0 + y1) / 2, zf + 28.8, 'SI', { font: 'serif', size: 3, color: C.goldHi, weight: 500, align: 'center', spacing: 0.3 });
 }
 
 function street(iso: Iso) {

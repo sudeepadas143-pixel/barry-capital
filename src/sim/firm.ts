@@ -4,7 +4,7 @@
  */
 import { DESK_COUNT, PARTNER_NAME, TICK_SECONDS } from '../../firm.config';
 import { SimulatedPriceSource, newCoin, type BoardState, type CoinState, type PriceSource } from './coins';
-import { STARTING_ROSTER, SURNAMES } from './names';
+import { STARTING_METHODS, TRADER_NAMES } from './names';
 import { SIM } from './params';
 import { holderCount } from './payout';
 import { hashString, mix, rng, tickRng, type Rng } from './prng';
@@ -77,17 +77,14 @@ function lookKey(l: Look) {
   return `${l.skin}${l.hair}${l.hairStyle}${l.suit}`;
 }
 
+/** A random name nobody on the floor or in line has, preferring ones not recently let go. */
 function nextName(s: SimState, r: Rng): string {
-  const inUse = new Set([...s.traders, ...s.waiting, ...s.alumni].map((t) => t.name));
-  for (let i = 0; i < SURNAMES.length; i++) {
-    const n = SURNAMES[(s.nameCursor + r.int(SURNAMES.length)) % SURNAMES.length];
-    if (!inUse.has(n)) {
-      s.nameCursor++;
-      return n;
-    }
-  }
+  const busy = new Set([...s.traders, ...s.waiting].map((t) => t.name));
+  const recent = new Set(s.alumni.map((t) => t.name));
+  const fresh = TRADER_NAMES.filter((n) => !busy.has(n) && !recent.has(n));
+  const free = fresh.length ? fresh : TRADER_NAMES.filter((n) => !busy.has(n));
   s.nameCursor++;
-  return `${SURNAMES[s.nameCursor % SURNAMES.length]} ii`;
+  return free.length ? r.pick(free) : `${r.pick(TRADER_NAMES)} ${s.nameCursor}`;
 }
 
 function candidate(s: SimState, r: Rng): TraderState {
@@ -151,7 +148,7 @@ export function genesis(seasonStart: string, tickSeconds = TICK_SECONDS): SimSta
     },
     outageLeft: 0,
     lastReadTick: -1,
-    nameCursor: r.int(SURNAMES.length),
+    nameCursor: 0,
     locals: [],
     localFeed: [],
   };
@@ -175,7 +172,8 @@ export function genesis(seasonStart: string, tickSeconds = TICK_SECONDS): SimSta
   s.board.rugged = [];
 
   const used = new Set<string>();
-  STARTING_ROSTER.slice(0, DESK_COUNT).forEach(([name, arch], i) => {
+  STARTING_METHODS.slice(0, DESK_COUNT).forEach((arch, i) => {
+    const name = nextName(s, r);
     let look = randomLook(r);
     while (used.has(lookKey(look))) look = randomLook(r);
     used.add(lookKey(look));

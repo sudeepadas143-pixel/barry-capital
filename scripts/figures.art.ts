@@ -4,7 +4,7 @@ import { PixelBuffer } from '../src/scene/buffer';
 import { encodePng } from '../src/scene/png';
 import { renderBust, renderFigure, type Pose } from '../src/art/figure';
 import { dress } from '../src/art/traits';
-import { STARTING_ROSTER } from '../src/sim/names';
+import { STARTING_METHODS, TRADER_NAMES } from '../src/sim/names';
 import { PARTNER_LOOK } from '../src/art/partner';
 import type { Look } from '../src/sim/types';
 import { blitAt } from '../src/art/props';
@@ -14,8 +14,8 @@ function paste(buf: PixelBuffer, img: { w: number; h: number; px: Uint32Array },
 }
 
 export const rosterLooks = (): [string, Look, boolean][] => [
-  ...STARTING_ROSTER.map(([name, arch], i): [string, Look, boolean] => [name, dress({ skin: [0, 4, 2, 0, 3, 5, 1, 0, 1, 2, 3][i], hair: [3, 0, 0, 3, 4, 0, 6, 1, 1, 2, 0][i], hairStyle: 0, suit: [0, 1, 2, 4, 5, 0, 1, 4, 3, 1, 2][i], tie: i % 6 }, arch, i * 7919 + 13, name), false]),
-  ['barry', PARTNER_LOOK, true],
+  ...STARTING_METHODS.map((arch, i): [string, Look, boolean] => [TRADER_NAMES[i], dress({ skin: [0, 4, 2, 0, 3, 5, 1, 0, 1, 2, 3][i], hair: [3, 0, 0, 3, 4, 0, 6, 1, 1, 2, 0][i], hairStyle: 0, suit: [0, 1, 2, 4, 5, 0, 1, 4, 3, 1, 2][i], tie: i % 6 }, arch, i * 7919 + 13), false]),
+  ['steve', PARTNER_LOOK, true],
 ];
 
 it('figure contact sheets', () => {

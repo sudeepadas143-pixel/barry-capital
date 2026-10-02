@@ -2,14 +2,14 @@
  * Every brand string and network-specific value lives here.
  * Nothing else in the codebase should hardcode these.
  */
-export const FIRM_NAME = 'Barry Capital';
-export const PARTNER_NAME = 'Barry';
+export const FIRM_NAME = 'Steve’s Investors';
+export const PARTNER_NAME = 'Steve';
 export const SEASON_LABEL = 'Q1';
 export const DESK_COUNT = 11;
 
-export const TOKEN_SYMBOL = 'BARRY';
+export const TOKEN_SYMBOL = 'STEVE';
 /** Placeholder. Swap for the real mint when there is one. */
-export const TOKEN_MINT = 'BarryCapXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+export const TOKEN_MINT = 'StevesInvXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 /** `{address}` is replaced with TOKEN_MINT. */
 export const EXPLORER_URL = 'https://solscan.io/token/{address}';
 export const EXPLORER_LABEL = 'solscan';

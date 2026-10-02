@@ -6,7 +6,7 @@
  */
 import { BUILD_NAMES, EYES_NAMES, FACE_NAMES, HAIRS, NECK_NAMES, OUTFIT_NAMES, SHIRTS, SKINS, SUITS, TIES } from './art/palette';
 import { ARCHETYPE_IDS } from './sim/archetypes';
-import { SURNAMES } from './sim/names';
+import { TRADER_NAMES } from './sim/names';
 import { hashString, rng } from './sim/prng';
 import type { ArchetypeId, Look } from './sim/types';
 
@@ -96,7 +96,7 @@ export function traderFromWallet(address: string): WalletTrader {
   };
   return {
     seed,
-    name: SURNAMES[r.int(SURNAMES.length)],
+    name: TRADER_NAMES[r.int(TRADER_NAMES.length)].toLowerCase().replace(/[^a-z' -]/g, '').slice(0, 16) || 'trader',
     archetype,
     look,
     risk: 0.2 + r.next() * 0.7,

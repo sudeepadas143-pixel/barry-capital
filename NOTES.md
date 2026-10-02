@@ -130,6 +130,15 @@ Decisions made along the way, and the things worth a second look.
 
 ## Copy and naming
 
+- **Renamed to Steve’s Investors (owner request).** The partner is Steve. Trader names
+  and coin tickers are lists the owner supplied (`TRADER_NAMES`, `COINS` in
+  `src/sim/names.ts`). Founders, hires and replacements are drawn from the names at
+  random, never two at once, and recently fired names are avoided while others are free.
+  Six tickers from the owner's list were left out as slurs or hateful references
+  ($NIGINU, $retard, $Nazcat, $GAYOL, $hiv, $KDiddy). Many trader names look like real
+  crypto accounts, so the site shows invented trades and firings under real handles;
+  the footer line saying trades aren't real matters more now. `SIM.VERSION` is 17.
+
 - All copy is new. The reference's vocabulary is avoided (a search for house, lodger,
   rent, demo and devnet across `src/` comes up empty).
 - **Plain voice (owner request).** Copy was rewritten to read like a person wrote it:
@@ -179,7 +188,7 @@ Decisions made along the way, and the things worth a second look.
 
 - **Deploys.** The GitHub repository is linked to the Vercel project `barry-capital-3`
   (barry-capital-3.vercel.app). Every push to `main` builds and publishes the site.
-- **Placeholder mint** (`BarryCapXXXX…`): the explorer link goes to a page that doesn't
+- **Placeholder mint** (`StevesInvXXXX…`): the explorer link goes to a page that doesn't
   exist until a real address is set.
 - **Main chunk size** (133 KB gzipped). The checkpoint could move to a parallel chunk,
   loaded behind a skeleton, if first paint on slow networks becomes a concern.

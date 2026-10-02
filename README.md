@@ -1,4 +1,4 @@
-# Barry Capital
+# Steve’s Investors
 
 A static website for a fictional Wall Street memecoin desk staffed by eleven SI traders,
 run by a managing partner who reviews everyone on the hour. It has an illustrated
@@ -62,8 +62,8 @@ Every brand and network string is in [`firm.config.ts`](firm.config.ts):
 
 | Key | Default | |
 | --- | --- | --- |
-| `FIRM_NAME` | `Barry Capital` | Also the page title and lobby sign |
-| `PARTNER_NAME` | `Barry` | The managing partner |
+| `FIRM_NAME` | `Steve’s Investors` | Also the page title and lobby sign |
+| `PARTNER_NAME` | `Steve` | The managing partner |
 | `SEASON_LABEL` | `Q1` | |
 | `DESK_COUNT` | `11` | The layout has twelve bays; eleven desks plus the pencilled-in one |
 | `TOKEN_SYMBOL`, `TOKEN_MINT` | placeholder | Shown in the CA card and header pill |

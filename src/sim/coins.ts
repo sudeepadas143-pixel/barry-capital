@@ -3,7 +3,7 @@
  * launch → pump → chop → (bleed | run | rug). Returns are fat-tailed.
  */
 import { SIM } from './params';
-import { COINS, type Theme } from './names';
+import { COINS, THEME_NOUN, type Theme } from './names';
 import type { Rng } from './prng';
 import type { CoinPhase } from './types';
 
@@ -89,7 +89,7 @@ export function newCoin(board: BoardState, tick: number, r: Rng): CoinState {
   const c: CoinState = {
     id: board.nextId++,
     ticker,
-    name: pick.name,
+    name: THEME_NOUN[pick.theme],
     theme,
     price,
     ath: price,

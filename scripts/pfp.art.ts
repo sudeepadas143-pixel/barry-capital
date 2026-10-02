@@ -6,7 +6,7 @@ import { renderBust } from '../src/art/figure';
 import { blitAt } from '../src/art/props';
 import { PARTNER_LOOK } from '../src/art/partner';
 
-it('barry profile pictures', () => {
+it('steve profile pictures', () => {
   mkdirSync('art-out', { recursive: true });
   const size = 1000;
   const bust = renderBust(PARTNER_LOOK, 900, true, 3);
@@ -14,6 +14,6 @@ it('barry profile pictures', () => {
     const buf = new PixelBuffer(size, size);
     buf.rect(0, 0, size, size, rgba(bg));
     blitAt(buf, bust, size / 2, size + 20);
-    writeFileSync(`art-out/barry-pfp-${name}.png`, encodePng(buf, 1));
+    writeFileSync(`art-out/steve-pfp-${name}.png`, encodePng(buf, 1));
   }
 });

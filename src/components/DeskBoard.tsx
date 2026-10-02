@@ -14,23 +14,17 @@ export function DeskBoard({ hot, onHover }: Props) {
   const { state } = useFirm();
   const { open } = usePanel();
   const byDesk = new Map(state.traders.filter((t) => t.desk).map((t) => [t.desk!, t]));
-  // Ranked by result, best first; empty desks at the bottom.
-  const desks = Array.from({ length: DESK_COUNT }, (_, i) => i + 1).sort((a, b) => {
-    const ta = byDesk.get(a);
-    const tb = byDesk.get(b);
-    if (!ta || !tb) return ta ? -1 : tb ? 1 : a - b;
-    return tb.resultPct - ta.resultPct;
-  });
+  const desks = Array.from({ length: DESK_COUNT }, (_, i) => i + 1);
   const mine = state.mine[0];
 
   return (
     <section aria-labelledby="desks-title">
       <div className="desks-head">
         <h2 id="desks-title" className="label" style={{ color: 'var(--ink)' }}>
-          The leaderboard
+          The traders’ desks
         </h2>
         <span className="label" style={{ color: 'var(--ink)' }} aria-hidden="true">
-          Since hire
+          Result
         </span>
       </div>
       <ul className="desks">

@@ -26,3 +26,9 @@ export const ArrowRight = () => (
     <path d="M1.5 6h9M7 2.5L10.5 6 7 9.5" />
   </svg>
 );
+
+export const CheckIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3.5 8.5l3 3 6-7" />
+  </svg>
+);

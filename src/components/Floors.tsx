@@ -10,8 +10,8 @@ export function floorStatus(id: FloorId, s: FirmState, now: number): string {
   switch (id) {
     case 'office':
       return s.bonus.poolSol > 0.0005
-        ? `treasury ${fmtSol(s.treasurySol)} SOL · bonus pool ${fmtSol(s.bonus.poolSol)}`
-        : `treasury ${fmtSol(s.treasurySol)} SOL`;
+        ? `treasury ${fmtSol(s.treasurySol, 2)} SOL · bonus pool ${fmtSol(s.bonus.poolSol, 2)}`
+        : `treasury ${fmtSol(s.treasurySol, 2)} SOL`;
     case 'terminal':
       return `${s.coins.length} coins on the board`;
     case 'compliance':

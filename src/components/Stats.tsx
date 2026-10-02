@@ -16,7 +16,7 @@ export function Stats() {
     <>
       <div className="stats">
         <div className="stat">
-          <p className="label">On the floor</p>
+          <p className="label">Traders</p>
           <div className="stat-val num">
             {seated}
             <span className="of">/ {DESK_COUNT} desks</span>
@@ -37,7 +37,7 @@ export function Stats() {
           </div>
         </div>
       </div>
-      <p className="read-at">prices updated {agoWords(now - state.boardReadAt)}</p>
+      <p className="read-at">board read {agoWords(now - state.boardReadAt)}</p>
     </>
   );
 }

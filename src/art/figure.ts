@@ -297,6 +297,11 @@ export class Painter {
   }
 
   /** A view that draws `k` times larger around the design point (ax, ay), on the same pixels. */
+  /** The same painter, with everything drawn moved by (dx, dy) units. */
+  moved(dx: number, dy: number): Painter {
+    return new Painter(this.w, this.h, this.ox + dx * this.s, this.oy + dy * this.s, this.s, this.px, this.ss);
+  }
+
   scaled(k: number, ax: number, ay: number): Painter {
     const s2 = this.s * k;
     return new Painter(this.w, this.h, this.ox + ax * this.s - ax * s2, this.oy + ay * this.s - ay * s2, s2, this.px, this.ss);
@@ -1281,7 +1286,7 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
   // Long hair falls behind everything.
   const style = lk.hairStyle % 14;
   if (front && style === 9) {
-    const cy = -44.6 + r.up + r.bob;
+    const cy = -44.6 + r.up + r.bob + Yb(b, -38.2) + 38.2;
     pn.part(union(poly([[-7.2, cy - 1], [7.2, cy - 1], [7.8, cy + 12.6], [-7.8, cy + 12.6]]), ellipse(0, cy + 12.6, 7.8, 2.2)), c.hair, { shade: c.hairS, hi: c.hairH });
   }
   if (r.box && !front) drawBox(pn, c, r, true);
@@ -1300,8 +1305,10 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
     pn.part(ellipse(-8, -25.4 + r.bob, 1.5, 1.7), c.skin, { shade: c.skinS });
     pn.part(ellipse(8, -25.4 + r.bob, 1.5, 1.7), c.skin, { shade: c.skinS });
   }
-  const chin = Yb(b, -38.2) + r.up + r.bob + (r.head === 'down' ? 2.2 : 0);
-  drawHead(pn.scaled(HEAD_SCALE, 0, chin), b, r, frame);
+  // The head is drawn at the standard height, scaled about its own chin,
+  // then lifted or dropped onto this body's neck so it always sits on the collar.
+  const lift = r.up + r.bob + (r.head === 'down' ? 2.2 : 0);
+  drawHead(pn.moved(0, Yb(b, -38.2) + 38.2).scaled(HEAD_SCALE, 0, -38.2 + lift), b, r, frame);
   if (front) for (const a of [r.armL, r.armR]) if (a.over) drawArm(pn, b, a, true);
   if (r.phone) {
     const hd = armPoints(b, r.armR).hd;

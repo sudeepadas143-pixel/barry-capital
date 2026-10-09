@@ -27,6 +27,7 @@ export const HAIR_STYLE_NAMES = [
   'ponytail',
   'bun',
   'afro',
+  'curtains',
 ];
 /** Shirts: white, pale blue, pink, lavender, blue stripe. */
 export const SHIRTS = ['#f6f3ec', '#cfe0f2', '#f2cfd6', '#ddd3ee', '#d8e6f5'];
@@ -36,7 +37,7 @@ export const VESTS = ['#6d737c', '#33405a', '#2a2b30', '#59603f'];
 export const OUTFIT_NAMES = ['suit', 'pinstripe suit', 'fleece vest', 'shirtsleeves and braces', 'waistcoat', 'turtleneck and blazer', 'double-breasted'];
 export const NECK_NAMES = ['tie', 'loosened tie', 'bow tie', 'open collar', 'lanyard'];
 export const EYES_NAMES = ['nothing', 'sunglasses, indoors', 'glasses', 'headset', 'earpiece'];
-export const FACE_NAMES = ['clean-shaven', 'stubble', 'beard', 'moustache', 'goatee'];
+export const FACE_NAMES = ['clean-shaven', 'stubble', 'short beard', 'moustache', 'goatee'];
 export const BUILD_NAMES = ['slim', 'average', 'broad'];
 
 export const INK = '#1d1c19';

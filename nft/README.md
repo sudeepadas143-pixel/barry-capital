@@ -25,7 +25,7 @@ Stack one file from each folder, lowest number at the bottom:
 
 - **Hair back and hair share a file name.** If you pick `08-hair/long-auburn.png`, also use `02-hair-back/long-auburn.png`. Bald has no back file, so skip that layer for it.
 - **Neck and head use the same skin.** For example `03-neck/skin-4.png` goes with `05-head/skin-4.png`.
-- **Facial hair should match the hair colour.** `beard-grey` goes with grey hair, and so on.
+- **Facial hair should match the hair colour.** `short-beard-grey` goes with grey hair, and so on.
 - **No cigar with `shouting`** (the mouth is wide open) **or with `headset`** (the mouthpiece is in the way).
 - `stubble-*` and some `07-expression` pixels are semi-transparent on purpose, so one file works on every skin. Your tool needs to blend alpha (any normal PNG compositing does).
 

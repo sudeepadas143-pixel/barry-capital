@@ -99,7 +99,9 @@ const OUTFITS: [string, number, number, number, number, number][] = [
   ['visitor-lanyard', 0, 2, 0, 3, 4],
 ];
 
-const FACIAL = ['', 'stubble', 'beard', 'moustache', 'goatee'];
+const FACIAL = ['', 'stubble', 'short-beard', 'moustache', 'goatee'];
+/** Hair styles left out of the NFTs (the afro read as a helmet at this size). */
+const SKIP_STYLES = new Set(['afro']);
 const EYEWEAR: [string, Partial<Look>, boolean][] = [
   ['sunglasses', { eyes: 1 }, false],
   ['glasses', { eyes: 2 }, false],
@@ -164,6 +166,7 @@ it('nft layers', () => {
 
   HAIRS.forEach((_, hc) =>
     HAIR_STYLE_NAMES.forEach((style, hs) => {
+      if (SKIP_STYLES.has(style)) return;
       const look = { hair: hc, hairStyle: hs };
       const n = `${slug(style)}-${slug(HAIR_NAMES[hc])}`;
       add('02-hair-back', n, part(look, ['hairBack']));
@@ -282,11 +285,11 @@ function catalog(bank: Record<string, Record<string, SpriteImage>>) {
     return px;
   };
   const rows: Uint32Array[][] = [
-    HAIR_STYLE_NAMES.map((h) => make({ '08-hair': `${slug(h)}-dark-brown` })),
+    HAIR_STYLE_NAMES.filter((h) => !SKIP_STYLES.has(h)).map((h) => make({ '08-hair': `${slug(h)}-dark-brown` })),
     HAIR_NAMES.map((c) => make({ '08-hair': `pompadour-${slug(c)}` })),
     Object.keys(bank['04-outfit']).map((o) => make({ '04-outfit': o })),
     [...Object.keys(bank['07-expression']).map((e) => make({ '07-expression': e })), ...Object.keys(bank['09-eyewear']).map((e) => make({ '09-eyewear': e })), make({ '10-accessory': 'cigar' })],
-    [...Object.keys(bank['05-head']).map((k) => make({ '05-head': k, '03-neck': k, '01-background': 'brass' })), ...['stubble', 'beard', 'moustache', 'goatee'].map((f) => make({ '06-facial-hair': `${f}-dark-brown`, '08-hair': 'short-crop-dark-brown' })), ...Object.keys(bank['01-background']).map((b) => make({ '01-background': b }))],
+    [...Object.keys(bank['05-head']).map((k) => make({ '05-head': k, '03-neck': k, '01-background': 'brass' })), ...['stubble', 'short-beard', 'moustache', 'goatee'].map((f) => make({ '06-facial-hair': `${f}-dark-brown`, '08-hair': 'short-crop-dark-brown' })), ...Object.keys(bank['01-background']).map((b) => make({ '01-background': b }))],
   ];
   const cell = 160;
   const cols = Math.max(...rows.map((r) => r.length));
@@ -299,6 +302,18 @@ function catalog(bank: Record<string, Record<string, SpriteImage>>) {
     }),
   );
   writeFileSync(`${OUT}/catalog.png`, encodePng(buf, 1));
+
+  // The newest options, large.
+  const fresh = [
+    ...[['black', 'skin-1'], ['dark-brown', 'skin-3'], ['sandy', 'skin-2'], ['auburn', 'skin-5']].map(([c, sk]) => make({ '08-hair': `curtains-${c}`, '05-head': sk, '03-neck': sk })),
+    ...[['black', 'skin-6'], ['dark-brown', 'skin-2'], ['grey', 'skin-4'], ['auburn', 'skin-1']].map(([c, sk]) => make({ '06-facial-hair': `short-beard-${c}`, '08-hair': `short-crop-${c}`, '05-head': sk, '03-neck': sk })),
+  ];
+  const fb = 300;
+  const fbuf = new PixelBuffer(4 * fb, 2 * fb);
+  fresh.forEach((px, i) => {
+    for (let y = 0; y < fb; y++) for (let x = 0; x < fb; x++) fbuf.data[(Math.floor(i / 4) * fb + y) * 4 * fb + (i % 4) * fb + x] = px[Math.floor((y * G) / fb) * G + Math.floor((x * G) / fb)];
+  });
+  writeFileSync(`${OUT}/new-options.png`, encodePng(fbuf, 1));
 
   // The building rooms, large.
   const rooms = ROOMS.map(([n]) => make({ '01-background': n, '07-expression': 'smirk', '08-hair': 'slicked-back-grey' }));

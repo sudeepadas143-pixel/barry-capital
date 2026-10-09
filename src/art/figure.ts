@@ -1082,9 +1082,16 @@ function hairFor(style: number, cy: number): HairSet {
         cap: clip(ellipse(0, cy - 3, 6.9, 5.4), (_x, y) => y < cy - 4),
         top: ellipse(0, cy - 8.8, 3.2, 2.6),
       };
-    default:
+    case 13:
       // Afro.
       return { back: ellipse(0, cy - 2.2, 8.8, 8.4), cap: clip(ellipse(0, cy - 3, 8.4, 7), (_x, y) => y < cy - 3.2) };
+    default:
+      // Curtains: parted in the middle, falling to either side of the forehead.
+      return {
+        back: ellipse(0, cy - 1, 7, 7),
+        cap: clip(ellipse(0, cy - 2.8, 7, 5.6), (x, y) => y < cy - 5.4 + 0.62 * Math.abs(x) && y < cy - 1.2),
+        part: [0, cy - 8.2, 0, cy - 5.6],
+      };
   }
 }
 
@@ -1093,7 +1100,7 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
   const down = r.head === 'down';
   const cy = -44.6 + r.up + r.bob + (down ? 2.2 : 0);
   const cx = r.headDx;
-  const style = look.hairStyle % 14;
+  const style = look.hairStyle % 15;
   const hs = hairFor(style, cy);
   const shift = (s?: [Test, Box]): [Test, Box] | undefined => (s ? [(x, y) => s[0](x - cx, y), [s[1][0] + cx, s[1][1], s[1][2] + cx, s[1][3]]] : undefined);
   const H = { back: shift(hs.back), cap: shift(hs.cap), top: shift(hs.top) };
@@ -1173,8 +1180,11 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
   const my = cy + 4.8;
   if (face === 1) pn.tint(clip(union(ellipse(cx, cy + 2.8, 5.2, 4.6)), (_x, y) => y > cy + 3.2), fh, 0.32);
   if (face === 2) {
-    pn.part(minus(clip(union(ellipse(cx, cy + 2.9, 5.5, 5)), (_x, y) => y > cy + 2.4), ellipse(cx, my + 0.1, 1.9, 0.9)), c.hair, hairOpts);
+    // A short, trimmed beard: along the jaw and chin, cheeks clear, with a moustache.
+    const jaw = clip(ellipse(cx, cy + 3.2, 5.2, 4.6), (_x, y) => y > my - 0.6);
+    pn.part(minus(union(jaw, ellipse(cx - 1, my - 0.8, 1.6, 0.6), ellipse(cx + 1, my - 0.8, 1.6, 0.6)), ellipse(cx, my + 0.1, 1.6, 0.7)), c.hair, hairOpts);
   }
+
   if (face === 3 || face === 4) pn.part(union(ellipse(cx - 1, my - 0.8, 1.5, 0.6), ellipse(cx + 1, my - 0.8, 1.5, 0.6)), c.hair, { shade: c.hairS });
   if (face === 4) pn.part(ellipse(cx, my + 1.9, 1.4, 1.2), c.hair, { shade: c.hairS });
 
@@ -1324,7 +1334,7 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
   const c = b.c;
 
   // Long hair falls behind everything.
-  const style = lk.hairStyle % 14;
+  const style = lk.hairStyle % 15;
   if (front && style === 9) {
     pn.gate.tag = 'hairBack';
     const cy = -44.6 + r.up + r.bob + Yb(b, -38.2) + 38.2;

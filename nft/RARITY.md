@@ -40,7 +40,7 @@ skin-1 to skin-6: about 16.7 each.
 | pompadour | 6 |
 | ponytail | 6 |
 | bun | 6 |
-| afro | 6 |
+| curtains | 6 |
 | bald | 5 |
 | man-bun | 5 |
 
@@ -92,7 +92,7 @@ skin-1 to skin-6: about 16.7 each.
 |---|---|
 | none | 60 |
 | stubble | 14 |
-| beard | 10 |
+| short-beard | 10 |
 | moustache | 8 |
 | goatee | 8 |
 

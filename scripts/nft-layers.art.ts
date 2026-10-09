@@ -13,6 +13,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { it } from 'vitest';
 import { PixelBuffer, rgba } from '../src/scene/buffer';
 import { ROOMS } from './nft-rooms';
+import { drawText } from '../src/scene/font';
 import { CHARTS, FINISHES, FRAMES, shadow } from './nft-flair';
 import { encodePng } from '../src/scene/png';
 import { renderFigure, type FigureOpts, type SpriteImage } from '../src/art/figure';
@@ -350,6 +351,49 @@ function catalog(bank: Record<string, Record<string, SpriteImage>>) {
     for (let y = 0; y < fl; y++) for (let x = 0; x < fl; x++) flb.data[(Math.floor(i / fc) * fl + y) * fc * fl + (i % fc) * fl + x] = px[Math.floor((y * G) / fl) * G + Math.floor((x * G) / fl)];
   });
   writeFileSync(`${OUT}/flair.png`, encodePng(flb, 1));
+
+  // A showcase: every kind of trait, rare ones included, each with a caption.
+  type Pick = [string, Record<string, string>];
+  const sk = (n: number) => ({ '05-neck': `skin-${n}`, '07-head': `skin-${n}` });
+  const show: Pick[] = [
+    ['RARE: GOLD CERT + CIGAR', { '01-background': 'after-hours', '10-hair': 'slicked-back-grey', '09-expression': 'smirk', '06-outfit': 'navy-double-breasted', '11-eyewear': 'gold-glasses', '12-accessory': 'cigar', '13-frame': 'gold-certificate', ...sk(2) }],
+    ['RARE: MOON CHART', { '01-background': 'ledger-green', '02-chart': 'moon', '10-hair': 'pompadour-sandy', '09-expression': 'grin', '06-outfit': 'charcoal-suit', '13-frame': 'ticker-green', ...sk(1) }],
+    ['RUG PULL', { '01-background': 'brick', '02-chart': 'rug-pull', '10-hair': 'receding-grey', '09-expression': 'frown', '06-outfit': 'black-suit', '11-eyewear': 'sunglasses', '13-frame': 'ticker-red', ...sk(3) }],
+    ['BREAKING', { '01-background': 'lobby', '10-hair': 'bun-auburn', '09-expression': 'delighted', '06-outfit': 'braces-pink', '13-frame': 'breaking', ...sk(5) }],
+    ['CORNER OFFICE', { '01-background': 'corner-office', '10-hair': 'side-part-black', '08-facial-hair': 'goatee-black', '09-expression': 'smirk', '06-outfit': 'black-tie', '11-eyewear': 'glasses', '14-finish': 'vignette', ...sk(4) }],
+    ['TRADING FLOOR', { '01-background': 'trading-floor', '10-hair': 'short-crop-black', '09-expression': 'talking', '06-outfit': 'navy-pinstripe', '11-eyewear': 'headset', ...sk(6) }],
+    ['SERVER ROOM', { '01-background': 'server-room', '10-hair': 'buzz-cut-dark-brown', '09-expression': 'neutral', '06-outfit': 'turtleneck-and-blazer', '11-eyewear': 'earpiece', '14-finish': 'scanlines', ...sk(2) }],
+    ['SCREEN WALL', { '01-background': 'screen-wall', '10-hair': 'curly-top-chestnut', '09-expression': 'shouting', '06-outfit': 'charcoal-pinstripe', '14-finish': 'film-grain', ...sk(5) }],
+    ['WALL STREET', { '01-background': 'wall-street', '10-hair': 'curtains-dark-brown', '09-expression': 'smirk', '06-outfit': 'tobacco-suit', ...sk(1) }],
+    ['PUTTING GREEN', { '01-background': 'putting-green', '10-hair': 'slicked-back-white', '08-facial-hair': 'moustache-white', '09-expression': 'grin', '06-outfit': 'grey-waistcoat', '12-accessory': 'cigar', ...sk(2) }],
+    ['CANDLES + INK BORDER', { '01-background': 'paper', '02-chart': 'candles', '10-hair': 'long-black', '09-expression': 'surprised', '06-outfit': 'olive-suit', '13-frame': 'ink-border', ...sk(3) }],
+    ['DEAD CAT BOUNCE', { '01-background': 'pink-paper', '02-chart': 'dead-cat-bounce', '10-hair': 'bob-chestnut', '09-expression': 'frown', '06-outfit': 'flannel-grey-suit', '14-finish': 'vignette', ...sk(4) }],
+    ['V RECOVERY', { '01-background': 'lilac', '02-chart': 'v-recovery', '10-hair': 'man-bun-dark-brown', '08-facial-hair': 'short-beard-dark-brown', '09-expression': 'delighted', '06-outfit': 'visitor-lanyard', ...sk(5) }],
+    ['CHOP', { '01-background': 'mint', '02-chart': 'chop', '10-hair': 'ponytail-sandy', '09-expression': 'neutral', '06-outfit': 'braces-pale-blue', '14-finish': 'scanlines', ...sk(1) }],
+    ['STEADY CLIMB', { '01-background': 'brass', '02-chart': 'steady-climb', '10-hair': 'side-part-chestnut', '08-facial-hair': 'stubble-chestnut', '09-expression': 'smirk', '06-outfit': 'navy-suit', ...sk(3) }],
+    ['RARE: AFTER HOURS', { '01-background': 'after-hours', '10-hair': 'bald-black', '08-facial-hair': 'short-beard-black', '09-expression': 'grin', '06-outfit': 'black-double-breasted', '11-eyewear': 'gold-glasses', '14-finish': 'vignette', ...sk(6) }],
+  ];
+  for (const [label, o] of show) for (const [d, n] of Object.entries(o)) if (!bank[d]?.[n]) throw new Error(`showcase "${label}": no ${d}/${n}`);
+  const sc = 300;
+  const cap = 30;
+  const scols = 4;
+  const sbuf = new PixelBuffer(scols * sc, Math.ceil(show.length / scols) * (sc + cap));
+  sbuf.data.fill(rgba('#111317'));
+  show.forEach(([label, o], i) => {
+    const px = make(o);
+    const x0 = (i % scols) * sc;
+    const y0 = Math.floor(i / scols) * (sc + cap);
+    for (let y = 0; y < sc; y++) for (let x = 0; x < sc; x++) sbuf.data[(y0 + y) * scols * sc + x0 + x] = px[Math.floor((y * G) / sc) * G + Math.floor((x * G) / sc)];
+    const gold = label.startsWith('RARE');
+    drawText(label, (gx, gy) => {
+      for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) {
+        const xx = x0 + 10 + gx * 3 + a;
+        const yy = y0 + sc + 8 + gy * 3 + b;
+        if (xx < x0 + sc) sbuf.data[yy * scols * sc + xx] = rgba(gold ? '#e0b54a' : '#f4f1e8');
+      }
+    });
+  });
+  writeFileSync(`${OUT}/showcase.png`, encodePng(sbuf, 1));
 
   // The building rooms, large.
   const rooms = ROOMS.map(([n]) => make({ '01-background': n, '09-expression': 'smirk', '10-hair': 'slicked-back-grey' }));

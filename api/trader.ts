@@ -1,7 +1,7 @@
-import { isSolanaAddress } from '../src/base58';
-import { validateTrader } from '../src/investor';
-import { statusFor } from './_lib/status';
-import { json, key, limited, redis } from './_lib/store';
+import { isSolanaAddress } from '../src/base58.js';
+import { validateTrader } from '../src/investor.js';
+import { statusFor } from './_lib/status.js';
+import { json, key, limited, redis } from './_lib/store.js';
 
 /**
  * POST /api/trader { address, trader } : set up the trader for an address

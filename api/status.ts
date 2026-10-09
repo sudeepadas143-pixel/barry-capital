@@ -1,6 +1,6 @@
-import { isSolanaAddress } from '../src/base58';
-import { statusFor } from './_lib/status';
-import { json } from './_lib/store';
+import { isSolanaAddress } from '../src/base58.js';
+import { statusFor } from './_lib/status.js';
+import { json } from './_lib/store.js';
 
 /** GET /api/status?address=… : the hire count, and where this address is in the flow. */
 export async function GET(req: Request): Promise<Response> {

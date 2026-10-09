@@ -1,6 +1,6 @@
-import { INVESTORS_CAP, TOKEN_LAUNCHED } from '../../firm.config';
+import { INVESTORS_CAP, TOKEN_LAUNCHED } from '../../firm.config.js';
 import type { StatusResponse, TraderConfig } from '../../src/investor';
-import { getJson, redis, storeReady } from './store';
+import { getJson, redis, storeReady } from './store.js';
 
 export async function statusFor(address: string | null): Promise<StatusResponse> {
   const base = { hired: 0, cap: INVESTORS_CAP };

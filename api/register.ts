@@ -1,6 +1,6 @@
-import { isSolanaAddress } from '../src/base58';
-import { statusFor } from './_lib/status';
-import { json, key, limited, redis } from './_lib/store';
+import { isSolanaAddress } from '../src/base58.js';
+import { statusFor } from './_lib/status.js';
+import { json, key, limited, redis } from './_lib/store.js';
 
 /** POST /api/register { address } : put an address on the list the airdrop worker watches for. */
 export async function POST(req: Request): Promise<Response> {

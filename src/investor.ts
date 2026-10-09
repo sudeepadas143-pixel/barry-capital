@@ -8,8 +8,8 @@
  * trader "does" on the trading floor, is the site's concept and moves no
  * funds.
  */
-import { BUILD_NAMES, EYES_NAMES, FACE_NAMES, HAIRS, HAIR_STYLE_NAMES, NECK_NAMES, OUTFIT_NAMES, SHIRTS, SKINS, SUITS, TIES } from './art/palette';
-import { ARCHETYPE_IDS } from './sim/archetypes';
+import { BUILD_NAMES, EYES_NAMES, FACE_NAMES, HAIRS, HAIR_STYLE_NAMES, NECK_NAMES, OUTFIT_NAMES, SHIRTS, SKINS, SUITS, TIES } from './art/palette.js';
+import { ARCHETYPE_IDS } from './sim/archetypes.js';
 import type { ArchetypeId, Look } from './sim/types';
 
 /**

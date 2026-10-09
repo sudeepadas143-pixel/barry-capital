@@ -9,7 +9,7 @@
  * Output: nft/layers/<NN-trait>/<option>.png, plus nft/preview.png.
  * Stack the folders in number order; see nft/README.md.
  */
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { it } from 'vitest';
 import { PixelBuffer, rgba } from '../src/scene/buffer';
 import { ROOMS } from './nft-rooms';
@@ -221,6 +221,7 @@ it('nft layers', () => {
   writeFileSync(`${OUT}/layers/counts.json`, JSON.stringify(counts, null, 2) + '\n');
   preview(bank);
   catalog(bank);
+  generated(bank);
 });
 
 /** Alpha-blend `top` over `under`, in place. */
@@ -404,4 +405,89 @@ function catalog(bank: Record<string, Record<string, SpriteImage>>) {
     for (let y = 0; y < big; y++) for (let x = 0; x < big; x++) rb.data[(Math.floor(i / 4) * big + y) * 4 * big + (i % 4) * big + x] = px[Math.floor((y * G) / big) * G + Math.floor((x * G) / big)];
   });
   writeFileSync(`${OUT}/rooms.png`, encodePng(rb, 1));
+}
+
+/**
+ * What a generator makes: traits rolled by the weights in RARITY.md, with the
+ * README's rules applied, stacked from the exported layers. No picking, no labels.
+ */
+function generated(bank: Record<string, Record<string, SpriteImage>>) {
+  const tables: Record<string, [string, number][]> = {};
+  let section = '';
+  for (const line of readFileSync(`${OUT}/RARITY.md`, 'utf8').split('\n')) {
+    const h = line.match(/^## (.+)/);
+    if (h) section = h[1].split(' (')[0].trim();
+    const row = line.match(/^\| ([a-z0-9-]+) \| (\d+)/);
+    if (row && section) (tables[section] ??= []).push([row[1], Number(row[2])]);
+  }
+  // mulberry32: a small, well-mixed generator (plain LCGs repeat patterns across rolls).
+  let seed = 20261009;
+  const rnd = () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const roll = (t: string) => {
+    const rows = tables[t];
+    if (!rows) throw new Error(`RARITY.md has no table for ${t}`);
+    let r = rnd() * rows.reduce((n, [, w]) => n + w, 0);
+    for (const [name, w] of rows) if ((r -= w) < 0) return name;
+    return rows[rows.length - 1][0];
+  };
+  const plainBgs = new Set(BACKGROUNDS.map(([b]) => b));
+  const order = ['01-background', '02-chart', '03-shadow', '04-hair-back', '05-neck', '06-outfit', '07-head', '08-facial-hair', '09-expression', '10-hair', '11-eyewear', '12-accessory', '13-frame', '14-finish'];
+  const tally: Record<string, number> = {};
+  const N = 24;
+  const cols = 6;
+  const cell = 256;
+  const buf = new PixelBuffer(cols * cell, (N / cols) * cell);
+  for (let i = 0; i < N; i++) {
+    const bg = roll('Background');
+    tally[bg] = (tally[bg] ?? 0) + 1;
+    const hair = `${roll('Hair style')}-${roll('Hair colour')}`;
+    const colour = HAIR_NAMES.map(slug).find((c) => hair.endsWith(`-${c}`))!;
+    const skin = `skin-${1 + Math.floor(rnd() * 6)}`;
+    const expression = roll('Expression');
+    const eyewear = roll('Eyewear');
+    let accessory = roll('Accessory');
+    if (expression === 'shouting' || eyewear === 'headset') accessory = 'none';
+    const facial = roll('Facial hair');
+    const chart = plainBgs.has(bg) ? roll('Chart') : 'none';
+    const pick: Record<string, string> = {
+      '01-background': bg,
+      '02-chart': chart,
+      '03-shadow': 'shadow',
+      '04-hair-back': hair,
+      '05-neck': skin,
+      '06-outfit': roll('Outfit'),
+      '07-head': skin,
+      '08-facial-hair': facial === 'none' ? 'none' : `${facial}-${colour}`,
+      '09-expression': expression,
+      '10-hair': hair,
+      '11-eyewear': eyewear,
+      '12-accessory': accessory,
+      '13-frame': roll('Frame'),
+      '14-finish': roll('Finish'),
+    };
+    const px = new Uint32Array(G * G);
+    for (const d of order) {
+      const name = pick[d];
+      if (name === 'none') continue;
+      const layer = bank[d]?.[name];
+      if (!layer && d !== '04-hair-back') throw new Error(`no layer ${d}/${name}`);
+      if (layer) over(px, layer.px);
+    }
+    const x0 = (i % cols) * cell;
+    const y0 = Math.floor(i / cols) * cell;
+    for (let y = 0; y < cell; y++) for (let x = 0; x < cell; x++) buf.data[(y0 + y) * cols * cell + x0 + x] = px[Math.floor((y * G) / cell) * G + Math.floor((x * G) / cell)];
+  }
+  writeFileSync(`${OUT}/generated-sample.png`, encodePng(buf, 1));
+  // Sanity check on the roller: 10,000 background rolls should land near RARITY.md's weights.
+  const big: Record<string, number> = {};
+  for (let k = 0; k < 10000; k++) {
+    const b = roll('Background');
+    big[b] = (big[b] ?? 0) + 1;
+  }
+  console.log('background mix per 10,000 rolls', big, 'in this sample', tally);
 }

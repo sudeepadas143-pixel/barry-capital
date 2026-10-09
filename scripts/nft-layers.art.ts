@@ -11,8 +11,8 @@
  */
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { it } from 'vitest';
-import { PixelBuffer, mixColor, rgba } from '../src/scene/buffer';
-import { buildPixelScene } from '../src/scene/building';
+import { PixelBuffer, rgba } from '../src/scene/buffer';
+import { ROOMS } from './nft-rooms';
 import { encodePng } from '../src/scene/png';
 import { renderFigure, type FigureOpts, type SpriteImage } from '../src/art/figure';
 import { HAIRS, HAIR_NAMES, HAIR_STYLE_NAMES, SKINS, shade } from '../src/art/palette';
@@ -137,52 +137,6 @@ function stubble(hc: number): SpriteImage {
   return { w: G, h: G, px };
 }
 
-// ---------------------------------------------------------------- building backgrounds
-
-/** Square crops of the site's building render: [name, centre x, centre y, size], in 1× pixels. */
-const ROOMS: [string, number, number, number][] = [
-  ['corner-office', 410, 440, 250],
-  ['trading-floor', 340, 790, 250],
-  ['lobby-bull', 190, 1090, 230],
-  ['lobby-sign', 440, 1190, 230],
-  ['server-room', 575, 1360, 220],
-  ['wall-street', 800, 1450, 190],
-  ['putting-green', 230, 400, 200],
-  ['glass-tower', 600, 520, 220],
-];
-
-let building: PixelBuffer | null = null;
-
-/** A room from the building, box-filtered down to the 80×80 grid and softened so the Investor stands out. */
-function room(cx: number, cy: number, size: number): SpriteImage {
-  if (!building) {
-    const sc = buildPixelScene();
-    building = new PixelBuffer(sc.bg.w, sc.bg.h);
-    building.data.fill(rgba('#f6f4ee'));
-    building.over(sc.bg);
-    building.over(sc.fg);
-    building.over(sc.front);
-  }
-  const b = building;
-  const paper = rgba('#f1ece0');
-  const px = new Uint32Array(G * G);
-  const k = size / G;
-  for (let y = 0; y < G; y++)
-    for (let x = 0; x < G; x++) {
-      let r = 0, g = 0, bl = 0, n = 0;
-      for (let j = Math.floor(y * k); j < Math.floor((y + 1) * k); j++)
-        for (let i = Math.floor(x * k); i < Math.floor((x + 1) * k); i++) {
-          const sx = Math.round(cx - size / 2) + i;
-          const sy = Math.round(cy - size / 2) + j;
-          const c = sx >= 0 && sy >= 0 && sx < b.w && sy < b.h ? b.data[sy * b.w + sx] : paper;
-          r += c & 255; g += (c >>> 8) & 255; bl += (c >>> 16) & 255; n++;
-        }
-      const c = ((255 << 24) | (Math.round(bl / n) << 16) | (Math.round(g / n) << 8) | Math.round(r / n)) >>> 0;
-      px[y * G + x] = mixColor(c, paper, 0.22);
-    }
-  return { w: G, h: G, px };
-}
-
 /** Lips and mouth lines become see-through dark, so one expression suits every skin. */
 function adaptMouth(img: SpriteImage, skinHex: string) {
   const lips = rgba(shade(skinHex, -0.22));
@@ -206,7 +160,7 @@ it('nft layers', () => {
   };
 
   for (const [name, hex] of BACKGROUNDS) add('01-background', name, backgroundLayer(hex));
-  for (const [name, x, y, size] of ROOMS) add('01-background', name, room(x, y, size));
+  for (const [name, draw] of ROOMS) add('01-background', name, { w: G, h: G, px: draw().data });
 
   HAIRS.forEach((_, hc) =>
     HAIR_STYLE_NAMES.forEach((style, hs) => {

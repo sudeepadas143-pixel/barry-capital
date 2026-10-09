@@ -272,6 +272,12 @@ const minus = (a: [Test, Box], b: [Test, Box]): [Test, Box] => [(x, y) => a[0](x
 
 // ---------------------------------------------------------------- painter
 
+/** Which parts a painter draws; see `FigureOpts.only`. */
+export interface Gate {
+  tag: string;
+  allow: Set<string> | null;
+}
+
 export class Painter {
   readonly px: Uint32Array;
   /**
@@ -287,8 +293,22 @@ export class Painter {
     readonly s: number,
     px?: Uint32Array,
     readonly ss = 1,
+    /** Shared by every view of this painter: with `allow` set, only parts whose current tag is allowed are drawn. */
+    readonly gate: Gate = { tag: '', allow: null },
   ) {
     this.px = px ?? new Uint32Array(w * h);
+  }
+
+  /** Draw what `fn` draws under `tag`, then go back to the previous tag. */
+  tagged(tag: string, fn: () => void) {
+    const prev = this.gate.tag;
+    this.gate.tag = tag;
+    fn();
+    this.gate.tag = prev;
+  }
+
+  private get skip() {
+    return this.gate.allow !== null && !this.gate.allow.has(this.gate.tag);
   }
 
   /** Pixels per design unit in the final (downsampled) image. */
@@ -299,12 +319,12 @@ export class Painter {
   /** A view that draws `k` times larger around the design point (ax, ay), on the same pixels. */
   /** The same painter, with everything drawn moved by (dx, dy) units. */
   moved(dx: number, dy: number): Painter {
-    return new Painter(this.w, this.h, this.ox + dx * this.s, this.oy + dy * this.s, this.s, this.px, this.ss);
+    return new Painter(this.w, this.h, this.ox + dx * this.s, this.oy + dy * this.s, this.s, this.px, this.ss, this.gate);
   }
 
   scaled(k: number, ax: number, ay: number): Painter {
     const s2 = this.s * k;
-    return new Painter(this.w, this.h, this.ox + ax * this.s - ax * s2, this.oy + ay * this.s - ay * s2, s2, this.px, this.ss);
+    return new Painter(this.w, this.h, this.ox + ax * this.s - ax * s2, this.oy + ay * this.s - ay * s2, s2, this.px, this.ss, this.gate);
   }
 
   /**
@@ -312,6 +332,7 @@ export class Painter {
    * light), an optional darker bottom rim and a highlight on the upper left.
    */
   part([test, box]: [Test, Box], base: number, opts: { shade?: number; sd?: number; hi?: number; hd?: number; bottom?: number; bd?: number; only?: number[] } = {}) {
+    if (this.skip) return;
     const { s, ox, oy } = this;
     const x0 = Math.max(0, Math.floor(box[0] * s + ox) - 1);
     const x1 = Math.min(this.w - 1, Math.ceil(box[2] * s + ox) + 1);
@@ -349,6 +370,7 @@ export class Painter {
   }
 
   tint([test, box]: [Test, Box], c: number, t: number) {
+    if (this.skip) return;
     const { s, ox, oy } = this;
     for (let py = Math.max(0, Math.floor(box[1] * s + oy)); py <= Math.min(this.h - 1, Math.ceil(box[3] * s + oy)); py++)
       for (let pxl = Math.max(0, Math.floor(box[0] * s + ox)); pxl <= Math.min(this.w - 1, Math.ceil(box[2] * s + ox)); pxl++) {
@@ -838,11 +860,11 @@ function drawNeckwear(p: Painter, b: Body, y: (v: number) => number, V: Test) {
   }
   if (neck === 3) {
     // Open collar.
-    p.part(poly([[-1.5, y(-35.8)], [1.5, y(-35.8)], [0, y(-32.2)]]), c.skin, { shade: c.skinS });
+    p.tagged('collar', () => p.part(poly([[-1.5, y(-35.8)], [1.5, y(-35.8)], [0, y(-32.2)]]), c.skin, { shade: c.skinS }));
     return;
   }
   const low = neck === 1 ? 2.4 : 0;
-  if (low) p.part(poly([[-1.6, y(-35.8)], [1.6, y(-35.8)], [0, y(-32.4)]]), c.skin, { shade: c.skinS });
+  if (low) p.tagged('collar', () => p.part(poly([[-1.6, y(-35.8)], [1.6, y(-35.8)], [0, y(-32.4)]]), c.skin, { shade: c.skinS }));
   const tie = clip(poly([[-1.1, y(-34.2 + low)], [1.1, y(-34.2 + low)], [1.6, y(-28.3 + low * 0.3)], [0, y(-26.2)], [-1.6, y(-28.3 + low * 0.3)]]), V);
   p.part(tie, c.tie, { shade: c.tieS, hi: c.tieH });
   p.part(ellipse(0, y(-34.6 + low), 1.25, 0.95), c.tie, { shade: c.tieS });
@@ -863,7 +885,7 @@ function drawTorso(p: Painter, b: Body, r: Rig) {
   const turtle = outfit === 5;
   // Neck.
   const nw = look.fem ? 1.45 : 1.8;
-  p.part(poly([[-nw, y(-38.6) - (1 - b.hf) * 2], [nw, y(-38.6) - (1 - b.hf) * 2], [nw + 0.1, y(-34.6)], [-nw - 0.1, y(-34.6)]]), c.skin, { shade: c.skinS });
+  p.tagged('neck', () => p.part(poly([[-nw, y(-38.6) - (1 - b.hf) * 2], [nw, y(-38.6) - (1 - b.hf) * 2], [nw + 0.1, y(-34.6)], [-nw - 0.1, y(-34.6)]]), c.skin, { shade: c.skinS }));
   const body = torsoShape(b, y, jacket);
 
   if (r.facing === 'back') {
@@ -976,7 +998,7 @@ function drawTorso(p: Painter, b: Body, r: Rig) {
     drawNeckwear(p, b, y, () => true);
   } else {
     // Open collar under the vest.
-    p.part(poly([[-1.5, y(-35.4)], [1.5, y(-35.4)], [0, y(-32.4)]]), c.skin, { shade: c.skinS });
+    p.tagged('collar', () => p.part(poly([[-1.5, y(-35.4)], [1.5, y(-35.4)], [0, y(-32.4)]]), c.skin, { shade: c.skinS }));
   }
 }
 
@@ -1094,7 +1116,9 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
   }
 
   // Hair behind the head, ears, the head itself.
+  pn.gate.tag = 'hairBack';
   if (!hs.bald && H.back) pn.part(clip(H.back, (_x, y) => y < cy + (style === 10 ? 6 : 1.6)), shaved, { shade: c.hairS });
+  pn.gate.tag = 'head';
   pn.part(ellipse(cx - 6.1, cy + 0.4, 1.25, 1.85), c.skin, { hi: c.skinH });
   pn.part(ellipse(cx + 6.1, cy + 0.4, 1.25, 1.85), c.skinS);
   const jaw = look.fem ? 4.5 : b.bw > 1.05 ? 5.4 : 4.9;
@@ -1104,6 +1128,7 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
   }
 
   // Eyes, brows.
+  pn.gate.tag = 'expression';
   const ey = cy + 0.4 + (down ? 0.8 : 0);
   const squint = r.brow === 'cocky';
   for (const sx of [-1, 1]) {
@@ -1135,12 +1160,14 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
     brow(1);
   }
   // Nose, cheeks.
+  pn.gate.tag = 'head';
   pn.part(ellipse(cx + 0.6, cy + 2.5, 0.6, 1), c.skinS);
   pn.dot(cx - 0.2, cy + 2.2, c.skinH, 0.28);
   pn.tint(ellipse(cx - 3.6, cy + 3, 1.3, 0.75), c.blush, look.fem ? 0.26 : 0.12);
   pn.tint(ellipse(cx + 3.6, cy + 3, 1.3, 0.75), c.blush, look.fem ? 0.2 : 0.09);
 
   // Facial hair.
+  pn.gate.tag = 'facial';
   const face = look.face ?? 0;
   const fh = c.hairS;
   const my = cy + 4.8;
@@ -1152,6 +1179,7 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
   if (face === 4) pn.part(ellipse(cx, my + 1.9, 1.4, 1.2), c.hair, { shade: c.hairS });
 
   // Mouth.
+  pn.gate.tag = 'expression';
   const m = r.mouth;
   if (m === 'shout') {
     pn.part(ellipse(cx, my + 0.2, 1.8, 1.35), c.mouth);
@@ -1172,9 +1200,10 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
   } else pn.line(cx - 1.3, my, cx + 1.3, my, c.lips, 0.32);
 
   // Hair on top.
+  pn.gate.tag = 'hair';
   if (hs.bald) {
     if (H.back) pn.part(H.back, c.hair, hairOpts);
-    pn.part(ellipse(cx - 2.2, cy - 5, 1.6, 0.8), mix(c.skin, 0xffffffff, 0.35));
+    pn.tagged('shine', () => pn.part(ellipse(cx - 2.2, cy - 5, 1.6, 0.8), mix(c.skin, 0xffffffff, 0.35)));
   } else {
     if (H.cap) pn.part(H.cap, shaved, hairOpts);
     if (H.top) pn.part(H.top, c.hair, hairOpts);
@@ -1189,6 +1218,7 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
   }
 
   // Accessories on the face.
+  pn.gate.tag = 'eyewear';
   const eyes = look.eyes ?? 0;
   if (eyes === 1 && !down) {
     // Sunglasses. Indoors.
@@ -1220,6 +1250,7 @@ function drawHead(pn: Painter, b: Body, r: Rig, t: number) {
     pn.dot(cx + 6.2, cy + 0.6, c.phone, 0.55);
     pn.line(cx + 6.2, cy + 1.2, cx + 5.4, cy + 7.2, c.cupS, 0.18);
   }
+  pn.gate.tag = 'cigar';
   if (look.cigar && r.mouth !== 'shout') {
     pn.part(capsule(cx + 1.4, my + 0.2, cx + 5.6, my + 1.2, 0.55), c.cigar, { hi: mix(c.cigar, 0xffffffff, 0.2) });
     pn.dot(cx + 5.9, my + 1.25, c.ember, 0.5);
@@ -1254,6 +1285,15 @@ export interface FigureOpts {
   glasses?: boolean;
   /** Supersampling factor for smooth edges (1 = hard pixels). */
   ss?: number;
+  /**
+   * Draw only these parts (for NFT trait layers): hairBack, neck, body,
+   * collar, head, expression, facial, hair, eyewear, cigar.
+   */
+  only?: string[];
+  /** Skip the ink outline. */
+  noOutline?: boolean;
+  /** Override the pose's expression. */
+  face?: { mouth?: Mouth; brow?: Rig['brow'] };
 }
 
 const HEAD_SCALE = 1.15;
@@ -1269,7 +1309,7 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
   const ss = Math.max(1, Math.round(opts.ss ?? 1));
   const w = Math.ceil(W_UNITS * s) + 2;
   const h = Math.ceil(H_UNITS * s) + 2;
-  const pn = new Painter(w * ss, h * ss, (w / 2) * ss, (h - 1 - 0.5 * s) * ss, s * ss, undefined, ss);
+  const pn = new Painter(w * ss, h * ss, (w / 2) * ss, (h - 1 - 0.5 * s) * ss, s * ss, undefined, ss, { tag: 'body', allow: opts.only ? new Set(opts.only) : null });
   const partner = !!opts.glasses;
   const lk: Look = partner ? { ...look, eyes: look.eyes ?? 2 } : look;
   const b: Body = {
@@ -1279,16 +1319,18 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
     c: palette(lk),
     partner,
   };
-  const r = rigFor(pose, frame);
+  const r = { ...rigFor(pose, frame), ...opts.face };
   const front = r.facing === 'front';
   const c = b.c;
 
   // Long hair falls behind everything.
   const style = lk.hairStyle % 14;
   if (front && style === 9) {
+    pn.gate.tag = 'hairBack';
     const cy = -44.6 + r.up + r.bob + Yb(b, -38.2) + 38.2;
     pn.part(union(poly([[-7.2, cy - 1], [7.2, cy - 1], [7.8, cy + 12.6], [-7.8, cy + 12.6]]), ellipse(0, cy + 12.6, 7.8, 2.2)), c.hair, { shade: c.hairS, hi: c.hairH });
   }
+  pn.gate.tag = 'body';
   if (r.box && !front) drawBox(pn, c, r, true);
   drawLegs(pn, b, r);
   if (!front) {
@@ -1309,6 +1351,7 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
   // then lifted or dropped onto this body's neck so it always sits on the collar.
   const lift = r.up + r.bob + (r.head === 'down' ? 2.2 : 0);
   drawHead(pn.moved(0, Yb(b, -38.2) + 38.2).scaled(HEAD_SCALE, 0, -38.2 + lift), b, r, frame);
+  pn.gate.tag = 'body';
   if (front) for (const a of [r.armL, r.armR]) if (a.over) drawArm(pn, b, a, true);
   if (r.phone) {
     const hd = armPoints(b, r.armR).hd;
@@ -1350,14 +1393,14 @@ export function renderFigure(look: Look, pose: Pose, frame: number, opts: Figure
     pn.part(capsule(-7, -33.6 + r.bob, -8.6, -26 + r.bob, 2), c.suit, { shade: c.suitS });
     pn.part(capsule(7, -33.6 + r.bob, 8.6, -26 + r.bob, 2), c.suit, { shade: c.suitS });
   }
-  pn.outline(c.ink);
+  if (!opts.noOutline) pn.outline(c.ink);
   return pn.image();
 }
 
 /** Head and shoulders, square, for headshots. */
-export function renderBust(look: Look, size: number, glasses = false, ss = 1): SpriteImage {
+export function renderBust(look: Look, size: number, glasses = false, ss = 1, extra: FigureOpts = {}): SpriteImage {
   const s = size / 30;
-  const full = renderFigure(look, 'stand', 0, { scale: s, glasses, ss });
+  const full = renderFigure(look, 'stand', 0, { ...extra, scale: s, glasses, ss });
   const cx = full.w / 2;
   const hf = [0.93, 1, 1.07][look.height ?? 1];
   const top = full.h - 1 - 0.5 * s - (38.2 * hf + 17.5) * s;

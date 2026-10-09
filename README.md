@@ -148,3 +148,7 @@ docs/                  reference renders and example hotspots for artists
 ```
 
 See [NOTES.md](NOTES.md) for decisions and open risks.
+
+## The Investors (real NFTs)
+
+The trading floor is fiction; the Investors NFT, its free airdrop and the hire flow are real. `LAUNCH.md` is the owner's step-by-step guide, `worker/` is the airdrop bot (runs on Railway), `api/` is the hire API (Vercel functions), and `nft/` holds the trait layers.

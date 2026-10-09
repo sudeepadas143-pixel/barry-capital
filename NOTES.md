@@ -4,10 +4,12 @@ Decisions made along the way, and the things worth a second look.
 
 ## Decisions from the brief review
 
-- **No market cap.** Removed entirely at the owner's request. It isn't in the page,
-  the simulation or the copy.
-- **The token is never real.** Bonus day splits across a *simulated* cap table
-  (`capTable()` in `src/sim/payout.ts`). No real wallet or holder is referenced anywhere.
+- **Market cap is back, and it's real.** It was removed at the owner's request, then
+  requested again with the Investors launch. The bar at the top of every page shows the
+  token's live market cap from a read-only public price feed (Jupiter, price × the fixed
+  one-billion supply) and the contract address. It is the one live number on the page.
+- **The trading floor stays fictional.** Bonus day splits across a *simulated* cap table
+  (`capTable()` in `src/sim/payout.ts`). No real holder is referenced by the simulation.
 - **Clock skew is accepted.** A device with a wrong clock sees a slightly different
   minute. There's no server to sync against.
 - **Placeholders** for `TOKEN_MINT` and `X_URL` stay in `firm.config.ts` until real values exist.
@@ -183,6 +185,42 @@ Decisions made along the way, and the things worth a second look.
   scrolled out of view. The clock that drives the page also stops while hidden.
 - Secondary routes are code-split. Fonts are self-hosted via `@fontsource` and loaded by
   unicode range.
+
+## Real vs concept: the Investors
+
+The split, stated once so nobody has to infer it:
+
+| Concept only (moves nothing) | Real (on-chain, real wallets, real SOL) |
+|---|---|
+| The trading floor: traders, desks, trades, P&L, treasury, creator fees, bonus day, firings | The Investors NFT collection (1,111, compressed NFTs on Bubblegum V2 in a Metaplex Core collection) |
+| What a holder's trader "does" once hired | The free mint and airdrop to a wallet |
+| | The hire list and count (`xyz/1111 Investors Hired`), and the market cap bar |
+
+- **The site still has no wallet connection and no signing.** Visitors paste a public
+  address; nothing in the browser can move funds. All signing happens in the airdrop
+  bot (`worker/`), which holds its own wallet's key in Railway's settings.
+- **The hire API** (`api/`) is three Vercel functions over Upstash Redis REST: register an
+  address, report its status, save its trader once. Keys are documented in
+  `api/_lib/store.ts`; the bot uses the same keys. Imports in `api/` carry `.js`
+  extensions because Vercel loads the functions as plain Node ES modules.
+- **The bot** (`worker/`) reads the token's pump.fun chat, applies the rules in
+  `worker/src/airdrop.ts` (registered, one per wallet, at least $5 at comment time and
+  again at mint time, cap, pause switch), mints, and writes every decision to an audit log.
+  The rules are tested with a fake store and chain (`npm test` in `worker/`). The balance
+  and price reads were checked against a real mainnet holder; the collection, tree and
+  mint transactions were built and size-checked offline. They were not sent from here,
+  because the public test-network faucet refused this machine. LAUNCH.md has a
+  test-network rehearsal for that.
+- **pump.fun comments.** The old `frontend-api…/replies/{mint}` endpoint is gone (404).
+  Coin-page chat now runs on socket.io at `wss://livechat.pump.fun`: `joinRoom
+  {roomId: mint}`, `getMessageHistory {roomId, before, limit}`, live `newMessage` events,
+  and each message carries `userAddress`. No auth is needed to read, and there are no
+  published rate limits. It is not a documented API, so the bot warns when the chat goes
+  quiet. The pump.fun REST API refuses browsers on other sites (403), so the site only
+  calls it from servers.
+- **Trader setup without a signature** (the owner's choice): anyone who knows an address
+  could set up its trader first. It locks after the first save.
+- **Costs** are in LAUNCH.md: about 0.2 SOL for everything at 1,111.
 
 ## Open risks and things not done
 

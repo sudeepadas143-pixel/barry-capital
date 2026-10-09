@@ -136,6 +136,107 @@ function stubble(hc: number): SpriteImage {
   return { w: G, h: G, px };
 }
 
+// ---------------------------------------------------------------- building backgrounds
+
+type Put = (x: number, y: number, w: number, h: number, hex: string) => void;
+
+function scene(draw: (r: Put, px: Uint32Array) => void): SpriteImage {
+  const px = new Uint32Array(G * G);
+  const r: Put = (x, y, w, h, hex) => {
+    const c = rgba(hex);
+    for (let j = Math.max(0, y); j < Math.min(G, y + h); j++) for (let i = Math.max(0, x); i < Math.min(G, x + w); i++) px[j * G + i] = c;
+  };
+  draw(r, px);
+  return { w: G, h: G, px };
+}
+
+/** Backgrounds taken from rooms in the building. Names start with the room. */
+const SCENES: [string, (r: Put, px: Uint32Array) => void][] = [
+  [
+    'trading-floor',
+    (r) => {
+      r(0, 0, G, G, '#e9e2cf');
+      r(0, 44, G, 2, '#c9bfa6');
+      for (let x = 2; x < G; x += 19) {
+        r(x, 18, 16, 12, '#22262c');
+        r(x + 1, 19, 14, 10, '#17331f');
+        for (let k = 0; k < 4; k++) r(x + 2 + k * 3, 26 - ((x + k * 5) % 6), 2, 1, k % 2 ? '#d0574a' : '#5fcf7a');
+        r(x + 7, 30, 2, 3, '#22262c');
+      }
+      r(0, 33, G, 4, '#6b4a33');
+      r(0, 37, G, 1, '#4e3424');
+    },
+  ],
+  [
+    'corner-office',
+    (r) => {
+      r(0, 0, G, G, '#3d2c22');
+      r(8, 6, 64, 50, '#9cc3dc');
+      const towers = [[10, 30, 8], [19, 22, 7], [27, 34, 9], [37, 18, 8], [46, 28, 10], [57, 24, 7], [64, 32, 8]];
+      for (const [x, y, w] of towers) {
+        r(x, y, w, 56 - y, '#5e7286');
+        for (let j = y + 2; j < 54; j += 3) for (let i = x + 1; i < x + w - 1; i += 2) r(i, j, 1, 1, '#d9e6ee');
+      }
+      for (let y = 8; y < 56; y += 4) r(8, y, 64, 1, '#c7dbe8');
+      r(8, 6, 64, 2, '#2a1e17');
+      r(39, 6, 2, 50, '#2a1e17');
+      r(0, 56, G, G - 56, '#6b4a33');
+    },
+  ],
+  [
+    'lobby',
+    (r) => {
+      r(0, 0, G, G, '#efe8d6');
+      r(0, 8, G, 3, '#8b2f30');
+      r(22, 13, 36, 9, '#2a2a2f');
+      for (let i = 0; i < 8; i++) r(25 + i * 4, 16, 2, 3, '#d4a640');
+      for (let y = 48; y < G; y += 4) for (let x = 0; x < G; x += 4) r(x, y, 4, 4, ((x + y) / 4) % 2 ? '#2f2f33' : '#e6e1d6');
+      r(0, 46, G, 2, '#b88a38');
+    },
+  ],
+  [
+    'ticker-wall',
+    (r) => {
+      r(0, 0, G, G, '#16181c');
+      for (let row = 0; row < 7; row++) {
+        const y = 6 + row * 10;
+        for (let x = (row * 7) % 5; x < G; x += 5) {
+          const up = (x * 7 + row * 13) % 3 !== 0;
+          r(x, y, 3, 1, up ? '#5fcf7a' : '#d0574a');
+          r(x, y + 2, 2, 1, '#7b8590');
+        }
+      }
+    },
+  ],
+  [
+    'server-room',
+    (r) => {
+      r(0, 0, G, G, '#232a33');
+      for (let x = 2; x < G; x += 15) {
+        r(x, 4, 12, 60, '#3a4552');
+        for (let y = 7; y < 62; y += 4) {
+          r(x + 1, y, 10, 3, '#151a20');
+          r(x + 2, y + 1, 1, 1, (x + y) % 3 ? '#5fcf7a' : '#e2a33c');
+        }
+      }
+      r(0, 64, G, G - 64, '#1a1f26');
+    },
+  ],
+  [
+    'elevator',
+    (r) => {
+      r(0, 0, G, G, '#e2dac6');
+      r(14, 4, 52, G, '#a77e3a');
+      r(16, 6, 23, G, '#d4a640');
+      r(41, 6, 23, G, '#d4a640');
+      r(39, 6, 2, G, '#6e5224');
+      for (const x of [20, 45]) r(x, 6, 2, G, '#e8c66e');
+      r(34, 0, 12, 3, '#2a2a2f');
+      r(38, 1, 4, 1, '#e2683a');
+    },
+  ],
+];
+
 /** Lips and mouth lines become see-through dark, so one expression suits every skin. */
 function adaptMouth(img: SpriteImage, skinHex: string) {
   const lips = rgba(shade(skinHex, -0.22));
@@ -159,6 +260,7 @@ it('nft layers', () => {
   };
 
   for (const [name, hex] of BACKGROUNDS) add('01-background', name, backgroundLayer(hex));
+  for (const [name, draw] of SCENES) add('01-background', name, scene(draw));
 
   HAIRS.forEach((_, hc) =>
     HAIR_STYLE_NAMES.forEach((style, hs) => {

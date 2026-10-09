@@ -3,16 +3,24 @@
 The weights are percentages within each trait. Change them freely. With these numbers, 1,111 Investors come out unique without any re-rolls: there are well over a hundred million combinations.
 
 ## Background
+Plain colours are common; rooms from the building are rarer.
+
 | Option | Weight |
 |---|---|
-| paper | 18 |
-| brass | 16 |
-| ledger-green | 16 |
-| pink-paper | 14 |
-| brick | 12 |
-| lilac | 10 |
-| mint | 10 |
-| after-hours | 4 (rare) |
+| paper | 14 |
+| brass | 12 |
+| ledger-green | 12 |
+| pink-paper | 10 |
+| brick | 9 |
+| lilac | 8 |
+| mint | 8 |
+| trading-floor | 6 |
+| lobby | 5 |
+| elevator | 4 |
+| ticker-wall | 4 |
+| corner-office | 3 |
+| server-room | 3 |
+| after-hours | 2 (rarest) |
 
 ## Skin (neck + head)
 skin-1 to skin-6: about 16.7 each.

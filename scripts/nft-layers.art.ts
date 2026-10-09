@@ -3,8 +3,8 @@
  *
  * Every layer is drawn by the same renderer as the site's traders
  * (src/art/figure.ts), one part at a time, then given the retro filter:
- * the bust is drawn at 80×80 hard pixels and scaled up 15× with
- * nearest-neighbour, so every layer is 1200×1200 and lines up exactly.
+ * the bust is drawn at 80×80 hard pixels and scaled to 1024×1024 with
+ * nearest-neighbour, so every layer lines up exactly.
  *
  * Output: nft/layers/<NN-trait>/<option>.png, plus nft/preview.png.
  * Stack the folders in number order; see nft/README.md.
@@ -20,7 +20,8 @@ import { HAIRS, HAIR_NAMES, HAIR_STYLE_NAMES, SKINS, shade } from '../src/art/pa
 import type { Look } from '../src/sim/types';
 
 const G = 80;
-const UP = 15;
+/** Output size. Generators offer 1024; every layer uses the same pixel mapping, so they still stack exactly. */
+const SIZE = 1024;
 const UNITS = 37;
 const OUT = 'nft';
 
@@ -43,14 +44,22 @@ function part(look: Partial<Look>, only: string[], extra: FigureOpts = {}): Spri
   return { w: G, h: G, px };
 }
 
+/** Nearest-neighbour from the 80×80 grid to SIZE×SIZE (each cell 12 or 13 px). */
+function upscale(img: SpriteImage): PixelBuffer {
+  const buf = new PixelBuffer(SIZE, SIZE);
+  for (let y = 0; y < SIZE; y++) {
+    const sy = Math.floor((y * G) / SIZE);
+    for (let x = 0; x < SIZE; x++) buf.data[y * SIZE + x] = img.px[sy * G + Math.floor((x * G) / SIZE)];
+  }
+  return buf;
+}
+
 const empty = (img: SpriteImage) => !img.px.some((c) => c >>> 24);
 
 function save(dir: string, name: string, img: SpriteImage) {
   if (empty(img)) return false;
   mkdirSync(`${OUT}/layers/${dir}`, { recursive: true });
-  const buf = new PixelBuffer(G, G);
-  buf.data.set(img.px);
-  writeFileSync(`${OUT}/layers/${dir}/${name}.png`, encodePng(buf, UP, 0));
+  writeFileSync(`${OUT}/layers/${dir}/${name}.png`, encodePng(upscale(img), 1, 0));
   return true;
 }
 

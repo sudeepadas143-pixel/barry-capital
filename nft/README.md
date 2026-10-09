@@ -1,8 +1,8 @@
 # Investors: trait layers
 
-Layers for the Investors collection, drawn by the same renderer as the traders on the site and finished with a retro filter. Each bust is drawn on an 80×80 pixel grid and scaled up 15× with nearest-neighbour.
+Layers for the Investors collection, drawn by the same renderer as the traders on the site and finished with a retro filter. Each bust is drawn on an 80×80 pixel grid and scaled to 1024×1024 with nearest-neighbour, ready for a 1024 canvas.
 
-Every file is a **1200×1200 transparent PNG** on the same frame, so the layers stack with no offsets. If you resize them, use nearest-neighbour scaling (in Photoshop: "Nearest Neighbor (hard edges)"), otherwise the pixels blur.
+Every file is a **1024×1024 transparent PNG** on the same frame, so the layers stack with no offsets. If you resize them, use nearest-neighbour scaling (in Photoshop: "Nearest Neighbor (hard edges)"), otherwise the pixels blur.
 
 ## Stack order
 

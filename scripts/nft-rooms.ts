@@ -195,7 +195,7 @@ export const ROOMS: [string, () => PixelBuffer][] = [
       s.obj((p) => {
         for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) monitor(p, 1 + c * 20, 2 + r * 18, 18, 14, (r + c) % 3 !== 0);
       });
-      const tick = 'SOL +4.2  STEVE +12  BONK -3';
+      const tick = 'SOL +4.2  SI +12  BONK -3';
       s.rect(0, 70, G, 10, hx('#0e0f12'));
       drawText(tick, (x, y) => { if (x + 2 < G) s.buf.data[(73 + y) * G + x + 2] = hx(x < 32 ? '#5fcf7a' : '#e0b54a'); });
       return s.buf;

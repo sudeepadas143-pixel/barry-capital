@@ -7,7 +7,7 @@ export const PARTNER_NAME = 'Steve';
 export const SEASON_LABEL = 'Q1';
 export const DESK_COUNT = 11;
 
-export const TOKEN_SYMBOL = 'STEVE';
+export const TOKEN_SYMBOL = 'SI';
 /** Placeholder. Swap for the real mint when there is one. */
 export const TOKEN_MINT = 'StevesInvXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 /** `{address}` is replaced with TOKEN_MINT. */

@@ -189,8 +189,8 @@ function certificate(): SpriteImage {
 }
 
 export const FRAMES: [string, () => SpriteImage][] = [
-  ['ticker-green', () => chyron('SI', '#2f9e5a', '$STEVE +4.20%', UP)],
-  ['ticker-red', () => chyron('SI', '#a83f35', '$STEVE -6.90%', DOWN)],
+  ['ticker-green', () => chyron('MKT', '#2f9e5a', '$SI +4.20%', UP)],
+  ['ticker-red', () => chyron('MKT', '#a83f35', '$SI -6.90%', DOWN)],
   ['breaking', () => chyron('LIVE', '#c8352b', 'INVESTOR HIRED', '#f4f1e8')],
   ['ink-border', inkBorder],
   ['gold-certificate', certificate],

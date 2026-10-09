@@ -97,7 +97,7 @@ export const COINS: { ticker: string; theme: Theme }[] = [
   { ticker: "IMDT", theme: 'culture' },
   { ticker: "Sartun", theme: 'culture' },
   { ticker: "WFM", theme: 'culture' },
-  { ticker: "SI", theme: 'agents' },
+  { ticker: "AGENT", theme: 'agents' },
   { ticker: "Ajax", theme: 'culture' },
   { ticker: "INU", theme: 'dogs' },
   { ticker: "OpenSI", theme: 'agents' },

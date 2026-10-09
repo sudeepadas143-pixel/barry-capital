@@ -1662,11 +1662,3 @@ input:focus-visible {
     transition: none;
   }
 }
-
-/* Pixel portraits: crisp cells, a soft square frame. */
-canvas.pixel {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  border-radius: 22%;
-  flex: none;
-}

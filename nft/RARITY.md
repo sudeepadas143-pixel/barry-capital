@@ -23,6 +23,21 @@ Plain colours are common; the rooms of the building are rarer.
 | putting-green | 3 |
 | after-hours | 2 (rarest) |
 
+## Chart (plain colour backgrounds only)
+| Option | Weight |
+|---|---|
+| none | 20 |
+| steady-climb | 16 |
+| chop | 14 |
+| candles | 14 |
+| v-recovery | 12 |
+| dead-cat-bounce | 10 |
+| rug-pull | 8 |
+| moon | 6 (rare) |
+
+## Shadow
+Always on.
+
 ## Skin (neck + head)
 skin-1 to skin-6: about 16.7 each.
 
@@ -112,5 +127,23 @@ skin-1 to skin-6: about 16.7 each.
 | none | 97 |
 | cigar | 3 (rare; never with shouting or headset) |
 
+## Frame
+| Option | Weight |
+|---|---|
+| none | 55 |
+| ticker-green | 14 |
+| ticker-red | 10 |
+| ink-border | 10 |
+| breaking | 8 |
+| gold-certificate | 3 (rarest) |
+
+## Finish
+| Option | Weight |
+|---|---|
+| none | 40 |
+| vignette | 30 |
+| scanlines | 18 |
+| film-grain | 12 |
+
 ## Metadata attribute names
-If your tool asks for `trait_type` names, these read well on marketplaces: Background, Skin, Hair, Hair Colour, Outfit, Expression, Facial Hair, Eyewear, Accessory.
+If your tool asks for `trait_type` names, these read well on marketplaces: Background, Chart, Skin, Hair, Hair Colour, Outfit, Expression, Facial Hair, Eyewear, Accessory, Frame, Finish.

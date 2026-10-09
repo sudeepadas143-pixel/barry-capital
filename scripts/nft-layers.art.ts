@@ -13,6 +13,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { it } from 'vitest';
 import { PixelBuffer, rgba } from '../src/scene/buffer';
 import { ROOMS } from './nft-rooms';
+import { CHARTS, FINISHES, FRAMES, shadow } from './nft-flair';
 import { encodePng } from '../src/scene/png';
 import { renderFigure, type FigureOpts, type SpriteImage } from '../src/art/figure';
 import { HAIRS, HAIR_NAMES, HAIR_STYLE_NAMES, SKINS, shade } from '../src/art/palette';
@@ -163,45 +164,49 @@ it('nft layers', () => {
 
   for (const [name, hex] of BACKGROUNDS) add('01-background', name, backgroundLayer(hex));
   for (const [name, draw] of ROOMS) add('01-background', name, { w: G, h: G, px: draw().data });
+  for (const [name, draw] of CHARTS) add('02-chart', name, draw());
+  add('03-shadow', 'shadow', shadow(part({ hairStyle: 1 }, ['neck', 'body', 'head', 'hair'])));
+  for (const [name, draw] of FRAMES) add('13-frame', name, draw());
+  for (const [name, draw] of FINISHES) add('14-finish', name, draw());
 
   HAIRS.forEach((_, hc) =>
     HAIR_STYLE_NAMES.forEach((style, hs) => {
       if (SKIP_STYLES.has(style)) return;
       const look = { hair: hc, hairStyle: hs };
       const n = `${slug(style)}-${slug(HAIR_NAMES[hc])}`;
-      add('02-hair-back', n, part(look, ['hairBack']));
-      add('08-hair', n, part(look, ['hair']));
+      add('04-hair-back', n, part(look, ['hairBack']));
+      add('10-hair', n, part(look, ['hair']));
     }),
   );
 
   SKINS.forEach((_, sk) => {
     const n = `skin-${sk + 1}`;
-    add('03-neck', n, part({ skin: sk }, ['neck']));
-    add('05-head', n, part({ skin: sk }, ['head']));
+    add('05-neck', n, part({ skin: sk }, ['neck']));
+    add('07-head', n, part({ skin: sk }, ['head']));
   });
 
   for (const [name, outfit, suit, shirt, tie, neck] of OUTFITS) {
     const look = { outfit, suit, shirt, tie, neck };
     const collar = part(look, ['collar'], { noOutline: true });
     if (!empty(collar)) throw new Error(`${name} shows skin at the collar; pick another neck`);
-    add('04-outfit', name, part(look, ['body']));
+    add('06-outfit', name, part(look, ['body']));
   }
 
   HAIRS.forEach((_, hc) =>
     FACIAL.forEach((f, face) => {
-      if (face === 1) add('06-facial-hair', `${f}-${slug(HAIR_NAMES[hc])}`, stubble(hc));
-      else if (face) add('06-facial-hair', `${f}-${slug(HAIR_NAMES[hc])}`, part({ face, hair: hc }, ['facial']));
+      if (face === 1) add('08-facial-hair', `${f}-${slug(HAIR_NAMES[hc])}`, stubble(hc));
+      else if (face) add('08-facial-hair', `${f}-${slug(HAIR_NAMES[hc])}`, part({ face, hair: hc }, ['facial']));
     }),
   );
 
   for (const [name, face] of EXPRESSIONS) {
     const img = part({ skin: 2 }, ['expression'], { face, noOutline: true });
     adaptMouth(img, SKINS[2]);
-    add('07-expression', name, img);
+    add('09-expression', name, img);
   }
 
-  for (const [name, look, gold] of EYEWEAR) add('09-eyewear', name, part(look, ['eyewear'], { glasses: gold, noOutline: name !== 'headset' }));
-  add('10-accessory', 'cigar', part({ cigar: true }, ['cigar']));
+  for (const [name, look, gold] of EYEWEAR) add('11-eyewear', name, part(look, ['eyewear'], { glasses: gold, noOutline: name !== 'headset' }));
+  add('12-accessory', 'cigar', part({ cigar: true }, ['cigar']));
 
   writeFileSync(`${OUT}/layers/counts.json`, JSON.stringify(counts, null, 2) + '\n');
   preview(bank);
@@ -238,20 +243,26 @@ function preview(bank: Record<string, Record<string, SpriteImage>>) {
   const W = cols * cell;
   const buf = new PixelBuffer(W, rows * cell);
   for (let n = 0; n < cols * rows; n++) {
-    const hairName = pick('08-hair');
+    const hairName = pick('10-hair');
     const colour = HAIR_NAMES.map(slug).find((c) => hairName.endsWith(`-${c}`))!;
-    const skin = pick('05-head');
+    const skin = pick('07-head');
+    const bg = pick('01-background');
+    const plain = BACKGROUNDS.some(([b]) => b === bg);
     const stack: (SpriteImage | undefined)[] = [
-      bank['01-background'][pick('01-background')],
-      bank['02-hair-back']?.[hairName],
-      bank['03-neck'][skin],
-      bank['04-outfit'][pick('04-outfit')],
-      bank['05-head'][skin],
-      rnd() < 0.3 ? bank['06-facial-hair'][`${FACIAL[1 + Math.floor(rnd() * 4)]}-${colour}`] : undefined,
-      bank['07-expression'][pick('07-expression')],
-      bank['08-hair'][hairName],
-      rnd() < 0.35 ? bank['09-eyewear'][pick('09-eyewear')] : undefined,
-      rnd() < 0.08 ? bank['10-accessory'].cigar : undefined,
+      bank['01-background'][bg],
+      plain && rnd() < 0.8 ? bank['02-chart'][pick('02-chart')] : undefined,
+      bank['03-shadow'].shadow,
+      bank['04-hair-back']?.[hairName],
+      bank['05-neck'][skin],
+      bank['06-outfit'][pick('06-outfit')],
+      bank['07-head'][skin],
+      rnd() < 0.3 ? bank['08-facial-hair'][`${FACIAL[1 + Math.floor(rnd() * 4)]}-${colour}`] : undefined,
+      bank['09-expression'][pick('09-expression')],
+      bank['10-hair'][hairName],
+      rnd() < 0.35 ? bank['11-eyewear'][pick('11-eyewear')] : undefined,
+      rnd() < 0.08 ? bank['12-accessory'].cigar : undefined,
+      rnd() < 0.45 ? bank['13-frame'][pick('13-frame')] : undefined,
+      rnd() < 0.6 ? bank['14-finish'][pick('14-finish')] : undefined,
     ];
     const px = new Uint32Array(G * G);
     for (const l of stack) if (l) over(px, l.px);
@@ -266,17 +277,18 @@ function preview(bank: Record<string, Record<string, SpriteImage>>) {
 function catalog(bank: Record<string, Record<string, SpriteImage>>) {
   const base = {
     '01-background': 'paper',
-    '03-neck': 'skin-2',
-    '04-outfit': 'navy-suit',
-    '05-head': 'skin-2',
-    '07-expression': 'neutral',
-    '08-hair': 'side-part-dark-brown',
+    '03-shadow': 'shadow',
+    '05-neck': 'skin-2',
+    '06-outfit': 'navy-suit',
+    '07-head': 'skin-2',
+    '09-expression': 'neutral',
+    '10-hair': 'side-part-dark-brown',
   } as Record<string, string>;
-  const order = ['01-background', '02-hair-back', '03-neck', '04-outfit', '05-head', '06-facial-hair', '07-expression', '08-hair', '09-eyewear', '10-accessory'];
+  const order = ['01-background', '02-chart', '03-shadow', '04-hair-back', '05-neck', '06-outfit', '07-head', '08-facial-hair', '09-expression', '10-hair', '11-eyewear', '12-accessory', '13-frame', '14-finish'];
   const make = (o: Record<string, string>) => {
     const pick = { ...base, ...o };
-    if (o['08-hair']) pick['02-hair-back'] = o['08-hair'];
-    else pick['02-hair-back'] = base['08-hair'];
+    if (o['10-hair']) pick['04-hair-back'] = o['10-hair'];
+    else pick['04-hair-back'] = base['10-hair'];
     const px = new Uint32Array(G * G);
     for (const d of order) {
       const img = pick[d] ? bank[d]?.[pick[d]] : undefined;
@@ -285,11 +297,11 @@ function catalog(bank: Record<string, Record<string, SpriteImage>>) {
     return px;
   };
   const rows: Uint32Array[][] = [
-    HAIR_STYLE_NAMES.filter((h) => !SKIP_STYLES.has(h)).map((h) => make({ '08-hair': `${slug(h)}-dark-brown` })),
-    HAIR_NAMES.map((c) => make({ '08-hair': `pompadour-${slug(c)}` })),
-    Object.keys(bank['04-outfit']).map((o) => make({ '04-outfit': o })),
-    [...Object.keys(bank['07-expression']).map((e) => make({ '07-expression': e })), ...Object.keys(bank['09-eyewear']).map((e) => make({ '09-eyewear': e })), make({ '10-accessory': 'cigar' })],
-    [...Object.keys(bank['05-head']).map((k) => make({ '05-head': k, '03-neck': k, '01-background': 'brass' })), ...['stubble', 'short-beard', 'moustache', 'goatee'].map((f) => make({ '06-facial-hair': `${f}-dark-brown`, '08-hair': 'short-crop-dark-brown' })), ...Object.keys(bank['01-background']).map((b) => make({ '01-background': b }))],
+    HAIR_STYLE_NAMES.filter((h) => !SKIP_STYLES.has(h)).map((h) => make({ '10-hair': `${slug(h)}-dark-brown` })),
+    HAIR_NAMES.map((c) => make({ '10-hair': `pompadour-${slug(c)}` })),
+    Object.keys(bank['06-outfit']).map((o) => make({ '06-outfit': o })),
+    [...Object.keys(bank['09-expression']).map((e) => make({ '09-expression': e })), ...Object.keys(bank['11-eyewear']).map((e) => make({ '11-eyewear': e })), make({ '12-accessory': 'cigar' })],
+    [...Object.keys(bank['07-head']).map((k) => make({ '07-head': k, '05-neck': k, '01-background': 'brass' })), ...['stubble', 'short-beard', 'moustache', 'goatee'].map((f) => make({ '08-facial-hair': `${f}-dark-brown`, '10-hair': 'short-crop-dark-brown' })), ...Object.keys(bank['01-background']).map((b) => make({ '01-background': b }))],
   ];
   const cell = 160;
   const cols = Math.max(...rows.map((r) => r.length));
@@ -305,8 +317,8 @@ function catalog(bank: Record<string, Record<string, SpriteImage>>) {
 
   // The newest options, large.
   const fresh = [
-    ...[['black', 'skin-1'], ['dark-brown', 'skin-3'], ['sandy', 'skin-2'], ['auburn', 'skin-5']].map(([c, sk]) => make({ '08-hair': `curtains-${c}`, '05-head': sk, '03-neck': sk })),
-    ...[['black', 'skin-6'], ['dark-brown', 'skin-2'], ['grey', 'skin-4'], ['auburn', 'skin-1']].map(([c, sk]) => make({ '06-facial-hair': `short-beard-${c}`, '08-hair': `short-crop-${c}`, '05-head': sk, '03-neck': sk })),
+    ...[['black', 'skin-1'], ['dark-brown', 'skin-3'], ['sandy', 'skin-2'], ['auburn', 'skin-5']].map(([c, sk]) => make({ '10-hair': `curtains-${c}`, '07-head': sk, '05-neck': sk })),
+    ...[['black', 'skin-6'], ['dark-brown', 'skin-2'], ['grey', 'skin-4'], ['auburn', 'skin-1']].map(([c, sk]) => make({ '08-facial-hair': `short-beard-${c}`, '10-hair': `short-crop-${c}`, '07-head': sk, '05-neck': sk })),
   ];
   const fb = 300;
   const fbuf = new PixelBuffer(4 * fb, 2 * fb);
@@ -315,8 +327,23 @@ function catalog(bank: Record<string, Record<string, SpriteImage>>) {
   });
   writeFileSync(`${OUT}/new-options.png`, encodePng(fbuf, 1));
 
+  // The flair layers, large: charts, frames and finishes.
+  const flair = [
+    ...Object.keys(bank['02-chart']).map((c, i) => make({ '02-chart': c, '01-background': BACKGROUNDS[i % 7][0], '09-expression': 'smirk' })),
+    ...Object.keys(bank['13-frame']).map((f, i) => make({ '13-frame': f, '02-chart': ['moon', 'rug-pull', 'candles', 'steady-climb', 'v-recovery'][i], '01-background': ['ledger-green', 'brick', 'paper', 'lilac', 'brass'][i], '14-finish': 'vignette' })),
+    ...Object.keys(bank['14-finish']).map((f) => make({ '14-finish': f, '02-chart': 'chop', '01-background': 'mint' })),
+  ];
+  const fl = 300;
+  const fc = 5;
+  const flb = new PixelBuffer(fc * fl, Math.ceil(flair.length / fc) * fl);
+  flb.data.fill(rgba('#f6f4ee'));
+  flair.forEach((px, i) => {
+    for (let y = 0; y < fl; y++) for (let x = 0; x < fl; x++) flb.data[(Math.floor(i / fc) * fl + y) * fc * fl + (i % fc) * fl + x] = px[Math.floor((y * G) / fl) * G + Math.floor((x * G) / fl)];
+  });
+  writeFileSync(`${OUT}/flair.png`, encodePng(flb, 1));
+
   // The building rooms, large.
-  const rooms = ROOMS.map(([n]) => make({ '01-background': n, '07-expression': 'smirk', '08-hair': 'slicked-back-grey' }));
+  const rooms = ROOMS.map(([n]) => make({ '01-background': n, '09-expression': 'smirk', '10-hair': 'slicked-back-grey' }));
   const big = 360;
   const rb = new PixelBuffer(4 * big, 2 * big);
   rb.data.fill(rgba('#f6f4ee'));

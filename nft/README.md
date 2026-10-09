@@ -11,17 +11,23 @@ Stack one file from each folder, lowest number at the bottom:
 | # | Folder | Required | Options |
 |---|---|---|---|
 | 1 | `01-background` | yes | 15 (8 colours, 7 rooms of the building) |
-| 2 | `02-hair-back` | when it exists | matches the hair |
-| 3 | `03-neck` | yes | 6 skins |
-| 4 | `04-outfit` | yes | 16 |
-| 5 | `05-head` | yes | 6 skins |
-| 6 | `06-facial-hair` | optional | 4 styles × 7 colours |
-| 7 | `07-expression` | yes | 8 |
-| 8 | `08-hair` | yes | 14 styles × 7 colours |
-| 9 | `09-eyewear` | optional | 5 |
-| 10 | `10-accessory` | optional | cigar |
+| 2 | `02-chart` | optional | 7 price charts behind the Investor |
+| 3 | `03-shadow` | yes | 1 (the cast shadow that gives depth) |
+| 4 | `04-hair-back` | when it exists | matches the hair |
+| 5 | `05-neck` | yes | 6 skins |
+| 6 | `06-outfit` | yes | 16 |
+| 7 | `07-head` | yes | 6 skins |
+| 8 | `08-facial-hair` | optional | 4 styles × 7 colours |
+| 9 | `09-expression` | yes | 8 |
+| 10 | `10-hair` | yes | 14 styles × 7 colours |
+| 11 | `11-eyewear` | optional | 5 |
+| 12 | `12-accessory` | optional | cigar |
+| 13 | `13-frame` | optional | 5: two ticker strips, a breaking banner, an ink border, a gold stock-certificate edge |
+| 14 | `14-finish` | optional | 3: dithered vignette, CRT scanlines, film grain |
 
 ## Rules that keep it looking right
+
+- **Charts go on plain colour backgrounds only.** The rooms are already busy.
 
 - **Hair back and hair share a file name.** If you pick `08-hair/long-auburn.png`, also use `02-hair-back/long-auburn.png`. Bald has no back file, so skip that layer for it.
 - **Neck and head use the same skin.** For example `03-neck/skin-4.png` goes with `05-head/skin-4.png`.

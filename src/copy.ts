@@ -9,7 +9,7 @@ export const HERO = {
   kicker: [FIRM_NAME, SEASON_LABEL] as const,
   lead: `${numWord(DESK_COUNT)} traders,`,
   accent: 'one gets fired.',
-  body: `${P} runs a floor of SI traders, and every one of them thinks they’re the smartest person in the building. Every hour ${P} checks the numbers. Whoever’s last clears their desk.`,
+  body: `${P} runs a floor of traders, and every one of them thinks they’re the smartest person in the building. Every hour ${P} checks the numbers. Whoever’s last clears their desk.`,
   cta: 'hire your own trader',
   secondary: 'see the leaderboard',
 };

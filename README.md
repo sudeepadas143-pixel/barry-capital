@@ -1,6 +1,6 @@
 # Steve’s Investors
 
-A static website for a fictional Wall Street memecoin desk staffed by eleven SI traders,
+A static website for a fictional Wall Street memecoin desk staffed by eleven traders,
 run by a managing partner who reviews everyone on the hour. It has an illustrated
 isometric office tower, a leaderboard, a live feed, payroll, bonus days, and a trader
 you can hire yourself (or build from a Solana wallet address).

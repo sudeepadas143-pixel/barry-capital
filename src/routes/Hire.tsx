@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { DESK_COUNT, accountUrl } from '../../firm.config';
-import { checkWallet, shortAddress, traderFromWallet } from '../wallet';
+import { DESK_COUNT, INVESTORS_CAP, accountUrl } from '../../firm.config';
+import { shortAddress, traderFromWallet } from '../wallet';
+import { HireDesk, HiredCount } from '../components/HireDesk';
+import { useHireStatus } from '../hooks/useHireStatus';
 import { Figure, Headshot } from '../components/Sprite';
 import { TradeRow } from '../components/Books';
 import {
@@ -82,7 +84,6 @@ const CUT_NAMES = ['men’s cut', 'women’s cut'];
 const HEIGHT_NAMES = ['short', 'average', 'tall'];
 const WRIST_NAMES = ['bare wrist', 'gold watch'];
 
-const START: Look = { skin: 1, hair: 1, hairStyle: 3, suit: 0, tie: 0, fem: false, build: 1, height: 1, face: 0, outfit: 0, shirt: 0, neck: 0, eyes: 0, watch: true };
 
 const cleanName = (s: string) =>
   s
@@ -100,7 +101,9 @@ function EmployeeFile() {
   if (!t) return null;
   const a = ARCHETYPES[t.archetype];
   const trades = t.recent.filter((x) => x.at <= now);
-  const wallet = hires.find((h) => h.id === t.id)?.wallet;
+  const rec = hires.find((h) => h.id === t.id);
+  const wallet = rec?.wallet;
+  const investor = !!rec?.investor;
   return (
     <div className="two-col">
       <section className="section" style={{ borderTop: '2px solid var(--ink)' }} aria-labelledby="file-title">
@@ -149,7 +152,7 @@ function EmployeeFile() {
           <dd>not reviewed: your hire can’t be let go</dd>
           {wallet && (
             <>
-              <dt>built from</dt>
+              <dt>{investor ? 'Investor held by' : 'built from'}</dt>
               <dd>
                 <a className="textlink mono" href={accountUrl(wallet)} target="_blank" rel="noreferrer" title={wallet}>
                   {shortAddress(wallet)} <ArrowUpRight />
@@ -159,13 +162,15 @@ function EmployeeFile() {
           )}
         </dl>
         <p className="prose muted" style={{ fontSize: 17, marginTop: 18 }}>
-          Only this browser can see {t.name}, and their results don’t count toward the firm’s.
+          {investor
+            ? `${t.name} is tied to your Investor: paste the same address on any device to see them. Their trades are illustrative and don’t count toward the firm’s.`
+            : `Only this browser can see ${t.name}, and their results don’t count toward the firm’s.`}
         </p>
         <div className="panel-actions">
           <button type="button" className="btn-black follow-btn" onClick={() => open(t.id)}>
             open the file
           </button>
-          {!confirm ? (
+          {investor ? null : !confirm ? (
             <button type="button" className="textlink" onClick={() => setConfirm(true)}>
               let {t.name} go
             </button>
@@ -207,27 +212,34 @@ function EmployeeFile() {
   );
 }
 
-export default function Hire() {
-  const { state, addHire } = useFirm();
-  const [name, setName] = useState('');
-  const [arch, setArch] = useState<ArchetypeId>('intern');
-  const [risk, setRisk] = useState(50);
-  const [patience, setPatience] = useState(50);
-  const [look, setLook] = useState<Look>(START);
+interface Draft {
+  name: string;
+  archetype: ArchetypeId;
+  risk: number;
+  patience: number;
+  look: Look;
+  seed: number;
+}
+
+/** Design the trader that comes with an Investor. Starts from the trader the address would make. */
+function TraderForm({ address, busy, error, onSave }: { address: string; busy: boolean; error: string | null; onSave: (d: Draft) => void }) {
+  const { state } = useFirm();
+  const start = useMemo(() => traderFromWallet(address), [address]);
+  const [name, setName] = useState(start.name);
+  const [arch, setArch] = useState<ArchetypeId>(start.archetype);
+  const [risk, setRisk] = useState(Math.round(start.risk * 100));
+  const [patience, setPatience] = useState(Math.round(start.patience * 100));
+  const [look, setLook] = useState<Look>(start.look);
   const [touched, setTouched] = useState(false);
-  const [wallet, setWallet] = useState('');
-  const [walletNote, setWalletNote] = useState<{ text: string; bad: boolean } | null>(null);
-  const [walletSeed, setWalletSeed] = useState<number | undefined>(undefined);
-  const keepTemper = useRef(false);
-  const walletName = useRef('');
+  const first = useRef(true);
   const set = (k: keyof Look) => (i: number) => setLook((l) => ({ ...l, [k]: i }));
   const setFlag = (k: 'fem' | 'watch') => (i: number) => setLook((l) => ({ ...l, [k]: i === 1, ...(k === 'fem' && i === 1 ? { face: 0 } : {}) }));
   const reduced = useReducedMotion();
 
-  // Default the sliders to the method's temperament (unless a wallet just set them).
+  // Default the sliders to the method's temperament, except for the address's own pick.
   useEffect(() => {
-    if (keepTemper.current) {
-      keepTemper.current = false;
+    if (first.current) {
+      first.current = false;
       return;
     }
     setRisk(Math.round(ARCHETYPES[arch].risk * 100));
@@ -236,56 +248,13 @@ export default function Hire() {
 
   const taken = useMemo(() => new Set([...state.traders, ...state.waiting].map((t) => t.name.toLowerCase())), [state.traders, state.waiting]);
   const clean = cleanName(name).trim();
-  const error = !clean ? 'A surname, please.' : taken.has(clean.toLowerCase()) ? 'That name is already on a desk.' : null;
-  const hired = state.mine[0];
-  const walletCheck = checkWallet(wallet);
-
-  /** Paste a wallet, get a trader. Secrets are refused and cleared straight away. */
-  const onWallet = (value: string) => {
-    const c = checkWallet(value);
-    if (c.kind === 'secret') {
-      setWallet('');
-      setWalletSeed(undefined);
-      setWalletNote({ text: c.message, bad: true });
-      return;
-    }
-    setWallet(value);
-    if (c.kind === 'ok') {
-      const w = traderFromWallet(c.address);
-      if (w.archetype !== arch) keepTemper.current = true;
-      setArch(w.archetype);
-      setRisk(Math.round(w.risk * 100));
-      setPatience(Math.round(w.patience * 100));
-      setLook(w.look);
-      // Names are shared with the floor; if the wallet's pick is taken, add a suffix.
-      const pick = taken.has(w.name) ? `${w.name.slice(0, 13)} ii` : w.name;
-      if (!clean || clean === walletName.current) setName(pick);
-      walletName.current = pick;
-      setWalletSeed(w.seed);
-      setWalletNote({ text: 'Built from your wallet. You can still change anything below.', bad: false });
-    } else {
-      setWalletSeed(undefined);
-      setWalletNote(c.kind === 'invalid' && value.trim().length >= 32 ? { text: c.message, bad: true } : null);
-    }
-  };
+  const nameError = !clean ? 'A surname, please.' : taken.has(clean.toLowerCase()) ? 'That name is already on a desk.' : null;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
-    if (error) return;
-    if (walletCheck.kind === 'invalid') {
-      setWalletNote({ text: walletCheck.message, bad: true });
-      return;
-    }
-    addHire({
-      name: clean,
-      archetype: arch,
-      look,
-      risk: risk / 100,
-      patience: patience / 100,
-      ...(walletCheck.kind === 'ok' ? { wallet: walletCheck.address, seed: walletSeed } : {}),
-    });
-    window.scrollTo(0, 0);
+    if (nameError) return;
+    onSave({ name: clean, archetype: arch, look, risk: risk / 100, patience: patience / 100, seed: start.seed });
   };
 
   const randomise = () => {
@@ -310,6 +279,128 @@ export default function Hire() {
   };
 
   return (
+    <form className="two-col" onSubmit={submit} noValidate>
+      <div className="section" style={{ borderTop: '2px solid var(--ink)' }}>
+        <p className="hire-ok">
+          Your Investor is in <span className="mono">{shortAddress(address)}</span>. Set up the trader who takes your desk. You can do this once.
+        </p>
+        <label className="field">
+          <span className="label">Surname</span>
+          <input
+            className="input"
+            value={name}
+            maxLength={16}
+            autoComplete="off"
+            spellCheck={false}
+            aria-invalid={touched && !!nameError}
+            aria-describedby="name-err"
+            onChange={(e) => setName(cleanName(e.target.value))}
+            placeholder="pemberton"
+          />
+          <span id="name-err" className="field-err" role="alert">
+            {touched && nameError ? nameError : ''}
+          </span>
+        </label>
+        <div className="field" role="radiogroup" aria-label="Method">
+          <span className="label">Method</span>
+          <div className="options">
+            {ARCHETYPE_IDS.map((id) => (
+              <button key={id} type="button" role="radio" aria-checked={arch === id} className="option" onClick={() => setArch(id)}>
+                {ARCHETYPES[id].title}
+              </button>
+            ))}
+          </div>
+          <p className="prose muted" style={{ fontSize: 17, marginTop: 12 }}>
+            {ARCHETYPES[arch].blurb}
+          </p>
+        </div>
+        <label className="field">
+          <span className="label">
+            Risk <span className="mono muted">{risk}</span>
+          </span>
+          <input type="range" min={0} max={100} value={risk} onChange={(e) => setRisk(+e.target.value)} />
+          <span className="range-ends">
+            <span>careful</span>
+            <span>unwell</span>
+          </span>
+        </label>
+        <label className="field">
+          <span className="label">
+            Patience <span className="mono muted">{patience}</span>
+          </span>
+          <input type="range" min={0} max={100} value={patience} onChange={(e) => setPatience(+e.target.value)} />
+          <span className="range-ends">
+            <span>minutes</span>
+            <span>forever</span>
+          </span>
+        </label>
+      </div>
+      <div className="section">
+        <div className="file-id">
+          <div className="portrait portrait-tall">
+            <Figure look={look} pose={reduced ? 'stand' : 'walk'} animate={!reduced} height={132} label="Preview of your trader" />
+          </div>
+          <div>
+            <p className="panel-name">{clean || 'unnamed'}</p>
+            <p className="panel-arch">{ARCHETYPES[arch].title}</p>
+            <div style={{ marginTop: 12 }}>
+              <Headshot look={look} size={48} />
+            </div>
+          </div>
+        </div>
+        <Options label="Cut" names={CUT_NAMES} value={look.fem ? 1 : 0} onChange={setFlag('fem')} />
+        <Options label="Build" names={BUILD_NAMES} value={look.build ?? 1} onChange={set('build')} />
+        <Options label="Height" names={HEIGHT_NAMES} value={look.height ?? 1} onChange={set('height')} />
+        <Swatches label="Skin" colors={SKINS} value={look.skin} onChange={set('skin')} />
+        <Swatches label="Hair" colors={HAIRS} names={HAIR_NAMES} value={look.hair} onChange={set('hair')} />
+        <Options label="Haircut" names={HAIR_STYLE_NAMES} value={look.hairStyle} onChange={set('hairStyle')} />
+        {!look.fem && <Options label="Facial hair" names={FACE_NAMES} value={look.face ?? 0} onChange={set('face')} />}
+        <Options label="Outfit" names={OUTFIT_NAMES} value={look.outfit ?? 0} onChange={set('outfit')} />
+        <Swatches label="Suit" colors={SUITS} names={SUIT_NAMES} value={look.suit} onChange={set('suit')} />
+        <Swatches label="Shirt" colors={SHIRTS} names={SHIRT_NAMES} value={look.shirt ?? 0} onChange={set('shirt')} />
+        <Options label="Neck" names={NECK_NAMES} value={look.neck ?? 0} onChange={set('neck')} />
+        <Swatches label="Tie" colors={TIES} names={TIE_NAMES} value={look.tie} onChange={set('tie')} />
+        <Options label="Eyes and ears" names={EYES_NAMES} value={look.eyes ?? 0} onChange={set('eyes')} />
+        <Options label="Wrist" names={WRIST_NAMES} value={look.watch ? 1 : 0} onChange={setFlag('watch')} />
+        <div className="panel-actions">
+          <button type="submit" className="btn-black" disabled={busy}>
+            {busy ? 'signing…' : 'sign the paperwork'} <ArrowUpRight />
+          </button>
+          <button type="button" className="textlink" onClick={randomise}>
+            surprise me
+          </button>
+        </div>
+        <p className={error ? 'field-err' : 'muted'} style={{ fontSize: 14, marginTop: 16 }} role={error ? 'alert' : undefined}>
+          {error ?? 'Saved to your Investor and locked once signed. Paste the same address on any device to see them.'}
+        </p>
+      </div>
+    </form>
+  );
+}
+
+export default function Hire() {
+  const { state, addHire } = useFirm();
+  const hire = useHireStatus();
+  const st = hire.status;
+  const mine = state.mine[0];
+
+  // A trader saved with the hiring desk shows up on any device with the same address.
+  useEffect(() => {
+    if (mine || st?.state !== 'hired' || !st.trader) return;
+    const t = st.trader;
+    addHire({ name: t.name, archetype: t.archetype, look: t.look, risk: t.risk, patience: t.patience, seed: t.seed, wallet: hire.address, investor: true });
+  }, [mine, st, addHire, hire.address]);
+
+  const save = async (d: Draft) => {
+    const s = await hire.saveTrader(d);
+    if (s.state === 'hired' && s.trader) {
+      const t = s.trader;
+      addHire({ name: t.name, archetype: t.archetype, look: t.look, risk: t.risk, patience: t.patience, seed: t.seed, wallet: hire.address, investor: true });
+      window.scrollTo(0, 0);
+    }
+  };
+
+  return (
     <div className="wrap">
       <header className="page-head">
         <p className="label">Hiring</p>
@@ -318,135 +409,13 @@ export default function Hire() {
           <em>yours to fill.</em>
         </h1>
         <p className="prose">
-          {hired
-            ? `${hired.name} has the spare desk on this browser. You can have one hire at a time.`
-            : 'Design a trader yourself, or build one from your wallet. They get the spare desk on this browser and trade the same coins as everyone else, with a book of their own.'}
+          {mine
+            ? `${mine.name} has your desk.`
+            : 'Every trader hired here comes with an Investor, a real NFT sent to your wallet. Get one in four steps, then set up the trader who takes your desk.'}
         </p>
+        <HiredCount hired={st?.hired ?? 0} cap={st?.cap ?? INVESTORS_CAP} />
       </header>
-      {hired ? (
-        <EmployeeFile />
-      ) : (
-        <form className="two-col" onSubmit={submit} noValidate>
-          <div className="section" style={{ borderTop: '2px solid var(--ink)' }}>
-            <div className="field wallet-field">
-              <label className="label" htmlFor="wallet">
-                Solana wallet <span className="muted">· optional</span>
-              </label>
-              <input
-                id="wallet"
-                className="input mono"
-                value={wallet}
-                autoComplete="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                inputMode="text"
-                placeholder="your public address"
-                aria-invalid={!!walletNote?.bad}
-                aria-describedby="wallet-help wallet-note"
-                onChange={(e) => onWallet(e.target.value)}
-                onBlur={() => walletCheck.kind === 'invalid' && setWalletNote({ text: walletCheck.message, bad: true })}
-              />
-              <p id="wallet-help" className="field-help">
-                Paste a public wallet address and we’ll build a trader from it: the look, the method and a name. The same
-                wallet always makes the same trader. The address stays in this browser, and nothing is connected or
-                signed. Never paste a private key or recovery phrase here, or anywhere else.
-              </p>
-              <span id="wallet-note" className={walletNote?.bad ? 'field-err' : 'field-ok'} role={walletNote?.bad ? 'alert' : 'status'}>
-                {walletNote?.text ?? ''}
-              </span>
-            </div>
-            <label className="field">
-              <span className="label">Surname</span>
-              <input
-                className="input"
-                value={name}
-                maxLength={16}
-                autoComplete="off"
-                spellCheck={false}
-                aria-invalid={touched && !!error}
-                aria-describedby="name-err"
-                onChange={(e) => setName(cleanName(e.target.value))}
-                placeholder="pemberton"
-              />
-              <span id="name-err" className="field-err" role="alert">
-                {touched && error ? error : ''}
-              </span>
-            </label>
-            <div className="field" role="radiogroup" aria-label="Method">
-              <span className="label">Method</span>
-              <div className="options">
-                {ARCHETYPE_IDS.map((id) => (
-                  <button key={id} type="button" role="radio" aria-checked={arch === id} className="option" onClick={() => setArch(id)}>
-                    {ARCHETYPES[id].title}
-                  </button>
-                ))}
-              </div>
-              <p className="prose muted" style={{ fontSize: 17, marginTop: 12 }}>
-                {ARCHETYPES[arch].blurb}
-              </p>
-            </div>
-            <label className="field">
-              <span className="label">
-                Risk <span className="mono muted">{risk}</span>
-              </span>
-              <input type="range" min={0} max={100} value={risk} onChange={(e) => setRisk(+e.target.value)} />
-              <span className="range-ends">
-                <span>careful</span>
-                <span>unwell</span>
-              </span>
-            </label>
-            <label className="field">
-              <span className="label">
-                Patience <span className="mono muted">{patience}</span>
-              </span>
-              <input type="range" min={0} max={100} value={patience} onChange={(e) => setPatience(+e.target.value)} />
-              <span className="range-ends">
-                <span>minutes</span>
-                <span>forever</span>
-              </span>
-            </label>
-          </div>
-          <div className="section">
-            <div className="file-id">
-              <div className="portrait portrait-tall">
-                <Figure look={look} pose={reduced ? 'stand' : 'walk'} animate={!reduced} height={132} label="Preview of your trader" />
-              </div>
-              <div>
-                <p className="panel-name">{clean || 'unnamed'}</p>
-                <p className="panel-arch">{ARCHETYPES[arch].title}</p>
-                <div style={{ marginTop: 12 }}>
-                  <Headshot look={look} size={48} />
-                </div>
-              </div>
-            </div>
-            <Options label="Cut" names={CUT_NAMES} value={look.fem ? 1 : 0} onChange={setFlag('fem')} />
-            <Options label="Build" names={BUILD_NAMES} value={look.build ?? 1} onChange={set('build')} />
-            <Options label="Height" names={HEIGHT_NAMES} value={look.height ?? 1} onChange={set('height')} />
-            <Swatches label="Skin" colors={SKINS} value={look.skin} onChange={set('skin')} />
-            <Swatches label="Hair" colors={HAIRS} names={HAIR_NAMES} value={look.hair} onChange={set('hair')} />
-            <Options label="Haircut" names={HAIR_STYLE_NAMES} value={look.hairStyle} onChange={set('hairStyle')} />
-            {!look.fem && <Options label="Facial hair" names={FACE_NAMES} value={look.face ?? 0} onChange={set('face')} />}
-            <Options label="Outfit" names={OUTFIT_NAMES} value={look.outfit ?? 0} onChange={set('outfit')} />
-            <Swatches label="Suit" colors={SUITS} names={SUIT_NAMES} value={look.suit} onChange={set('suit')} />
-            <Swatches label="Shirt" colors={SHIRTS} names={SHIRT_NAMES} value={look.shirt ?? 0} onChange={set('shirt')} />
-            <Options label="Neck" names={NECK_NAMES} value={look.neck ?? 0} onChange={set('neck')} />
-            <Swatches label="Tie" colors={TIES} names={TIE_NAMES} value={look.tie} onChange={set('tie')} />
-            <Options label="Eyes and ears" names={EYES_NAMES} value={look.eyes ?? 0} onChange={set('eyes')} />
-            <Options label="Wrist" names={WRIST_NAMES} value={look.watch ? 1 : 0} onChange={setFlag('watch')} />
-            <div className="panel-actions">
-              <button type="submit" className="btn-black">
-                sign the paperwork <ArrowUpRight />
-              </button>
-              <button type="button" className="textlink" onClick={randomise}>
-                surprise me
-              </button>
-            </div>
-            <p className="muted" style={{ fontSize: 14, marginTop: 16 }}>
-              Saved in this browser only.
-            </p>
-          </div>
-        </form>
-      )}
+      {mine ? <EmployeeFile /> : st?.state === 'minted' ? <TraderForm address={hire.address} busy={hire.busy} error={hire.error} onSave={save} /> : <HireDesk hire={hire} />}
     </div>
   );
 }

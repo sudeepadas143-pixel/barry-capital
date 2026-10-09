@@ -3,6 +3,7 @@ import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import { FIRM_NAME } from '../firm.config';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { MarketBar } from './components/MarketBar';
 import { TraderPanel } from './components/TraderPanel';
 import { FirmProvider } from './hooks/useFirm';
 import Home from './routes/Home';
@@ -63,6 +64,7 @@ export default function App() {
         Skip to content
       </a>
       <RouteEffects />
+      <MarketBar />
       <Header />
       <main id="main">
         <Suspense fallback={<div className="wrap page-head" aria-busy="true" />}>

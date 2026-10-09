@@ -21,6 +21,8 @@ export interface HireRecord {
   seed: number;
   /** A public Solana address the visitor chose to build the trader from. Kept in this browser only. */
   wallet?: string;
+  /** Set when the trader belongs to an Investor NFT: saved with the hiring desk and locked. */
+  investor?: boolean;
 }
 
 export function localTrader(h: HireRecord): TraderState {

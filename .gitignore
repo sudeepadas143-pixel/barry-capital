@@ -5,7 +5,6 @@ playwright-report
 *.log
 .vercel
 art-out
-barry-capital.zip
+investors-layers.zip
 *-pfp*.png
 steves-investors.zip
-investors-layers.zip

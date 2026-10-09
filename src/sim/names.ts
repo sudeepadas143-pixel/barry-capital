@@ -79,7 +79,7 @@ export const THEME_LABEL: Record<Theme, string> = {
   dogs: 'dog coins',
   cats: 'cat coins',
   critters: 'other animals',
-  agents: 'SI coins',
+  agents: 'agent coins',
   culture: 'internet culture',
 };
 
@@ -386,7 +386,7 @@ export const THEME_NOUN: Record<Theme, string> = {
   dogs: 'dog coin',
   cats: 'cat coin',
   critters: 'animal coin',
-  agents: 'SI coin',
+  agents: 'agent coin',
   culture: 'meme coin',
 };
 

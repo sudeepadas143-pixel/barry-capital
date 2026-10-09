@@ -10,7 +10,7 @@ Stack one file from each folder, lowest number at the bottom:
 
 | # | Folder | Required | Options |
 |---|---|---|---|
-| 1 | `01-background` | yes | 14 (8 colours, 6 rooms from the building) |
+| 1 | `01-background` | yes | 16 (8 colours, 8 rooms from the building) |
 | 2 | `02-hair-back` | when it exists | matches the hair |
 | 3 | `03-neck` | yes | 6 skins |
 | 4 | `04-outfit` | yes | 16 |

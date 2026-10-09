@@ -3,7 +3,7 @@
 The weights are percentages within each trait. Change them freely. With these numbers, 1,111 Investors come out unique without any re-rolls: there are well over a hundred million combinations.
 
 ## Background
-Plain colours are common; rooms from the building are rarer.
+Plain colours are common; rooms cropped from the site's building art are rarer.
 
 | Option | Weight |
 |---|---|
@@ -14,12 +14,14 @@ Plain colours are common; rooms from the building are rarer.
 | brick | 9 |
 | lilac | 8 |
 | mint | 8 |
-| trading-floor | 6 |
-| lobby | 5 |
-| elevator | 4 |
-| ticker-wall | 4 |
+| trading-floor | 4 |
+| lobby-bull | 4 |
+| lobby-sign | 3 |
 | corner-office | 3 |
+| wall-street | 3 |
 | server-room | 3 |
+| glass-tower | 3 |
+| putting-green | 2 |
 | after-hours | 2 (rarest) |
 
 ## Skin (neck + head)

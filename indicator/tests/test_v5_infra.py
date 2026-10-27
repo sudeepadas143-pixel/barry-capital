@@ -205,7 +205,7 @@ def path(segments, start="2021-01-04"):
 def test_score_instrument_lead_remaining_and_censoring():
     # 1D labels: L=63, F=126, D=8 ATR. Top at 150, bottom at 300; long tail so both are observable.
     h, l, c, a, idx = path([(0, 30, 150), (30, 0, 150), (0, 30, 150), (30, 30, 200)])
-    r = EV.score_instrument(h, l, c, a, [140, 141, 160, 400], "top", "warning", "1D", idx)
+    r = EV.score_instrument("SPY", h, l, c, [140, 141, 160, 400], "top", "warning", "1D", idx)
     assert list(r["events"]) == [150]
     assert r["pairs"] == [(140, 150)] and r["status"][141] == "duplicate" and r["status"][160] == "duplicate"
     assert r["status"][400] == "false_alarm"
@@ -214,14 +214,14 @@ def test_score_instrument_lead_remaining_and_censoring():
     assert r["remaining"][0] == pytest.approx((c[140] - final) / (h[150] - final))
     # censoring: cut the series so the top's forward window is incomplete → censored, not a miss
     n = 150 + 100
-    r2 = EV.score_instrument(h[:n], l[:n], c[:n], a[:n], [140], "top", "warning", "1D", idx[:n])
+    r2 = EV.score_instrument("SPY", h[:n], l[:n], c[:n], [140], "top", "warning", "1D", idx[:n])
     assert r2["events_censored"] == 1 and 150 not in list(r2["events"])
     assert r2["alerts_censored"] == 1 and len(r2["alerts"]) == 0
 
 
 def test_detection_report_pools_without_double_counting():
     h, l, c, a, idx = path([(0, 30, 150), (30, 0, 150), (0, 30, 150), (30, 30, 200)])
-    r = EV.score_instrument(h, l, c, a, [140, 141, 400], "top", "warning", "1D", idx)
+    r = EV.score_instrument("SPY", h, l, c, [140, 141, 400], "top", "warning", "1D", idx)
     rep = EV.detection_report({"X": r, "Y": r}, {"X": idx, "Y": idx}, "1D", "warning", reps=200)
     assert rep["events"] == 2 and rep["alerts"] == 6 and rep["matched"] == 2
     assert rep["duplicates"] == 2 and rep["false_alarms"] == 2
@@ -233,31 +233,34 @@ def test_detection_report_pools_without_double_counting():
 def test_lift_is_exactly_one_for_alerts_on_every_scorable_candle():
     h, l, c, a, idx = path([(0, 30, 150), (30, 0, 150), (0, 30, 150), (30, 30, 200)])
     n = len(c)
-    r0 = EV.score_instrument(h, l, c, a, [], "top", "warning", "1D", idx)
+    r0 = EV.score_instrument("SPY", h, l, c, [], "top", "warning", "1D", idx)
     lo, hi = r0["L"], n - 1 - max(r0["L"], r0["F"])
     every = [s for s in range(n) if s - r0["K"] >= lo and s + r0["W"] <= hi]
-    r = EV.score_instrument(h, l, c, a, every, "top", "warning", "1D", idx)
-    out = EV.lift_report({"X": {"index": idx, "score": r, "state": np.full(n, "s")}}, "1D", "warning", reps=100)
+    r = EV.score_instrument("SPY", h, l, c, every, "top", "warning", "1D", idx)
+    out = EV.lift_report({"SPY": {"index": idx, "score": r, "state": np.full(n, "s")}}, "1D", "warning", reps=100)
     assert out["lift"] == pytest.approx(1.0) and abs(out["mean_excess"]) < 1e-12
-    on = EV.score_instrument(h, l, c, a, [150], "top", "warning", "1D", idx)
-    out2 = EV.lift_report({"X": {"index": idx, "score": on, "state": np.full(n, "s")}}, "1D", "warning", reps=100)
+    on = EV.score_instrument("SPY", h, l, c, [150], "top", "warning", "1D", idx)
+    out2 = EV.lift_report({"SPY": {"index": idx, "score": on, "state": np.full(n, "s")}}, "1D", "warning", reps=100)
     assert out2["lift"] > 1.0
 
 
 def test_evaluation_refuses_forward_candles_and_other_partitions():
     idx = pd.date_range(FREEZE - pd.Timedelta(days=5), periods=10, freq="D", tz="UTC")
     with pytest.raises(DG.ReservedDataError):
-        EV.check_partition(idx)
+        EV.check_partition(idx, "1D")
     with pytest.raises(DG.ReservedDataError):
-        EV.check_partition(idx[:3], partition="forward")
+        EV.check_partition(idx[:3], "1D", partition="forward")
     with pytest.raises(DG.ReservedDataError):
-        EV.candle_table("X", idx, "1D", 5, {}, {})
+        EV.candle_table("SPY", idx, "1D", 5, {}, {})
     h = np.ones(10)
     with pytest.raises(DG.ReservedDataError):
-        EV.score_instrument(h, h, h, h, [], "top", "warning", "1D", idx)
+        EV.score_instrument("SPY", h, h, h, [], "top", "warning", "1D", idx)
 
 
 # ----------------------------------------------------------------------------- continuation / excess
+
+SYMS = ["SPY", "QQQ", "IWM", "EFA"]
+
 
 def synthetic_candles(n_sym=4, n=3000, seed=0):
     rng = np.random.default_rng(seed)
@@ -267,7 +270,7 @@ def synthetic_candles(n_sym=4, n=3000, seed=0):
         state = np.where(rng.random(n) < 0.5, "bull", "bear")
         vol = rng.choice(["low", "mid", "high"], n)
         r = rng.normal(0, 1, n)
-        tabs.append(EV.candle_table(f"S{k}", idx, "4H", 30, {"direction_label": state, "vol_regime": vol}, {"r_h": r}))
+        tabs.append(EV.candle_table(SYMS[k], idx, "4H", 30, {"direction_label": state, "vol_regime": vol}, {"r_h": r}))
     out = pd.concat(tabs, ignore_index=True)
     out.attrs.update(tabs[0].attrs)
     return out
@@ -276,7 +279,7 @@ def synthetic_candles(n_sym=4, n=3000, seed=0):
 def test_matching_only_on_declared_causal_columns():
     idx = pd.date_range("2020-01-01", periods=50, freq="D", tz="UTC")
     with pytest.raises(EV.MatchingError):
-        EV.candle_table("X", idx, "1D", 5, {"r_h": np.zeros(50)}, {})
+        EV.candle_table("SPY", idx, "1D", 5, {"r_h": np.zeros(50)}, {})
     ct = synthetic_candles(1, 200)
     with pytest.raises(EV.MatchingError):
         EV.bench_table(ct, "r_h", ["r_h"])
@@ -292,8 +295,8 @@ def test_excess_is_zero_when_units_are_the_benchmark_and_dependence_is_reported(
     u = EV.units_from(ct, ct[["sym", "i"]], ["vol_regime"])
     res = EV.excess(u, b, "r_h", 30, (int(ct["t"].min()), int(ct["t"].max())), reps=200)
     assert abs(res["mean_excess"]) < 1e-12 and res["lo"] <= 0 <= res["hi"]
-    assert res["overlap_share"] == pytest.approx(1 - 4 / len(u)) and res["effective_n"] == 4 * int(np.ceil(3000 / 31))
-    assert res["leave_one_instrument_out"] is not None and res["largest_instrument"] in {"S0", "S1", "S2", "S3"}
+    assert res["overlap_share"] == pytest.approx(1 - 4 / len(u)) and res["effective_n"] == 4 * 100     # windows i+1..i+30: units 30 apart do not overlap
+    assert res["leave_one_instrument_out"] is not None and res["largest_instrument"] in set(SYMS)
 
 
 def test_continuation_report_pairs_comparisons_and_counts_excluded_signals():
@@ -322,7 +325,8 @@ def test_short_costs_units_and_annualisation():
     assert C.short_holding_cost("equity", T0, one_year) == (pytest.approx(0.01), "estimated_gc_borrow_1pct")
     c, src = C.short_holding_cost("equity_index", T0, T0 + pd.Timedelta(days=1))
     assert c == pytest.approx(0.01 / 365.25) and src == "estimated_gc_borrow_1pct"
-    assert C.short_holding_cost("fx", T0, one_year) == (0.0, "unavailable_fx_carry")
+    c_fx, s_fx = C.short_holding_cost("fx", T0, one_year)
+    assert np.isnan(c_fx) and s_fx == "unavailable_fx_carry"            # never a silent zero
     assert C.short_holding_cost("crypto", T0, one_year) == (pytest.approx(0.10), "estimated_crypto_10pct")
     assert C.holding_cost(1, "crypto", T0, one_year) == (0.0, "none_long_spot")
     with pytest.raises(ValueError):
@@ -365,9 +369,16 @@ def test_trade_stops_time_exit_costs_and_data_end():
 
 # ----------------------------------------------------------------------------- ledger
 
+CFG = "reports/V5_VALIDATION_PROTOCOL.md"     # any committed, unmodified file serves as config in tests
+
+
 def rec(path, tid, **kw):
+    data = path.parent / "data.bin"
+    if not data.exists():
+        data.write_bytes(b"candles")
     args = dict(hypothesis_id="C1", partitions=["exploration"], config={"x": 1},
-                code_files=["research/v5_eval.py"], metrics_requested=["recall"], outcomes_accessed=False, path=path)
+                code_files=["research/v5_eval.py"], metrics_requested=["recall"], outcomes_accessed=False,
+                config_file=CFG, data_files=[str(data)], path=path)
     args.update(kw)
     return LG.record(tid, **args)
 
@@ -405,7 +416,7 @@ def test_ledger_rejects_unregistered_hypotheses_and_reserved_partitions(tmp_path
         rec(p, "x-003", partitions=["reserve_xs"], confirmatory_prereg="reports/NOPE.md")
     with pytest.raises(LG.LedgerError):
         rec(p, "x-004", outcomes_accessed="no")
-    assert not p.exists()
+    assert not p.exists() or p.read_text() == ""
 
 
 # ----------------------------------------------------------------------------- data guard
@@ -434,4 +445,5 @@ def test_guard_cuts_forward_candles_even_if_the_cache_contains_them(monkeypatch,
     (tmp_path / "SPY_1d.csv.gz").write_text("x")       # cache present
     monkeypatch.setattr(D, "load", lambda sym, tf: df)
     out = DG.load("SPY", "1D")
-    assert out.index.max() <= FREEZE and len(out) == int((idx <= FREEZE).sum())
+    closes = idx + pd.Timedelta("1D")
+    assert out.index.max() <= FREEZE and len(out) == int((closes <= FREEZE + pd.Timedelta(seconds=1)).sum())

@@ -5,7 +5,9 @@ Append-only JSON Lines at reports/V5_TRIAL_LEDGER.jsonl (machine-checkable; repl
 
 Each record: trial_id, hypothesis_id, partitions, recorded_at (UTC), code fingerprint (sha256
 per file + git HEAD + whether those files had uncommitted changes), config fingerprint (sha256
-of canonical JSON), metrics_requested, outcomes_accessed, notes, prev_hash, record_hash.
+of canonical JSON) and the committed configuration FILE it came from, a DATA fingerprint (sha256
+per data file read; detects vendor revisions of cached candles), metrics_requested,
+outcomes_accessed, notes, prev_hash, record_hash.
 
 Protections
 * prev_hash chains every record to the one before; record_hash covers the whole record. Any
@@ -13,13 +15,20 @@ Protections
 * record() verifies the chain before appending and refuses a trial_id that already exists, so a
   trial can never be silently overwritten or re-recorded with different results.
 * The file is only ever opened in append mode.
+* Every trial must name a configuration file that is committed in git and unmodified (the
+  configuration is pre-registered before outcomes are computed).
 * Partitions: only "exploration" is accepted. Reserved partitions ("reserve_xs", "forward")
-  require a confirmatory pre-registration path that exists in the repository; until a family
-  reaches gate G2 no such path exists, so they are refused.
+  require a confirmatory pre-registration that is committed and unmodified, lives at
+  reports/V5_*PREREG*.md and names the hypothesis id; until a family reaches gate G2 none exists.
+* Appends are serialised with an exclusive file lock. A local chain cannot detect deletion of
+  the whole file or of its newest records; verify_against_git() checks that the committed ledger
+  is a prefix of the working one (commit the ledger after every trial).
+* outcomes_accessed is self-reported: the ledger records it, it cannot verify it.
 """
 
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import json
 import re
@@ -59,6 +68,38 @@ def code_fingerprint(files: list[str], root: Path = ROOT) -> dict:
     return out
 
 
+def _git(root: Path, *args) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True)
+
+
+def committed_and_clean(rel: str, root: Path = ROOT) -> bool:
+    """True if `rel` is tracked by git and has no uncommitted changes."""
+    if not (root / rel).is_file():
+        return False
+    if _git(root, "ls-files", "--error-unmatch", rel).returncode != 0:
+        return False
+    return _git(root, "status", "--porcelain", "--", rel).stdout.strip() == ""
+
+
+def data_fingerprint(files: list[str], root: Path = ROOT) -> dict:
+    out = {}
+    for f in sorted(files):
+        p = Path(f) if Path(f).is_absolute() else root / f
+        out[str(f)] = sha(p.read_bytes())
+    return out
+
+
+def verify_against_git(path: Path = LEDGER, rev: str = "HEAD", root: Path = ROOT) -> None:
+    """The ledger committed at `rev` must be a prefix of the working ledger (no rewritten,
+    deleted or truncated history). A ledger not yet committed passes trivially."""
+    rel = str(path.relative_to(root)) if path.is_absolute() and root in path.parents else str(path)
+    r = _git(root, "show", f"{rev}:{rel}")
+    if r.returncode != 0:
+        return
+    if not (path.read_text() if path.exists() else "").startswith(r.stdout):
+        raise LedgerError(f"working ledger does not extend the ledger committed at {rev}")
+
+
 def read(path: Path = LEDGER) -> list[dict]:
     if not path.exists():
         return []
@@ -83,8 +124,8 @@ def verify(path: Path = LEDGER) -> list[dict]:
 
 
 def record(trial_id: str, hypothesis_id: str, partitions: list[str], config: dict, code_files: list[str],
-           metrics_requested: list[str], outcomes_accessed: bool, notes: str = "",
-           confirmatory_prereg: str | None = None, path: Path = LEDGER, root: Path = ROOT) -> dict:
+           metrics_requested: list[str], outcomes_accessed: bool, config_file: str, data_files: list[str],
+           notes: str = "", confirmatory_prereg: str | None = None, path: Path = LEDGER, root: Path = ROOT) -> dict:
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{2,80}", trial_id or ""):
         raise LedgerError("trial_id must be 3-81 characters of letters, digits, . _ -")
     if hypothesis_id not in HYPOTHESES:
@@ -92,10 +133,31 @@ def record(trial_id: str, hypothesis_id: str, partitions: list[str], config: dic
     if not partitions or any(p not in PARTITIONS for p in partitions):
         raise LedgerError(f"unknown partition in {partitions}")
     if any(p != "exploration" for p in partitions):
-        if not confirmatory_prereg or not (root / confirmatory_prereg).is_file():
-            raise LedgerError("reserved partitions need an existing confirmatory pre-registration file")
+        ok = (confirmatory_prereg is not None
+              and re.fullmatch(r"reports/V5_[A-Za-z0-9_]*PREREG[A-Za-z0-9_]*\.md", confirmatory_prereg)
+              and committed_and_clean(confirmatory_prereg, root)
+              and hypothesis_id in (root / confirmatory_prereg).read_text())
+        if not ok:
+            raise LedgerError("reserved partitions need a committed, unmodified reports/V5_*PREREG*.md naming the hypothesis")
     if not isinstance(outcomes_accessed, bool):
         raise LedgerError("outcomes_accessed must be True or False")
+    if not config_file or not committed_and_clean(config_file, root):
+        raise LedgerError("config_file must be committed in git and unmodified before a trial is recorded")
+    if not data_files:
+        raise LedgerError("data_files must list every data file the trial read")
+    dfp = data_fingerprint(data_files, root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a") as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        try:
+            return _append(fh, path, trial_id, hypothesis_id, partitions, config, code_files, metrics_requested,
+                           outcomes_accessed, config_file, dfp, notes, confirmatory_prereg, root)
+        finally:
+            fcntl.flock(fh, fcntl.LOCK_UN)
+
+
+def _append(fh, path, trial_id, hypothesis_id, partitions, config, code_files, metrics_requested,
+            outcomes_accessed, config_file, dfp, notes, confirmatory_prereg, root) -> dict:
     recs = verify(path)
     if any(r["trial_id"] == trial_id for r in recs):
         raise LedgerError(f"trial {trial_id} already recorded; trials are never overwritten")
@@ -103,12 +165,12 @@ def record(trial_id: str, hypothesis_id: str, partitions: list[str], config: dic
         "trial_id": trial_id, "hypothesis_id": hypothesis_id, "partitions": list(partitions),
         "recorded_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "code": code_fingerprint(code_files, root), "config": config, "config_sha256": sha(_canon(config)),
+        "config_file": config_file, "config_file_sha256": sha((root / config_file).read_bytes()), "data": dfp,
         "metrics_requested": list(metrics_requested), "outcomes_accessed": outcomes_accessed,
         "confirmatory_prereg": confirmatory_prereg, "notes": notes,
         "prev_hash": recs[-1]["record_hash"] if recs else GENESIS,
     }
     body["record_hash"] = sha(_canon(body))
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "a") as fh:
-        fh.write(json.dumps(body, sort_keys=True) + "\n")
+    fh.write(json.dumps(body, sort_keys=True) + "\n")
+    fh.flush()
     return body

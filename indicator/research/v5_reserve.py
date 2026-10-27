@@ -37,3 +37,20 @@ FROZEN_V41 = ["research/v41.py", "research/universe41.py", "scripts/v41_run.py",
 def exploration_only(df: pd.DataFrame) -> pd.DataFrame:
     """Drop every candle that opens after FREEZE. Exploratory V5 code must call this on every frame."""
     return df[df.index <= FREEZE]
+
+
+def candle_close_times(index: pd.DatetimeIndex, tf: str) -> pd.DatetimeIndex:
+    """Nominal close time of each candle (period end). Weekly/monthly/quarterly candles that OPEN
+    before FREEZE can CLOSE after it and then contain post-freeze prices (V5 audit finding A1)."""
+    if tf in ("1M",):
+        return index + pd.offsets.MonthBegin(1)
+    if tf in ("3M",):
+        return index + pd.offsets.QuarterBegin(1, startingMonth=1)
+    step = {"15m": "15min", "1H": "1h", "4H": "4h", "1D": "1D", "1W": "7D"}[tf]
+    return index + pd.Timedelta(step)
+
+
+def exploration_closed(df: pd.DataFrame, tf: str) -> pd.DataFrame:
+    """Keep only candles that CLOSE at or before the end of the freeze day (every price they
+    contain is pre-freeze). Stricter than exploration_only; used by research.v5_data."""
+    return df[candle_close_times(df.index, tf) <= FREEZE + pd.Timedelta(seconds=1)]

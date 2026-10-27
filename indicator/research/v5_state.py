@@ -23,15 +23,19 @@ State definitions (fixed a priori, not tuned; the cut points are conventional va
 * strength: chart ADX(14): weak < 20 <= moderate < 30 <= strong. Independent of direction.
 * vol_regime: percentile of chart ATR%(14) = ATR/close against its previous 200 values:
   low < 33.3 <= mid < 66.7 <= high. Independent of direction and strength.
-* extension_atr: (chart close - HTF1 EMA21 of the last completed HTF1 candle) / chart ATR14;
+* extension_atr: (chart close - EMA21 of the last completed HTF1 candle) / chart ATR14, where the
+  HTF1 closes are taken FROM THE CHART FEED (the last chart close inside each HTF1 period). Mixing
+  feeds biased this on dividend-adjusted daily vs hourly Yahoo data (audit finding A2);
   ext_bucket: <= -3 "far_below", (-3,-1] "below", (-1,1) "near", [1,3) "above", >= 3 "far_above".
 * warm: True only when every input above is defined. Any state field is "unknown" (or NaN) when
   its inputs are not available: HTF1 trend undefined, fewer than 200 prior ATR% values, ADX/ATR
   warm-up, or a candle with missing OHLC.
 
 Missing candles: indicators run over the candles that exist, as TradingView does (no synthetic
-filling). gap_steps reports the calendar gap before each candle in units of the median candle
-spacing minus 1 (0 = no gap), for diagnostics; it does not change any state. A candle with NaN
+filling). gap_steps reports the calendar gap before each candle in units of the median of the
+PREVIOUS spacings minus 1 (0 = no gap; causal), for diagnostics; it does not change any state.
+decided_at is timestamp metadata only (the next candle's open, capped at open + median spacing),
+not an input to any computation. A candle with NaN
 OHLC is "unknown" and its NaN propagates through the recursive indicators until they re-warm.
 """
 
@@ -47,6 +51,21 @@ from hcmtf.engine import _bar_close_times, percentrank
 from hcmtf.htf import align, trend_state
 
 UNKNOWN = "unknown"
+
+
+def _htf_close_from_chart(chart_index: pd.DatetimeIndex, c: np.ndarray, htf_index: pd.DatetimeIndex) -> np.ndarray:
+    """Close of each HTF period as seen in the CHART feed: the last chart close whose candle opens
+    before the next HTF period starts (NaN if the period has no chart candle). Only used through
+    align(), which reads the PREVIOUS (completed) HTF period, so it never reads the future."""
+    if len(htf_index) == 0:
+        return np.full(0, np.nan)
+    nxt = htf_index[1:].append(pd.DatetimeIndex([htf_index[-1] + pd.Timedelta(days=36500)]))
+    pos = chart_index.searchsorted(nxt, side="left") - 1
+    start = chart_index.searchsorted(htf_index, side="left")
+    out = np.full(len(htf_index), np.nan)
+    ok = (pos >= 0) & (pos >= start)
+    out[ok] = c[pos[ok]]
+    return out
 
 
 @dataclass(frozen=True)
@@ -86,7 +105,7 @@ def classify(df: pd.DataFrame, htf1: pd.DataFrame, htf2: pd.DataFrame | None,
     t1 = align(df.index, htf1.index, trend_state(htf1, cfg.ema_len))
     t2 = (align(df.index, htf2.index, trend_state(htf2, cfg.ema_len)) if htf2 is not None
           else np.full(len(df), np.nan))
-    ema1 = align(df.index, htf1.index, ta.ema(htf1["close"].to_numpy(float), cfg.ema_len))
+    ema1 = align(df.index, htf1.index, ta.ema(_htf_close_from_chart(df.index, c, htf1.index), cfg.ema_len))
     direction = _direction(t1, t2)
     with np.errstate(divide="ignore", invalid="ignore"):
         ext = (c - ema1) / atr
@@ -115,8 +134,13 @@ def classify(df: pd.DataFrame, htf1: pd.DataFrame, htf2: pd.DataFrame | None,
     for arr in (direction, adx, vol_pct, ext, atr):
         arr[bad] = np.nan
 
-    step = pd.Series(df.index[1:] - df.index[:-1]).median() if len(df) > 1 else pd.Timedelta(0)
-    gaps = np.r_[0.0, ((df.index[1:] - df.index[:-1]) / step).to_numpy(float) - 1.0] if len(df) > 1 else np.zeros(len(df))
+    gaps = np.zeros(len(df))
+    if len(df) > 2:
+        sp = pd.Series((df.index[1:] - df.index[:-1]).total_seconds().to_numpy(float))
+        prior = sp.expanding().median().shift(1).to_numpy()          # median of PREVIOUS spacings only
+        with np.errstate(invalid="ignore", divide="ignore"):
+            g = sp.to_numpy() / prior - 1.0
+        gaps[1:] = np.nan_to_num(g, nan=0.0)
     warm = (dlabel != UNKNOWN) & (strength != UNKNOWN) & (vol_regime != UNKNOWN) & (ext_bucket != UNKNOWN)
     return pd.DataFrame({
         "decided_at": _bar_close_times(df.index), "t1": t1, "t2": t2, "direction": direction, "direction_label": dlabel,

@@ -33,9 +33,11 @@ import pandas as pd
 
 from .v41 import CLUSTER_MONTHS, boot_excess, cluster_id, weights
 from .v5_costs import holding_cost, round_trip
-from .v5_data import ReservedDataError
+from hcmtf import ta
+
+from .v5_data import ReservedDataError, check_symbol
 from .v5_labels import BOTTOM_PARAMS, TOP_PARAMS, major_bottoms, major_tops, remaining_fraction
-from .v5_reserve import FREEZE
+from .v5_reserve import FREEZE, candle_close_times
 
 REPS = 5000
 SEED = 20261027
@@ -47,13 +49,13 @@ class MatchingError(ValueError):
     pass
 
 
-def check_partition(index: pd.DatetimeIndex, partition: str = "exploration") -> None:
-    """Exploration only until a confirmatory loader exists (protocol G2): any candle after FREEZE,
-    or any other partition name, raises."""
+def check_partition(index: pd.DatetimeIndex, tf: str, partition: str = "exploration") -> None:
+    """Exploration only until a confirmatory loader exists (protocol G2): any candle that CLOSES
+    after the freeze day, or any other partition name, raises."""
     if partition != "exploration":
         raise ReservedDataError(f"partition {partition!r} is not available before a G2 pre-registration")
-    if len(index) and index.max() > FREEZE:
-        raise ReservedDataError("candles after the freeze reached an exploratory evaluation")
+    if len(index) and candle_close_times(index, tf).max() > FREEZE + pd.Timedelta(seconds=1):
+        raise ReservedDataError("candles closing after the freeze reached an exploratory evaluation")
 
 
 # ----------------------------------------------------------------------------- candle tables
@@ -63,14 +65,17 @@ def candle_table(sym: str, index: pd.DatetimeIndex, tf: str, horizon: int, causa
 
     causal: column -> array known at the candle's close (state labels, buckets ...)
     outcomes: column -> array of forward outcomes (used only as values, never for matching)
-    t_end is the open time of candle i+horizon (the end of the outcome window).
+    t_end is the CLOSE time of candle i+horizon, i.e. the open of candle i+horizon+1 (when an
+    outcome measured to the close of candle i+horizon is known). Units whose outcome would end
+    past the data get t_end = int64 max.
     """
-    check_partition(index)
+    check_symbol(sym)
+    check_partition(index, tf)
     n = len(index)
     t = index.as_unit("ns").asi8
     t_end = np.full(n, np.iinfo(np.int64).max)
-    if horizon < n:
-        t_end[: n - horizon] = t[horizon:]
+    if horizon + 1 < n:
+        t_end[: n - horizon - 1] = t[horizon + 1:]
     df = pd.DataFrame({"sym": sym, "i": np.arange(n), "t": t, "t_end": t_end, "cl": cluster_id(index, tf)})
     for k, v in causal.items():
         if OUTCOME_NAME.match(k):
@@ -121,16 +126,18 @@ def units_from(candles: pd.DataFrame, rows: pd.DataFrame, keys) -> pd.DataFrame:
 
 def overlap(units: pd.DataFrame, horizon: int) -> dict:
     """Share of units whose outcome window overlaps the next unit of the same instrument, and the
-    greedy count of non-overlapping units (an effective sample size)."""
+    greedy count of non-overlapping units (an effective sample size).
+
+    A unit at i uses candles i+1 .. i+horizon, so units at i and j > i overlap iff j - i < horizon."""
     if len(units) == 0:
         return {"overlap_share": None, "effective_n": 0}
     ov = eff = 0
     for _, g in units.groupby("sym"):
         i = np.sort(g["i"].to_numpy())
-        ov += int(np.sum(np.diff(i) <= horizon))
+        ov += int(np.sum(np.diff(i) < horizon))
         last = -10**12
         for x in i:
-            if x > last + horizon:
+            if x >= last + horizon:
                 eff += 1
                 last = x
     return {"overlap_share": ov / len(units), "effective_n": int(eff)}
@@ -150,9 +157,14 @@ def excess(units: pd.DataFrame, bench: pd.DataFrame, value: str, horizon: int, w
     window = (start_ns, end_ns) of the evaluation period, for the purged chronological spans.
     """
     u = units[units[value].notna()].copy()
+    n_with_value = len(u)
+    # units whose (instrument, stratum) has no benchmark at all cannot be scored: drop them up front
+    # so that n, means, medians and dependence statistics all describe the same scored units
+    have = set(zip(bench["sym"].astype(str), bench["st"].astype(str)))
+    u = u[[(a, b) in have for a, b in zip(u["sym"].astype(str), u["_st"].astype(str))]]
     n = len(u)
-    out = {"n": int(n), "instruments": int(u["sym"].nunique()) if n else 0,
-           "clusters": int(u["cl"].nunique()) if n else 0}
+    out = {"n": int(n), "units_without_benchmark": int(n_with_value - n),
+           "instruments": int(u["sym"].nunique()) if n else 0, "clusters": int(u["cl"].nunique()) if n else 0}
     out.update(overlap(u, horizon))
     if n == 0:
         out["evaluable"] = False
@@ -186,7 +198,7 @@ def excess(units: pd.DataFrame, bench: pd.DataFrame, value: str, horizon: int, w
         "p_one_sided": float((1 + np.sum(reps_ <= 0)) / (len(reps_) + 1)),
         "median_excess": float(np.median(pu)) if len(pu) else None,
         "mean_excess_ex_top1": float(srt[:-k1].mean()) if len(srt) > k1 else None,
-        "units_without_benchmark": int((~ok).sum()),
+        "units_dropped_in_point_estimate": int((~ok).sum()),
         "spans": spans, "spans_positive": int(sum(1 for s in spans if s["mean_excess"] is not None and s["mean_excess"] > 0)),
         "leave_one_instrument_out": [min(loo), max(loo)] if loo else None,
         "largest_instrument": str(per_sym["sum"].abs().idxmax()),
@@ -194,6 +206,68 @@ def excess(units: pd.DataFrame, bench: pd.DataFrame, value: str, horizon: int, w
         "evaluable": bool(n >= MIN_UNITS and out["instruments"] >= MIN_INSTRUMENTS and out["clusters"] >= MIN_CLUSTERS),
     })
     out["_reps"] = reps_
+    return out
+
+
+def causal_benchmark(candles: pd.DataFrame, value: str, keys, horizon: int, min_history: int) -> np.ndarray:
+    """CAUSAL per-candle benchmark (audit finding C1): for candle i, the mean of `value` over
+    earlier candles j of the same instrument and stratum whose outcome is already KNOWN at i's
+    close, i.e. j + horizon <= i. NaN until at least `min_history` such outcomes exist.
+
+    Unlike bench_table (a whole-window, ex-post average), this uses no information from after the
+    decision time, so excess over it is what a trader could have known. It is noisier early on
+    and changes the question from "better than a random entry in this state over the period" to
+    "better than the state's track record so far"; report both, decide by the pre-registration.
+    """
+    st = stratum(candles, keys).to_numpy()
+    out = np.full(len(candles), np.nan)
+    x_all = candles[value].to_numpy(float)
+    for sym, g in candles.groupby("sym", sort=False).groups.items():
+        rows = np.asarray(g)
+        order = rows[np.argsort(candles["i"].to_numpy()[rows], kind="stable")]
+        i_idx = candles["i"].to_numpy()[order]
+        if np.any(np.diff(i_idx) != 1):
+            raise ValueError(f"{sym}: candle table must hold consecutive candles for a causal benchmark")
+        x = x_all[order]
+        s_ = st[order]
+        for s in np.unique(s_):
+            m = (s_ == s) & ~np.isnan(x)
+            cs = np.r_[0.0, np.cumsum(np.where(m, x, 0.0))]
+            cn = np.r_[0.0, np.cumsum(m.astype(float))]
+            k = np.arange(len(x)) - horizon + 1          # outcomes of candles 0 .. i-horizon are known
+            k = np.clip(k, 0, len(x))
+            with np.errstate(invalid="ignore", divide="ignore"):
+                b = cs[k] / cn[k]
+            b[cn[k] < min_history] = np.nan
+            sel = s_ == s
+            out[order[sel]] = b[sel]
+    return out
+
+
+def excess_causal(units: pd.DataFrame, value: str, bench_col: str, horizon: int, window: tuple[int, int],
+                  reps: int = REPS, seed: int = SEED) -> dict:
+    """Mean excess over a causal (past-only) per-unit benchmark column, with a calendar-block
+    cluster bootstrap of the per-unit excess (the benchmark depends only on the past, so it is
+    held fixed within replicates)."""
+    u = units[units[value].notna() & units[bench_col].notna()]
+    out = {"n": int(len(u)), "units_without_causal_benchmark": int(units[value].notna().sum() - len(u)),
+           "instruments": int(u["sym"].nunique()), "clusters": int(u["cl"].nunique())}
+    out.update(overlap(u, horizon))
+    if len(u) == 0:
+        out["evaluable"] = False
+        return out
+    e = (u[value] - u[bench_col]).to_numpy(float)
+    cl = u["cl"].to_numpy()
+    m, lo, hi = _ratio_ci(e, np.ones(len(e)), cl, reps, seed)
+    uu, inv = np.unique(cl, return_inverse=True)
+    sums = np.bincount(inv, weights=e, minlength=len(uu))
+    cnt = np.bincount(inv, minlength=len(uu)).astype(float)
+    W = weights(uu, reps, seed)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        b = (W @ sums) / (W @ cnt)
+    out.update({"mean_excess": m, "lo": lo, "hi": hi, "median_excess": float(np.median(e)),
+                "p_one_sided": float((1 + np.sum(b <= 0)) / (len(b) + 1)),
+                "evaluable": bool(len(u) >= MIN_UNITS and out["instruments"] >= MIN_INSTRUMENTS and out["clusters"] >= MIN_CLUSTERS)})
     return out
 
 
@@ -277,15 +351,20 @@ def match_alerts(alerts, events, kind: str, K: int, W: int) -> tuple[list[tuple[
     return pairs, status
 
 
-def score_instrument(h, l, c, atr, alerts, family: str, kind: str, tf: str, index: pd.DatetimeIndex) -> dict:
+def score_instrument(sym: str, h, l, c, alerts, family: str, kind: str, tf: str, index: pd.DatetimeIndex) -> dict:
     """Detection metrics for one instrument against the frozen labels (register §2.2).
 
     Censoring: labels need L candles before and max(L, F) after; events outside
     [L, n-1-max(L,F)] are censored (excluded from recall). An alert is scorable only if its whole
     eligible range lies inside that region; others are censored (excluded from precision).
     Alerts are de-duplicated by candle index first (one candle = one alert).
+    ATR14 is computed here (Pine-exact, hcmtf.ta) so labels always use the frozen definition;
+    a caller cannot substitute another volatility measure (audit finding B2).
     """
-    check_partition(index)
+    check_symbol(sym)
+    check_partition(index, tf)
+    h, l, c = (np.asarray(x, float) for x in (h, l, c))
+    atr = ta.atr(h, l, c, 14)
     if family not in ("top", "bottom"):
         raise ValueError(family)
     p = (TOP_PARAMS if family == "top" else BOTTOM_PARAMS)[tf]
@@ -442,12 +521,31 @@ def detection_report(per_instrument: dict, times: dict, tf: str, kind: str, reps
 
 # ----------------------------------------------------------------------------- trading metrics
 
+def _close_time(index, k: int):
+    """Close time of candle k: the next candle's open, capped at open + the median spacing of the
+    PREVIOUS candles (so an overnight/weekend gap is not counted as holding time)."""
+    if k + 1 < len(index):
+        nxt = index[k + 1]
+    else:
+        nxt = None
+    prev = index[max(0, k - 50):k + 1]
+    step = pd.Series(prev[1:] - prev[:-1]).median() if len(prev) > 1 else pd.Timedelta(0)
+    cap = index[k] + step
+    return cap if nxt is None else min(nxt, cap)
+
+
 def trade(o, h, l, c, index, i: int, side: int, hold: int, stop: float | None, asset_cls: str,
           funding: pd.DataFrame | None = None) -> dict | None:
     """One trade for a signal known at the close of candle i: entry at open[i+1]; stop (gap
     fills at the open, intrabar touch fills at the stop); otherwise exit at the close of candle
     i+hold. Returns gross and net returns as fractions of notional, with cost sources. None if
-    the data end before the exit."""
+    the data end before the exit.
+
+    Holding time runs from the entry open to the exit: the open of the gap candle for a gap stop,
+    otherwise the CLOSE of the exit candle (not the next candle's open, which would add overnight
+    and weekend time; audit finding E2). An intrabar stop is charged to the candle close
+    (conservative). If a holding cost is unavailable (FX carry) net is NaN and cost_complete is
+    False: it is never silently zero."""
     e = i + 1
     x_last = i + hold
     if x_last >= len(c) or e >= len(c):
@@ -464,16 +562,31 @@ def trade(o, h, l, c, index, i: int, side: int, hold: int, stop: float | None, a
                 break
     gross = side * (exit_px / px - 1.0)
     rt = round_trip(asset_cls)
-    exit_time = index[x] if reason == "stop_gap" else (index[x + 1] if x + 1 < len(index) else index[x])
+    exit_time = index[x] if reason == "stop_gap" else _close_time(index, x)
     hc, src = holding_cost(side, asset_cls, index[e], exit_time, funding)
     return {"entry_i": e, "exit_i": x, "side": side, "reason": reason, "gross": gross, "round_trip": rt,
-            "holding_cost": hc, "holding_cost_source": src, "net": gross - rt - hc}
+            "holding_cost": hc, "holding_cost_source": src, "cost_complete": bool(np.isfinite(hc)),
+            "net": gross - rt - hc}
 
 
-def sequential_daily(o, c, index, trades: list[dict]) -> pd.Series:
+def cost_sources(trades: list[dict]) -> dict:
+    """Count of trades per holding-cost source, and how many have an unavailable cost."""
+    out: dict = {}
+    for t in trades:
+        out[t["holding_cost_source"]] = out.get(t["holding_cost_source"], 0) + 1
+    out["incomplete"] = sum(1 for t in trades if not t["cost_complete"])
+    return out
+
+
+def sequential_daily(o, c, index, trades: list[dict], unavailable_cost_as_zero: bool = False) -> pd.Series:
     """Daily log returns of one instrument trading its trades one at a time (overlapping signals
     are skipped), marked to market close-to-close, costs charged at entry (round trip /2) and exit
-    (round trip /2 + holding cost)."""
+    (round trip /2 + holding cost).
+
+    A trade with an unavailable holding cost raises unless unavailable_cost_as_zero=True is passed
+    explicitly (the report must then state it)."""
+    if not unavailable_cost_as_zero and any(not t.get("cost_complete", True) for t in trades):
+        raise ValueError("trades with unavailable holding costs; pass unavailable_cost_as_zero=True explicitly")
     r = np.zeros(len(c))
     busy_until = -1
     for t in sorted(trades, key=lambda z: z["entry_i"]):
@@ -489,7 +602,7 @@ def sequential_daily(o, c, index, trades: list[dict]) -> pd.Series:
                 r[e + 1:x] += d * (c[e + 1:x] / c[e:x - 1] - 1)
             r[x] += d * (exit_px / c[x - 1] - 1)
         r[e] -= t["round_trip"] / 2
-        r[x] -= t["round_trip"] / 2 + t["holding_cost"]
+        r[x] -= t["round_trip"] / 2 + (t["holding_cost"] if np.isfinite(t["holding_cost"]) else 0.0)
         busy_until = x
     s = pd.Series(np.log1p(np.maximum(r, -0.9999)), index=index)
     return s.groupby(s.index.normalize()).sum()

@@ -174,6 +174,19 @@ A, B, C and D can run in parallel after E0. None waits for another, and none is 
 
   Both are open.
 
+* **2026-10-27: adversarial audit of E0** ([`V5_INDEPENDENT_AUDIT.md`](V5_INDEPENDENT_AUDIT.md)).
+  * Found 1 critical defect (weekly/monthly candles absorbing post-freeze prices), 4 high, 7
+    medium and 3 low. All fixed with regression tests (`tests/test_v5_audit.py`); 16 of 18 fail on
+    the pre-fix code, the other 2 are protection checks. Full suite 93 passed.
+  * Frozen labels, V4.1 files and production code unchanged.
+  * **Decision: NO-GO for the first family-C evaluation.** Five blockers remain open:
+    * B1 review by someone other than the author;
+    * B2 matched-frequency baseline generators;
+    * B3 FX daily-boundary handling;
+    * B4 exploration data manifest;
+    * B5 committed C exploration configuration.
+  * A protocol amendment on small-cluster inference (S1) is required before any G3.
+
 ## 9. Next executable task (original wording, kept for the record)
 
 *Done 2026-10-27 (see §8).* Build **E0**: `research/v5_state.py` and `research/v5_eval.py`. They need:
@@ -194,7 +207,7 @@ Its tests must cover:
 No detector is evaluated in that task. The first evaluation, family C on 1H/4H exploration data,
 starts only after E0 is merged and the trial ledger exists.
 
-## 10. Next executable task (current)
+## 10. Next executable task (superseded by the audit; kept for the record)
 
 1. **Independent review** of the E0 modules against `V5_INFRASTRUCTURE_REPORT.md`, with every
    finding fixed and logged.
@@ -204,3 +217,9 @@ starts only after E0 is merged and the trial ledger exists.
    * the metrics requested from `research.v5_eval`;
    * ledger trial ids.
 3. Only then run the first exploratory family-C trial through `research.v5_ledger.record`.
+
+## 11. Next executable task (current, after the audit)
+
+* Close audit blockers B1–B5 (`V5_INDEPENDENT_AUDIT.md` §5) without computing any detector output.
+* Then, and only then, record the first exploratory family-C trial through
+  `research.v5_ledger.record`.

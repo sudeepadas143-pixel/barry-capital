@@ -14,8 +14,8 @@ cost; this is stated, not measured):
   conservative 10% a year accrued as above (source = "estimated_crypto_10pct").
   "Covers" means: first funding print <= entry, last print >= exit - 9h, and no gap between
   consecutive prints within (entry - 9h, exit] longer than 2 days.
-* FX: carry is not modelled: cost 0 with source = "unavailable_fx_carry" so it cannot be mistaken
-  for an observed zero.
+* FX: carry is not modelled: cost NaN with source = "unavailable_fx_carry". It is never returned
+  as 0 (audit finding E1); a caller must decide explicitly what to do with an unavailable cost.
 
 All costs are fractions of notional (0.01 = 1%). Every trade carries its source label, so
 estimated and observed costs stay distinguishable in every report.
@@ -73,7 +73,7 @@ def short_holding_cost(asset_cls: str, entry: pd.Timestamp, exit_: pd.Timestamp,
             return float(-np.sum(paid)), "observed_funding"
         return CRYPTO_SHORT_FALLBACK_ANNUAL * yrs, "estimated_crypto_10pct"
     if asset_cls == "fx":
-        return 0.0, "unavailable_fx_carry"
+        return float("nan"), "unavailable_fx_carry"
     raise ValueError(f"no cost rule for class {asset_cls!r}")
 
 

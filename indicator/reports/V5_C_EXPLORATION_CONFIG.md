@@ -1,9 +1,14 @@
 # V5 family C (major tops): first exploration configuration, 1H/4H
 
-**Status: DRAFT, NOT FROZEN.** It becomes frozen only after the external review (audit blocker B1)
-approves it, by changing this line to the exact frozen-status string `research/v5_gate.py` checks
-for, in its own commit. Until then `research.v5_gate.require_c_ready()` refuses every family-C
-evaluation.
+**Status: FROZEN** (2026-10-27).
+
+* **Frozen in a commit of its own**, after the self-audit (`V5_SELF_AUDIT.md`) and before any
+  detector code was written or any detector outcome computed.
+* **Review status.** External review is UNAVAILABLE (`V5_REVIEW_WAIVER.md`). This configuration
+  therefore runs in mode `self_audited_exploration_only`, and its results can support no G2/G3
+  step until an independent review exists.
+* **No changes after freezing.** Nothing in this file may change once any outcome is computed.
+  A defect found afterwards needs a logged amendment and a re-run of every trial under new ids.
 
 * **Drafted from** the register, the protocol, the audit and first principles. No detector output
   has been computed. The only data-derived information seen is:
@@ -185,3 +190,78 @@ without a new version.
 3. `research.v5_manifest.verify()` reports no differences.
 4. Ledger: append, then commit; `verify_against_git` passes.
 5. Disclosures stay as written: exploratory data, prior related results seen, label counts seen.
+
+## 11. Freezing clarifications
+
+These were resolved before freezing (self-audit SA2) and are binding. Every detail the draft left
+implicit is fixed here.
+
+* **F1 (C1b percentile).**
+  * pct_i = 100 · #{j ∈ [i−500, i−1] : ext[j] ≤ ext[i]} / 500, where ext = `extension_atr`. This
+    is `hcmtf.engine.percentrank`, defined only when all 500 previous values are defined.
+  * Fire when (bull and pct_i ≥ 95) holds at i and does not hold at i−1.
+* **F2 (C2 divergence).**
+  * Pivots: `hcmtf.ta.pivots(high, low, 5, 3)`. A pivot high at p is known at i = p + 3.
+  * p₀ is the latest earlier pivot high (p₀ < p). If p − p₀ > 100 there is no comparison and no
+    alert.
+  * RSI is `hcmtf.ta.rsi(close, 14)`, read at p and p₀.
+  * Fire at i when high[p] > high[p₀], RSI[p] < RSI[p₀] and `direction_label[i]` ∈ {bull, neutral}.
+* **F3 (C3 failed breakout).**
+  * S is the price of each confirmed pivot high (`ta.pivots` 5/3). A level can be broken once:
+    the first candle b after S is known with close[b] > S is its breakout.
+  * Fire at the first i ∈ [b+1, b+5] with close[i] < S.
+  * Several pending breakouts are tracked independently; one alert per candle.
+  * No state condition.
+  * The same alert set is scored as warning (trial `…-W-…`) and as confirmation (trial `…-C-…`).
+* **F4 (C4).** `vol_pct` is the `v5_state` ATR%-percentile against the previous 200 candles.
+  Fire when ext[i−1] ≥ 1, close[i] < open[i] and vol_pct[i] − vol_pct[i−5] ≥ 33.3. NaN gives no
+  alert.
+* **F5 (C5a / C5b).**
+  * Change of character: `hcmtf.engine.breaks(engine.features(Ctx(df, htf1, htf2, None,
+    asset.volume, is_crypto)), DEFAULTS[tf])` rows with dir = −1, choch = True, warm = True;
+    `direction_label[i]` ∈ {bull, neutral}.
+  * C5a additionally needs an eligible C1a, C1b, C2, C3 or C4 alert at some j ∈ [i−50, i−1].
+* **F6 (eligibility and window).**
+  * Every detector **and every baseline** alert is kept only on candles with `state.warm` True,
+    and only with candle open time ≥ 2020-01-01.
+  * Labels and scoring use `v5_eval.score_alerts(…, start_i)` with start_i = the first candle at
+    or after 2020-01-01 (non-crypto data begins 2023-11-28 anyway).
+* **F7 (groups).** crypto; equities; commodities; rates (the 8 bond ETFs); pooled = all 96.
+* **F8 (evaluable).** A cell decides only if all three hold:
+  * `detection_report.evaluable` (≥ 30 scorable events, ≥ 3 instruments, ≥ 8 event clusters);
+  * ≥ 30 lift units;
+  * G ≥ 10 lift-unit clusters.
+
+  Other cells are reported only.
+* **F9 (lift test).**
+  * Units: `v5_eval.lift_units(…, state = direction_label, warm = state.warm, start_i)`.
+  * Per-unit excess goes to `v5_inference.cluster_mean_test` (one-sided greater; clusters =
+    calendar blocks of the alert candle; 9,999 replicates; seed 20261027).
+  * lift = mean(near) / mean(bench).
+  * Secondary: percentile cluster bootstrap of the mean excess (`v5_eval._ratio_ci`, 5,000
+    replicates).
+* **F10 (trading, confirmations only).**
+  * `v5_eval.trade(o, h, l, c, index, i, side=−1, hold=2H, stop=max(high[i−19..i]), asset_cls,
+    funding=v5_data.load_funding(sym))`; mean and median net with cost sources.
+  * r_h = the register outcome at H (short; `hcmtf.evaluate.bar_outcomes`, round-trip costs
+    only).
+  * Excess over `v5_eval.causal_benchmark` (warm candles, stratum `direction_label`, horizon H,
+    `min_history` 200) through `cluster_mean_test` is primary. The whole-window benchmark
+    (`v5_eval.excess`) is secondary.
+* **F11 (baselines).**
+  * For each confirmation trial and TF, each baseline (after F6 eligibility) is thinned to that
+    detector's eligible alerts per (instrument, calendar block). 50 replicates, seed 20261027.
+  * Replicate means of recall, strict precision, precision excluding duplicates, false alarms
+    per 100 candles, median lead and median move remaining, each with its 2.5–97.5% range.
+  * Unthinned baselines are scored as confirmations in trials `c-x1-baselines-<TF>`.
+* **F12 (selection).** §8 applied per TF; "best eligible TF" = the TF with the highest score.
+* **F13 (Holm).** `hcmtf.metrics.holm` over the `p_wild` of all evaluable non-pooled cells.
+  Reported, not used for selection.
+* **F14 (ledger).**
+  * The 18 trials of §7, each recorded **before** its computation (`outcomes_accessed = True`).
+    The ledger is committed after each trial.
+  * `data_files` = the 1h and 1d cache files of the 96 instruments.
+  * `code_files` = `research/v5_detect_c.py`, `v5_eval.py`, `v5_baselines.py`, `v5_state.py`,
+    `v5_data.py`, `v5_inference.py`, `v5_costs.py` and the runner script.
+* **F15 (outputs).** `reports/v5_c_x1_results.json` and `reports/V5_C_EXPLORATION_RESULTS.md`,
+  reporting every variant and every baseline, whatever the outcome.

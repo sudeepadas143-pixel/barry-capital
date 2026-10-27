@@ -77,7 +77,9 @@ reports/
    | **▼ BEARISH** (red arrow above the candle) | The same, downward. |
    | nothing | Neutral: no qualifying break, HTFs flat or conflicting, or a break against the HTFs. Most candles. |
 
-   Arrows sit outside the candle's wick (`yloc.belowbar` / `yloc.abovebar`) so they never cover price;
+   Arrows sit outside the candle's wick (`yloc.belowbar` / `yloc.abovebar`) so they never cover price.
+   The arrow carries the colour; the BULLISH/BEARISH text uses the chart's text colour (or the arrow
+   colour, selectable), so it reads well on light and dark themes;
    size is selectable (Small / Normal / Large). Hover an arrow for the level broken, both HTF trends,
    the LTF reading and this profile's out-of-sample record. *Also mark continuation breaks* (off by
    default) adds arrows for further breaks in the HTF direction, using the same two arrows. The

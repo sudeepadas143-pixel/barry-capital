@@ -93,6 +93,8 @@ onClose   = input.bool(true, "Signals on closed candles only", group = G4)
 showCont  = input.bool(false, "Also mark continuation breaks", group = G4,
      tooltip = "Off (default): arrows mark the high-conviction signals only (structure turning back into the higher-timeframe direction). On: further breaks in the HTF direction are marked too, with the same BULLISH/BEARISH arrows.")
 arrowSize = input.string("Normal", "Arrow size", options = ["Small", "Normal", "Large"], group = G4)
+textStyle = input.string("Chart text colour", "Label text", options = ["Chart text colour", "Same as arrow"], group = G4,
+     tooltip = "Chart text colour keeps BULLISH/BEARISH readable on light and dark themes, with the arrow carrying the colour.")
 showLvls  = input.bool(true, "Show unbroken swing levels", group = G4)
 showDash  = input.bool(true, "Show dashboard", group = G4)
 parity    = input.bool(false, "Parity export (plots codes for scripts/compare_tv_export.py)", group = G4)
@@ -335,7 +337,7 @@ if showSig
     label.new(bar_index, dir > 0 ? low : high, (prov ? "? " : "") + side, xloc = xloc.bar_index,
          yloc = dir > 0 ? yloc.belowbar : yloc.abovebar,
          style = dir > 0 ? label.style_arrowup : label.style_arrowdown,
-         color = prov ? color.new(c, 60) : c, textcolor = prov ? color.new(c, 40) : c,
+         color = prov ? color.new(c, 60) : c, textcolor = color.new(textStyle == "Same as arrow" ? c : chart.fg_color, prov ? 50 : 0),
          size = lblSize, text_formatting = text.format_bold, tooltip = tip)
     lastText := side
     lastSigBar := bar_index

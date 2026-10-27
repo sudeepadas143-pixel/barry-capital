@@ -1,9 +1,12 @@
 # V5 workstream M, stages A and B: crypto price-only reference and BTC-regime context (1H/4H)
 
-**Status: DRAFT** (2026-10-27). **Not frozen.**
-* No code for this configuration exists yet, and no outcome under it has been computed.
-* Open decisions are listed in §12. They must be resolved, and this file frozen in a commit of
-  its own, before any detector, runner or outcome code for workstream M is written.
+**Status: FROZEN** (2026-10-27).
+* Frozen in a commit of its own, with decisions D1–D6 at their defaults (owner's instruction,
+  2026-10-27; D2 clarified in §7).
+* No code for this configuration existed, and no outcome under it had been computed, when it was
+  frozen.
+* Nothing in this file may change once any outcome is computed. A defect found later needs a
+  logged amendment, a new configuration version and new trial ids.
 
 **Basis:**
 * [`V5_M_CRYPTO_CONTEXT_PROPOSAL.md`](V5_M_CRYPTO_CONTEXT_PROPOSAL.md), approved with the owner's
@@ -45,22 +48,37 @@ existing, already-tested HC-MTF code. Per the owner's priority, external integra
 ### 1.1 Point-in-time eligibility (objective; computed from data closed before the decision)
 
 A target candle i (UTC open time t) is **eligible** only if **every** condition below holds.
-"Completed UTC days" means days that ended at or before t (the candle's **open**). This is
-stricter than the close of candle i, so the same rule serves 1H and 4H.
+
+**Reference day.** D(t) = the UTC calendar date of t minus one day, i.e. the last UTC day that
+ended at or before t (the candle's **open**). The 30-day window is days D(t)−29 … D(t). This is
+stricter than the close of candle i, and the same rule serves 1H and 4H.
+
+**Daily quote volume** of a pair on a UTC day:
+* the sum over that day's cached 1H candles of `volume` × `close`;
+* `volume` is Binance base-asset volume, and USDT is taken as USD;
+* a missing 1H candle contributes 0;
+* a day with no 1H candle at all has quote volume 0.
 
 | id | rule | rationale |
 |---|---|---|
-| E1 history | the pair's first cached 1H candle is ≥ 365 days before t | warm-up; excludes listing-pump months |
-| E2 liquidity | the median, over the previous 30 **completed** UTC days, of daily quote volume ≥ **$5,000,000**. Daily quote volume = Σ over that day's 1H candles of volume × close; `volume` is Binance base volume, and USDT is taken as USD | absolute floor (decision D5) |
-| E3 relative liquidity | on the previous completed UTC day, the pair's 30-day median from E2 ranks **≤ 25** among the non-BTC pairs that have a value that day | point-in-time "large and liquid" without hindsight on today's survivors |
-| E4 completeness | ≥ 95% of the expected 1H candles are present in the previous 30 completed UTC days | exchange outages and gaps |
+| E1 history | the pair's first cached 1H candle (after `v5_data.load`) opens ≤ t − 365 days | warm-up; excludes listing-pump months |
+| E2 liquidity | median of the 30 daily quote volumes of days D(t)−29 … D(t) ≥ **$5,000,000**. Undefined, so the candle fails, if the pair's first cached 1H candle opens after day D(t)−29 begins | absolute floor (decision D5) |
+| E3 relative liquidity | the pair's E2 median ranks **≤ 25** (rank 1 = largest; ties broken by symbol name, ascending) among the **non-BTC** target pairs whose E2 median is defined for the same D(t). Rank uses E2 medians whether or not those pairs pass E1, E2 or E4. **Not applied to BTCUSDT** (stage A only) | point-in-time "large and liquid" without hindsight on today's survivors |
+| E4 completeness | ≥ 684 of the 720 expected 1H candles (95%) are present in days D(t)−29 … D(t) | exchange outages and gaps |
 | E5 integrity | the candle is before the pair's integrity cut (V4.1 Amendment 1, already applied by `v5_data.load`) | token swaps (LUNA) |
 | E6 warm | the target's `v5_state.classify(...)["warm"]` is True | as family C |
-| E7 BTC available | a BTCUSDT candle with **the same open time** exists, and its state is warm (`direction_label` and `vol_regime` known) | missing context is never "neutral" |
+| E7 BTC context available | a BTCUSDT candle of the same TF with **the same open time** exists in the loaded BTC frame, **and** its BTC state is warm (so `direction_label` ∈ {bull, bear, neutral} and `vol_regime` ∈ {low, mid, high}). Applies to non-BTC targets only | missing context is never "neutral" |
 
-**Failures are counted, not hidden.** A candle failing E7 is counted as **context-unavailable**,
-per trial, per TF and per pair, and excluded from both stages. It is never kept as neutral, and
-the count is reported.
+**Unavailable context is enforced, not just counted:**
+* A target candle failing E7 is **context-unavailable**.
+* It is excluded from Model A **and** Model B, so both are evaluated on the identical unit set.
+  It is never mapped to neutral, stable, or any gate value.
+* The number of Model-A signals lost to E7 is reported per pair, signal, side and TF, next to
+  the number lost to each of E1–E6. Exclusions are tallied in the order E5, E6, E1, E2, E3, E4,
+  E7; a candle is tallied under the first rule it fails.
+* The context module returns an explicit `available` flag. Gate values for unavailable candles
+  are stored as the string `"unavailable"`, so any gate comparison on them is False **and** they
+  are dropped before the comparison (tested).
 
 **Evaluation-only exclusion (applied identically to every signal set):** a signal whose outcome
 window i+1 … i+H spans more than 1.25 × H nominal candle durations (a data gap or outage) is
@@ -91,11 +109,28 @@ open time t. Both candles close at the same instant, and the signal executes at 
 
 "Range" is `btc_dir == neutral`. No other BTC feature is used in stage B.
 
-**BTC episodes** (an evaluation unit, not a signal input):
-* An episode of a field is a maximal run of candles with a constant value.
-* A run shorter than H candles (§3) is merged into the preceding run. A leading short run merges
-  into the following one.
-* Episodes are computed per TF over the signal window.
+**Information set at the signal.** Both BTC fields are columns of `classify` on BTCUSDT and are
+known at the close of the BTC candle:
+* the HTF trend uses only HTF candles that were complete when the chart candle opened
+  (`hcmtf.htf.align`, Pine `[1]` with `lookahead_on`);
+* `vol_regime` compares the candle's own closed ATR% with the previous 200 values;
+* the BTC candle and the target candle close at the same instant, and the entry is the next
+  open.
+
+A forming or later BTC candle is never read.
+
+**BTC episodes** (an evaluation unit for clustering; never a signal input):
+* Built per TF and per field (`btc_dir` or `btc_unstable`) on the BTC candles that open inside
+  the signal window and have a warm BTC state, in time order. Unwarm BTC candles are skipped,
+  not treated as a value.
+* **Runs.** A run is a maximal sequence of consecutive such candles with the same value.
+* **Merging.** Runs are processed in time order:
+  * a run of fewer than H candles (§3) is appended to the preceding episode;
+  * if there is no preceding episode, it is prepended to the next run;
+  * an episode's **value** is the value of the run that opened it.
+* Every eligible signal gets the episode id of its BTC candle.
+* An episode **counts for a gate value** if its value satisfies the gate (for M-B4,
+  "≠ bull" / "≠ bear").
 
 Reported, per TF and per value:
 * the number of raw runs;
@@ -111,13 +146,20 @@ Reported, per TF and per value:
 | 4H | 30 | 60 |
 
 **Signal quality** (decision metrics for M-B1 to M-B3):
-* `rh`: side × (close[i+H] − open[i+1]) / ATR14[i], minus round trip and holding cost converted
-  to ATR14[i] units. This is register §2.1 "after costs", computed through `v5_eval.trade(...,
-  hold=H, stop=None)` net × open[i+1] / ATR14[i].
-* `rh_x`: `rh` minus the **causal** benchmark (`v5_eval.causal_benchmark`):
-  * stratum = (target `direction_label`, side);
-  * `min_history` 200;
-  * past-only.
+* `rh`, per side, for every candle i of the pair (register §2.1 "after costs"):
+  * `hcmtf.evaluate.bar_outcomes(…, H, 20 bp)["r_h"]`: side × (close[i+H] − open[i+1]) /
+    ATR14[i], minus the round trip × open[i+1] / ATR14[i];
+  * shorts only: minus the short holding cost × open[i+1] / ATR14[i]. The holding cost is
+    `v5_costs.short_holding_cost("crypto", entry = open time of i+1, exit = close time of i+H
+    as in `v5_eval._close_time`, funding)`. It may be computed vectorised, provided a test
+    shows it equals `v5_costs` on sampled candles.
+* `rh_x`: `rh` minus the **causal** benchmark `v5_eval.causal_benchmark(table, "rh",
+  ["direction_label"], H, 200)`, computed separately per side:
+  * the table holds every candle of the pair, with `rh` set to NaN on candles that are not warm;
+  * so the benchmark is the past-only mean over earlier warm candles of the same pair and own
+    state whose outcome was known at i;
+  * eligibility E1–E4/E7 is **not** applied to benchmark history (it describes the pair's own
+    track record).
 
   Units without a benchmark are counted and excluded.
 * Also reported, never decisive:
@@ -138,12 +180,14 @@ Reported, per TF and per value:
   * longs: stop = lowest low of i−19 … i;
   * shorts: stop = highest high of i−19 … i.
 * Net return as a fraction of notional.
+* Trade MAE = the worst price move against the position between entry and exit, as a fraction
+  of the entry price, from the candle highs/lows of entry … exit.
 * Per pair, the one-at-a-time book `v5_eval.sequential_daily`:
   * total log return;
-  * maximum drawdown;
+  * maximum drawdown of the cumulative log return;
   * worst trade;
   * MAE distribution (5/50/95%).
-* Reported per pair, per tier and pooled.
+* Reported per pair, per tier and pooled, for S, K and S∖K of every stage-B cell.
 
 ## 4. Model A: price-only signals (stage A; frozen list, no tuning)
 
@@ -191,19 +235,37 @@ candle.
 | M-B3 | 4 signals × 2 sides × 2 TF = 16 |
 | M-B4 | 2 sides × 2 TF = 4 |
 
-**Δ (primary contrast)** = mean metric over K − mean metric over S∖K, pooled over the eligible
-non-BTC pairs. Units are signals.
+**Unit set S of a cell** (identical for Model A and Model B). A Model-A signal on a non-BTC
+pair is in S only if all of these hold:
+* its candle opens in the signal window and passes E1–E7;
+* for M-B1–M-B3, `rh_x` is defined: full outcome window, no evaluation-only gap exclusion, and a
+  causal benchmark;
+* for M-B4, the alert is scorable under `lift_units`: warm, and its confirmation range inside
+  the scorable region with start index = first candle of the signal window.
+
+Each exclusion is counted. K = the units of S whose gate is true; S∖K = the rest.
+
+**Δ (primary contrast)** = mean metric over K − mean metric over S∖K, pooled over all units of
+S, so each signal weighs equally.
 
 **Three comparisons per cell.** All are reported, and the first two are decisive.
 
 1. **Context vs the same price-only signals.** Kept K vs removed S∖K (Δ), and K vs all of S.
-2. **Context vs matched removal (no BTC information).** 200 seeded replicates (seed 20261027)
-   of a random subset R ⊂ S. Within each (pair, own `direction_label`) stratum, R has exactly as
-   many signals as K. It uses only K's **total** count per stratum, never its timing.
-   * Count matching per calendar block is not used: it would copy the BTC gate's timing into the
-     control.
-   * Statistic: mean(K) vs the 2.5/50/97.5 percentiles of mean(R) over replicates.
-   * Matching is exact by construction (R ⊂ S, same counts). No shortfall can occur.
+2. **Context vs matched removal (no BTC information).** 200 seeded replicates (numpy
+   `default_rng(20261027)`) of a random subset R ⊂ S:
+   * Within each (pair, own `direction_label` at the signal) stratum, R draws, uniformly
+     without replacement, exactly as many units as K has in that stratum.
+   * The draw uses no timestamps and no BTC value; the only BTC-derived input is K's
+     **total count** per stratum, i.e. its pass rate.
+   * Count matching per calendar block is deliberately **not** used: it would copy the BTC
+     gate's timing into the control (§13).
+   * Statistic: mean(K) vs the 2.5/50/97.5 percentiles of mean(R) over replicates, where the
+     mean is pooled over units, as for Δ.
+   * Matching is exact by construction (R ⊂ S, same counts per stratum), so no shortfall can
+     occur.
+   * **Not a dependence-aware test.** The random subsets ignore time clustering. This check
+     only asks whether the gate does better than an equally selective, uninformed filter; the
+     dependence-aware evidence is the cluster test of §7.
 3. **Context vs existing simple baselines** (reported, not decisive; decision D3):
    * M-B1 to M-B3: `rh_x` of K vs each of the other three continuation signals, unthinned and
      gated by the same rule.
@@ -230,11 +292,12 @@ BTC regime is the same for every pair at a given time. Every test therefore uses
 clusters shared across pairs; the number of pairs never adds independent clusters.
 
 **Test** for Δ: a new `research.v5_inference.cluster_diff_test(x, kept, clusters)`.
-* OLS of x on [1, kept]. Δ is the coefficient.
-* CR1 standard error, t(G−1) 95% CI.
-* Wild cluster **restricted** bootstrap (Δ = 0 imposed): Rademacher if G ≥ 12, else Webb;
-  9,999 replicates; seed 20261027.
-* One-sided p for Δ > 0.
+* OLS of x on [1, kept]. Δ is the slope, which equals mean(K) − mean(S∖K).
+* CR1 standard error with factor G/(G−1), as `cluster_mean_test`; t(G−1) 95% CI.
+* Wild cluster **restricted** bootstrap: x* = x̄ + w_g (x − x̄), the null Δ = 0 imposed, with
+  one weight per cluster shared by every unit (every pair) in it. Rademacher if G ≥ 12, else
+  Webb; 9,999 replicates; seed 20261027.
+* One-sided p for Δ > 0: (1 + #{t* ≥ t}) / (reps + 1).
 * Valid only if G ≥ 10.
 
 It is run under **two** clusterings, and both are reported:
@@ -244,28 +307,42 @@ It is run under **two** clusterings, and both are reported:
 
 **Decisive p** = the larger of the two. G and the number of episodes are printed next to every p.
 
-**Per-pair results** (reported for every cell):
-* Δ, n(K) and n(S∖K) per pair;
-* the median of per-pair Δ over pairs with ≥ 20 signals in both K and S∖K;
-* the share of those pairs with Δ > 0;
-* an equal-pair-weight pooled Δ;
-* tier-level Δ (majors, altcoins).
+**Per-pair quantities** (exact definitions; reported for every cell):
+
+| quantity | definition |
+|---|---|
+| per-pair Δ_p | mean metric over K ∩ pair p − mean over (S∖K) ∩ pair p; defined if both are non-empty |
+| **qualifying pair** | a non-BTC pair with ≥ **20** units in K **and** ≥ **20** in S∖K, in this cell |
+| positive-pair share | #{qualifying pairs with Δ_p > 0} / #{qualifying pairs}. Δ_p = 0 counts as not positive |
+| median per-pair Δ | median of Δ_p over **qualifying** pairs |
+| equal-pair-weight Δ | unweighted mean of Δ_p over all pairs where Δ_p is defined |
+| altcoin-tier Δ | Δ pooled over the units of the 33 altcoin-tier pairs (all target pairs except ETHUSDT and SOLUSDT); defined only if both K and S∖K have altcoin units |
+| majors-tier Δ | the same over ETHUSDT and SOLUSDT; reported only |
 
 No per-pair p-values are used for any decision.
 
-**Multiple testing.**
-* Holm within each hypothesis, over its cells: M-B1 8, M-B2 8, M-B3 16, M-B4 4. This is the
-  decision (decision D2).
-* Holm across all 36 cells is reported as a sensitivity.
+**Multiple testing** (decision D2, clarified by the owner on 2026-10-27; both scopes fixed now):
+* **Primary decision.** Holm within each of the four hypotheses, over all of its cells (M-B1 8,
+  M-B2 8, M-B3 16, M-B4 4). A non-evaluable cell enters with p = 1, so the family size never
+  shrinks after seeing data.
+* **Stricter sensitivity.** Holm across all 36 cells, same p-values and the same p = 1 rule.
+  Every cell verdict is recomputed with this p in a separate column, along with the hypothesis
+  verdicts that would follow.
+* **No switching.** The primary verdicts are the only verdicts. The sensitivity column never
+  replaces them, whatever the results.
+* **Disclosure.** The results report must state, for every cell and hypothesis where the two
+  scopes disagree, that the primary (within-hypothesis) decision does not survive the stricter
+  all-cell correction.
 * Stage-A results carry no tests that feed a decision.
 
 ## 8. Evaluability (per cell)
 
 A cell is **evaluable** only if all of these hold:
-* ≥ 100 kept and ≥ 100 removed signals;
-* ≥ 10 pairs with at least one signal in each set;
-* G ≥ 10 under **both** clusterings;
-* ≥ 3 BTC episodes of the gate value **and** ≥ 3 of its complement containing eligible signals.
+* ≥ 100 units in K and ≥ 100 in S∖K;
+* ≥ 10 pairs with at least one unit in K and at least one in S∖K;
+* G ≥ 10 under **both** clusterings, counting clusters that contain ≥ 1 unit of S;
+* ≥ 3 BTC episodes (§2, the gate's field) whose value satisfies the gate **and** ≥ 3 whose
+  value does not, each containing ≥ 1 unit of S.
 
 A non-evaluable cell is reported as such and is neither "adds value" nor "no value".
 
@@ -274,10 +351,12 @@ A non-evaluable cell is reported as such and is neither "adds value" nor "no val
 **Per evaluable cell:**
 * **ADDS VALUE (exploratory)** if **all** of:
   1. pooled Δ > 0 **and** equal-pair-weight Δ > 0;
-  2. the median of per-pair Δ > 0, and Δ > 0 in ≥ 60% of the qualifying pairs (§7);
-  3. Holm-adjusted decisive p < 0.05 (§7);
-  4. mean(K) > the 97.5th percentile of the matched-removal replicates (§5, comparison 2);
-  5. altcoin-tier Δ > 0. Pooled results must not rest on ETH/SOL alone.
+  2. there are **≥ 8 qualifying pairs**, the median per-pair Δ over them is > 0, and the
+     positive-pair share is ≥ **0.60** (§7). With fewer than 8 qualifying pairs this
+     condition fails, so the cell cannot ADD VALUE, and the shortfall is reported;
+  3. Holm-adjusted decisive p < 0.05 (§7, within-hypothesis scope);
+  4. mean(K) > the 97.5th percentile of the matched-removal replicate means (§5, comparison 2);
+  5. altcoin-tier Δ is defined and > 0, so pooled results cannot rest on ETH/SOL alone.
 * **NO VALUE** if the t(G−1) 95% CI of Δ lies entirely ≤ 0 under either clustering, or the
   pooled Δ ≤ 0 **and** the equal-pair-weight Δ ≤ 0.
 * **INCONCLUSIVE** otherwise.
@@ -343,10 +422,9 @@ this run will be 28.
 | every post-freeze candle | **not read**. It is shared with the frozen V4.1 H6/H7v forward test (earliest 1H evaluation 2027-07-01). Using it to confirm an M result needs a separate protocol decision that leaves the V4.1 test unchanged |
 | family C config, results, ledger records; `v5_labels.py`; V4.1 protected files; Pine scripts | unchanged |
 
-## 12. Decisions before freezing
+## 12. Decisions (resolved at freezing: all defaults)
 
-Each decision has a recommended default. The file is frozen with the defaults unless the owner
-chooses otherwise.
+The owner chose the defaults for D1–D6 on 2026-10-27. D2 is clarified in §7.
 
 | id | decision | recommended default | alternative and trade-off |
 |---|---|---|---|
@@ -367,3 +445,52 @@ chooses otherwise.
 | `scripts/v5_m_explore.py` | **add**: runner, per-pair storage, report rendering |
 | `tests/test_v5_context.py`, `tests/test_v5_m_runner.py` | **add**: truncation, alignment, missing data, diff test size on synthetic null, synthetic end-to-end |
 | `reports/V5_HYPOTHESIS_REGISTER.md`, `reports/V5_VALIDATION_PROTOCOL.md` | Amendments sections only (workstream M) |
+
+## 13. Pre-freeze verification (2026-10-27, by reasoning over the specification and existing code; no data read)
+
+**1. Matched-removal control: no selection or timing leakage.**
+* R is a uniform random subset of S within (pair, own state), so its expected composition by pair
+  and own state equals K's. Any difference between K and R therefore comes from **which**
+  signals the BTC gate keeps.
+* The only BTC-derived input to R is K's count per stratum. R never sees timestamps, BTC values
+  or outcomes.
+* Calendar-block count matching (the family-C convention) was considered and rejected. If BTC
+  is bull for a whole block, K keeps every long in that block and the bear blocks contribute
+  none. A block-matched R would then select exactly the same blocks, absorbing the very
+  between-period effect being tested.
+* Own-state stratification stops a gate that merely re-expresses the pair's own trend (strongly
+  correlated with BTC's) from being credited as BTC information.
+* Residual limitation: the control is not time-cluster-aware, so it is a necessary condition
+  only (§5).
+
+**2. BTC regime and volatility use only information available at the signal.**
+* Both are `classify` columns on BTCUSDT, decided at the BTC candle's close (§2).
+* The BTC candle shares the target candle's open and close times, and entry is the next open.
+* Missing or unwarm BTC gives context-unavailable (E7), never a gate value.
+* The eligibility rules use only completed UTC days ending at or before the candle's open.
+* The trailing, possibly incomplete, 4H/1D candles at the cache end carry no outcome, because
+  their outcome windows run past the data end. They are excluded as `no_exit_in_data` and never
+  enter S.
+* Truncation tests on both the target and BTC frames are required (§10.1).
+
+**3. The bootstrap preserves temporal and cross-pair dependence.**
+* Clusters are time units shared by all pairs (calendar blocks; BTC episodes). Each wild weight
+  multiplies every unit of every pair in its cluster, so cross-pair co-movement within a period
+  is carried into the bootstrap distribution intact.
+* Serial dependence within a block or episode is preserved: blocks are ≥ 1 month and episodes ≥
+  H candles, against outcome windows of H candles.
+* Dependence across adjacent clusters is ignored, as stated in `v5_inference`.
+* Using the larger p of the two clusterings guards against an unlucky choice of cluster
+  boundary.
+* The number of pairs never enters G.
+
+**4. Rules made precise in this version:**
+* the reference day, the daily quote-volume formula and the rank tie-break (E2/E3, §1.1);
+* the E4 count (684 of 720);
+* the E7 definition and its mechanical enforcement (§1.1);
+* the unit set S, shared by Models A and B (§5);
+* episode construction and the value of a merged episode (§2);
+* qualifying pairs (≥ 20 units in each of K and S∖K), the minimum of 8 qualifying pairs, the
+  positive-pair share with Δ_p = 0 not positive, and the equal-pair-weight and tier definitions
+  (§7, §9);
+* Holm family sizes fixed, with p = 1 for non-evaluable cells (§7).

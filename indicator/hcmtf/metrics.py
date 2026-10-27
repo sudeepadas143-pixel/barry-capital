@@ -227,3 +227,24 @@ def component_lift(trig: pd.DataFrame, components: list[str]) -> pd.DataFrame:
         rows.append({"condition": k, "n_with": len(a), "mean_r_with": ma, "ci_with": f"[{la:+.2f}, {ha:+.2f}]",
                      "n_without": len(b), "mean_r_without": mb, "diff": ma - mb})
     return pd.DataFrame(rows)
+
+
+def boot_diff(a: pd.DataFrame, b: pd.DataFrame, reps: int = 1000, seed: int = 7):
+    """Difference of mean r_h (a - b) with a 90% month-cluster bootstrap interval."""
+    if len(a) < 20 or len(b) < 20:
+        return np.nan, np.nan, np.nan
+    allm = pd.concat([a.assign(g=1), b.assign(g=0)])
+    m = allm["time"].dt.tz_localize(None).dt.to_period("M").astype(str).to_numpy()
+    u, inv = np.unique(m, return_inverse=True)
+    x = allm["r_h"].to_numpy()
+    g = allm["g"].to_numpy()
+    sa = np.bincount(inv, weights=x * g, minlength=len(u))
+    na = np.bincount(inv, weights=g, minlength=len(u))
+    sb = np.bincount(inv, weights=x * (1 - g), minlength=len(u))
+    nb = np.bincount(inv, weights=1 - g, minlength=len(u))
+    rng = np.random.default_rng(seed)
+    pick = rng.integers(0, len(u), (reps, len(u)))
+    with np.errstate(invalid="ignore", divide="ignore"):
+        d = sa[pick].sum(1) / na[pick].sum(1) - sb[pick].sum(1) / nb[pick].sum(1)
+    lo, hi = np.nanpercentile(d, [5, 95])
+    return float(a["r_h"].mean() - b["r_h"].mean()), float(lo), float(hi)

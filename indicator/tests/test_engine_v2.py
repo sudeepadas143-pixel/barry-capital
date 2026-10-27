@@ -231,3 +231,12 @@ def test_acceptance_mode_never_changes_after_print():
         s_k = s_k[s_k["tier"] != "watch"]
         a = s_full[s_full["i"] <= k][["i", "dir", "tier"]].reset_index(drop=True)
         pd.testing.assert_frame_equal(a, s_k[["i", "dir", "tier"]].reset_index(drop=True), check_dtype=False)
+
+
+def test_strategy_twin_is_generated_from_the_indicator():
+    """The Strategy Tester twin must be exactly the generated version of the current indicator."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    import make_strategy_twin
+    twin = (Path(__file__).resolve().parent.parent / "pine" / "HighConvictionMTF_strategy.pine").read_text()
+    assert twin == make_strategy_twin.make(), "run scripts/make_strategy_twin.py"
+    assert twin.count("strategy(") == 1 and "alertcondition(" not in twin and "indicator(" not in twin

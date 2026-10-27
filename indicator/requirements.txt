@@ -3,5 +3,12 @@ pandas>=2.2
 yfinance>=0.2.50
 requests>=2.31
 pytest>=8
-pynescript>=0.2   # optional: Pine syntax check
-backtrader>=1.9.78   # optional: crosscheck/ only (GPL-3.0)
+matplotlib>=3.8      # previews only
+pynescript>=0.2      # optional: Pine syntax check
+# v3 validation (hcmtf/v3.py), installed from GitHub:
+#   pip install git+https://github.com/landtml/purgedcv git+https://github.com/landtml/finlab-ml
+#   pip install git+https://github.com/baronguyen001/pinescript-strategy-template   # pine-lint, Monte Carlo
+scipy>=1.10
+# independent cross-checks in crosscheck/ only, never imported by hcmtf:
+backtrader>=1.9.78   # GPL-3.0
+backtesting>=0.6     # AGPL-3.0

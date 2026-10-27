@@ -176,6 +176,28 @@ at Holm p < 0.05, beats unfiltered breaks, and the DEV record also beat random (
 
 ## Results
 
+### Latest: v3 (pre-registered, leakage-aware, deflated for repeated testing)
+
+[`reports/V3_SUMMARY.md`](reports/V3_SUMMARY.md) · pre-registration
+[`reports/PREREG_V3.md`](reports/PREREG_V3.md) · tables [`reports/V3_RESULTS.md`](reports/V3_RESULTS.md) ·
+independent trades [`reports/BACKTESTINGPY.md`](reports/BACKTESTINGPY.md).
+
+- **No timeframe × side × market cell of the shipped signal met the pre-registered bar.** Three
+  are PROMISING relative to random entries (1H bullish crypto, 4H bullish crypto, 4H bearish
+  crypto), but their deflated Sharpe ratios are ~0 once ~60 tried configurations are counted.
+- **The HTF gate is the one layer with fairly consistent incremental value.** Restricting to
+  realignments (MAJOR) and next-candle acceptance did not reliably improve on it; with event
+  weighting, purged CPCV most often prefers simply every structure break, and PBO is high in many
+  cells.
+- **Bearish:** intraday signals are balanced; daily/weekly lean bullish because the HTF filter
+  follows mostly rising markets. The counter-HTF bearish reversals it suppresses did worse than the
+  bearish signals it keeps, so loosening it would add mostly losing signals.
+- **Trades (backtesting.py, 5,279 trades, crypto/equities/commodities):** bullish profit factors
+  1.18–3.53, bearish 0.44–1.10; large drawdowns at full allocation. Absolute results include market
+  drift.
+
+### v2 results
+
 All numbers: MAJOR signals (realignments), **fresh symbols** unless stated. `r` = mean move over the
 horizon in ATR after costs; "random" = same symbols, dates, count and long/short mix. Full tables
 (every tier, WATCH, warnings, baselines, holdout windows, crypto tiers, simulations, timeliness) in
@@ -281,6 +303,24 @@ double-counted.
 None of the eight publishes an out-of-sample test; none of their performance claims was carried
 over. Ideas were reimplemented, not copied, so this repository contains no third-party code.
 
+### Research and validation tools (v3)
+
+Each has one role; none is merged into the indicator or imported by `hcmtf` at module level.
+
+| repository | licence / deps | actual capability (checked) | role here |
+|---|---|---|---|
+| [baronguyen001/pinescript-strategy-template](https://github.com/baronguyen001/pinescript-strategy-template) | MIT; numpy, pandas | `pinewf`: Pine lint, next-open fill engine, grid/walk-forward on its own MA templates, TradingView trade-export parser, Monte Carlo | `pinewf pine-lint` on both Pine files (only finding: PL001 on `f()[1]` + `lookahead_on`, a false positive, since the linter does not check the `[1]` offset that makes it non-repainting; PL007 fixed lengths are intentional). Its Monte Carlo is used by `scripts/analyze_tv_trades.py`. Its export parser computes `exit/entry − 1` for every trade when the % column is missing (wrong sign for shorts), so the analysis script parses direction itself. Its template layout informed `pine/HighConvictionMTF_strategy.pine`. |
+| [landtml/purgedcv](https://github.com/landtml/purgedcv) | MIT; scikit-learn | Combinatorial purged CV with label end times and embargo; requires a unique time index | Purged CPCV on weekly/monthly buckets of pooled events (`hcmtf/v3.py`) for the "pick the best configuration" question. |
+| [landtml/finlab-ml](https://github.com/landtml/finlab-ml) | MIT; numba, scipy | PBO by CSCV, deflated/probabilistic Sharpe, triple-barrier labelling, purged k-fold | PBO across configurations C0–C6 and deflated Sharpe with 60 trials (`hcmtf/v3.py`). Its triple barrier is the same idea as the +2/−1 ATR barrier used throughout. |
+| [kernc/backtesting.py](https://github.com/kernc/backtesting.py) | **AGPL-3.0**; pandas, bokeh | Event-driven single-asset backtester, `sl` on orders and trades, trade lists with ReturnPct | Independent trade-level re-simulation, long and short separately, in `crosscheck/backtestingpy_check.py` only (AGPL: kept out of the package and the indicator). Reproduces every trade of the in-house simulator. |
+
+`pine/HighConvictionMTF_strategy.pine` is a `strategy()` twin of the indicator for TradingView's
+Strategy Tester. It is *generated* from the indicator by `scripts/make_strategy_twin.py` (a test
+fails if they drift), trades exactly the drawn markers with the research exits (2 ATR stop,
+3 ATR trailing stop, reversal, time exit), and is meant for checking outcomes on TradingView's own
+data: export *List of Trades*, then `python scripts/analyze_tv_trades.py trades.csv` for results by
+side with bootstrap intervals and Monte Carlo bands. The indicator stays the primary deliverable.
+
 ## Reproducing
 
 ```sh
@@ -296,6 +336,10 @@ python scripts/design_check.py            # DEV only → reports/DESIGN_CHECK.md
 python -m hcmtf.report2                   # → reports/RESULTS.md
 python crosscheck/backtrader_check.py     # → reports/BACKTRADER_CROSSCHECK.md
 python scripts/sync_pine.py               # writes config + record into the Pine file
+python scripts/make_strategy_twin.py      # regenerates the strategy() twin from the indicator
+python -m hcmtf.v3                        # v3: CPCV, PBO, deflated Sharpe → reports/V3_RESULTS.md
+python crosscheck/backtestingpy_check.py  # independent trades → reports/BACKTESTINGPY.md
+pinewf pine-lint pine/HighConvictionMTF.pine
 ```
 
 Data is not committed; `data/MANIFEST.json` records SHA-256, rows and span of every file used.

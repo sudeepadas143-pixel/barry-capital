@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from research import v5_baselines as B, v5_eval as EV, v5_gate as GT  # noqa: E402
+from research.v5_reserve import V5_RESERVE  # noqa: E402
 
 
 def test_SA1_no_baseline_alert_from_a_missing_data_candle():
@@ -46,7 +47,7 @@ def test_SA4_cached_labels_score_exactly_like_score_instrument():
     assert all(t >= 400 for t in late["events"]) and late["lo"] == 400
     assert all(s - late["K"] >= 400 for s in late["alerts"])
     with pytest.raises(Exception):
-        EV.frozen_labels("JNJ", h, l, c, "top", "4H", idx)          # reserve symbol
+        EV.frozen_labels(V5_RESERVE["equities"][0], h, l, c, "top", "4H", idx)   # reserve symbol
 
 
 def test_SA3_lift_units_use_only_warm_scorable_candles():

@@ -182,10 +182,14 @@ def test_committed_manifest_matches_the_cache():
 
 # ----------------------------------------------------------------------------- readiness gate
 
-def test_family_c_evaluation_is_blocked():
+def test_family_c_gate_state_is_honest():
+    """Without an independent review the gate may open only in the exploration-only waiver mode,
+    and confirmatory runs stay blocked (the earlier "blocked" state ended when the configuration
+    was frozen and the detectors committed under the documented waiver)."""
     b = GT.c_blockers(check_cache=False)
-    assert any(x.startswith("B1:") for x in b)          # no external review yet
-    assert any(x.startswith("B5:") for x in b)          # configuration is a draft
-    assert any(x.startswith("detectors:") for x in b)   # detector code not written yet
-    with pytest.raises(GT.NotReady):
-        GT.require_c_ready()
+    mode = GT.review_mode()
+    if not b:
+        assert mode in ("independent", "self_audited_exploration_only")
+    if mode != "independent":
+        assert GT.confirmatory_blockers()                   # never unlocked by the waiver
+        assert any(x.startswith("B1") for x in GT.confirmatory_blockers())

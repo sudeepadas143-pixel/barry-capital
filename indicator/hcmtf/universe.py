@@ -111,4 +111,8 @@ FRESH = [
     Asset("EURJPY=X", "fx", "yahoo", False, "24h"),
 ]
 
-BY_SYMBOL = {a.symbol: a for a in UNIVERSE + FRESH}
+# AUDIT: long-history BTC (Yahoo, from 2014) to match what TradingView charts load for BTC.
+# Used only by the BTC audit (scripts/audit_btc.py), never for design decisions.
+AUDIT = [Asset("BTC-USD", "crypto", "yahoo", True, "24h", "large")]
+
+BY_SYMBOL = {a.symbol: a for a in UNIVERSE + FRESH + AUDIT}

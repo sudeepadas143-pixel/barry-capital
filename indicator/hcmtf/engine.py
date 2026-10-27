@@ -85,6 +85,7 @@ class Params:
     range_adx: float = 18.0
     spike_wick_atr: float = 0.8
     strict_htf: bool = False            # require both HTFs to agree (tested; did worse; off)
+    accept: bool = False                # signal only if the NEXT candle also closes beyond the level
     evidence: tuple = ()                # screening kept none; see reports/SCREENING.md
     filters: tuple = ()
     crypto_only: tuple = ()             # conditions/filters that apply on crypto charts only
@@ -387,6 +388,9 @@ def breaks(f: Feat, p: Params) -> pd.DataFrame:
     dow = f.index[i].dayofweek
     t["not_weekend"] = ~(f.is_crypto & (dow >= 5))
 
+    nxt = np.r_[f.c[1:], np.nan]
+    with np.errstate(invalid="ignore"):
+        t["accepted"] = d * (nxt[i] - t["level"].to_numpy()) > 0   # known at the close of i + 1
     t["atr"] = f.atr[i]
     t["warm"] = ~np.isnan(f.atr[i]) & ~np.isnan(f.rsi[i]) & ~np.isnan(f.hist[i]) & ~np.isnan(f.adx[i])
     return t
@@ -473,16 +477,23 @@ def classify(t: pd.DataFrame, p: Params) -> pd.DataFrame:
             continue
         if r.frac < p.confirm - 1e-9:
             continue
-        if r.dir == last_dir and r.i - last_i < p.cooldown:
+        if p.accept and not r.accepted:
+            continue
+        at = r.i + 1 if p.accept else r.i       # the candle on which the signal prints
+        if r.dir == last_dir and at - last_i < p.cooldown:
             continue
         major = r.cls in p.major_classes and r.frac >= p.major - 1e-9
         keep.append((idx, "major" if major else "confirmed"))
-        last_dir, last_i = r.dir, r.i
+        last_dir, last_i = r.dir, at
     if not keep:
         return t.iloc[:0].assign(tier=pd.Series(dtype=str))
     idx, tiers = zip(*keep)
     out = t.loc[list(idx)].copy()
     out["tier"] = list(tiers)
+    out["break_i"] = out["i"]
+    if p.accept:
+        sig = out["tier"] != "watch"
+        out.loc[sig, "i"] = out.loc[sig, "i"] + 1
     return out
 
 

@@ -35,6 +35,7 @@ def run(f, profile, p):
     shUsed = slUsed = True
     trend = 0
     lastDir, lastBar = 0, None
+    pend = None                  # acceptance mode: (dir, level, major, bar, cls, met, avail)
     leg, armed = 0, -1
     sweepUp_h, sweepDn_h = [], []
     trend_h = []
@@ -53,6 +54,7 @@ def run(f, profile, p):
         if up and dn:
             up, dn = c[i] >= o[i], c[i] < o[i]
         d = 1 if up else -1 if dn else 0
+        level = sh if up else sl
         choch = d != 0 and trend == -d
         if d != 0:
             trend = d
@@ -103,11 +105,20 @@ def run(f, profile, p):
                  (not ("not_spike_wick" in fl and spike)) and (not ("not_weekend" in fl and weekend))
         warm = not (np.isnan(f.atr[i]) or np.isnan(f.rsi[i]) or np.isnan(f.hist[i]) or np.isnan(f.adx[i]))
 
+        if p.accept and pend is not None:
+            pdir, plev, pmaj, pbar, pcls, pmet, pav = pend
+            if i == pbar + 1 and pdir * (c[i] - plev) > 0 and \
+                    not (pdir == lastDir and lastBar is not None and i - lastBar < p.cooldown):
+                sigs.append((i, pdir, pcls, "major" if pmaj else "confirmed", pmet, pav))
+                lastDir, lastBar = pdir, i
+            pend = None
         if d != 0 and warm and passes and cls == "counter_reversal":
             sigs.append((i, d, cls, "watch", met, avail))
         elif d != 0 and warm and passes and cls in ("realignment", "continuation") and htfWith and frac >= p.confirm - 1e-9:
-            if not (d == lastDir and lastBar is not None and i - lastBar < p.cooldown):
-                major = cls == "realignment" and frac >= p.major - 1e-9
+            major = cls == "realignment" and frac >= p.major - 1e-9
+            if p.accept:
+                pend = (d, level, major, i, cls, met, avail)
+            elif not (d == lastDir and lastBar is not None and i - lastBar < p.cooldown):
                 sigs.append((i, d, cls, "major" if major else "confirmed", met, avail))
                 lastDir, lastBar = d, i
 

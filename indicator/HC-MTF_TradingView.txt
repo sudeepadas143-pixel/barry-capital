@@ -20,7 +20,7 @@ indicator("High-Conviction MTF Trend Signals", shorttitle = "HC-MTF", overlay = 
 //   tooltip as context. They do NOT gate signals: none of them improved outcomes in the
 //   pre-registered screening (reports/SCREENING.md). Gating on them would make signals
 //   rarer without making them better. The evidence count is not a probability.
-//   On the chart: only Bullish ▲ / Bearish ▼ arrows. No dashboard, no diagnostics.
+//   On the chart: only ▲ BULLISH / ▼ BEARISH markers. No dashboard, no diagnostics.
 //
 // Integrity: closed candles only (default); HTF via f()[1] + lookahead_on (previous
 // completed HTF candle); LTF via request.security_lower_tf read on the closed chart
@@ -83,6 +83,8 @@ fShkIn  = input.bool(false, "Filter: volatility shock", group = G2, inline = "f1
 fSpkIn  = input.bool(false, "Filter: spike/liquidation wick", group = G2, inline = "f2")
 fWkdIn  = input.bool(false, "Filter: crypto weekend", group = G2, inline = "f2")
 cooldownIn = input.int(0, "Same-direction cooldown, candles (0 = profile)", minval = 0, group = G2)
+acceptOn = input.bool(false, "Require next-candle acceptance", group = G2,
+     tooltip = "Off (default, tested configuration). On: a break is signalled only if the NEXT candle also closes beyond the broken level; the arrow prints on that candle. In testing this cut signals that were invalidated within 3 candles from ~45% to ~32% but did not improve average outcomes, and removes ~25% of signals.")
 
 G3 = "Market"
 volMode = input.string("Auto", "Volume", options = ["Auto", "On", "Off"], group = G3,
@@ -279,11 +281,34 @@ var int lastBar = na
 bool gate = onClose ? barstate.isconfirmed : true
 bool isSig = false
 bool isMajor = false
+int sigDir = 0
 bool isWatch = dir != 0 and warm and passes and gate and cls == "COUNTER-HTF REVERSAL"
-if dir != 0 and warm and passes and gate and (cls == "REALIGNMENT" or cls == "CONTINUATION") and htfWith and frac >= confirmT - 1e-9
-    if not (dir == lastDir and bar_index - lastBar < cooldown)
+
+// acceptance mode: a qualifying break waits one candle; resolved here on the next close
+var int pDir = 0
+var float pLevel = na
+var bool pMajor = false
+var int pBar = na
+if acceptOn and pDir != 0 and gate
+    if bar_index == pBar + 1 and pDir * (close - pLevel) > 0 and not (pDir == lastDir and bar_index - lastBar < cooldown)
+        isSig := true
+        isMajor := pMajor
+        sigDir := pDir
+        lastDir := pDir
+        lastBar := bar_index
+    pDir := 0
+
+bool eligible = dir != 0 and warm and passes and gate and (cls == "REALIGNMENT" or cls == "CONTINUATION") and htfWith and frac >= confirmT - 1e-9
+if eligible
+    if acceptOn
+        pDir := dir
+        pLevel := level
+        pMajor := cls == "REALIGNMENT" and frac >= majorT - 1e-9
+        pBar := bar_index
+    else if not (dir == lastDir and bar_index - lastBar < cooldown)
         isSig := true
         isMajor := cls == "REALIGNMENT" and frac >= majorT - 1e-9
+        sigDir := dir
         lastDir := dir
         lastBar := bar_index
 
@@ -303,26 +328,28 @@ if trend != 0 and wFire and armed != leg and gate
     isWarn := true
     armed := leg
 
-// ── drawing: two signal types only — Bullish ▲ below the candle, Bearish ▼ above ─
-// Native plotshape arrows (see the Pine "Text and shapes" docs). location.belowbar /
-// abovebar keeps each arrow and its word clear of the wick; display.pane keeps the
-// values out of the status line, so nothing but the arrows sits on the chart.
+// ── drawing: two signal types only — ▲ BULLISH below the candle, ▼ BEARISH above ─
+// Solid filled labels with white bold text: they render the same on desktop and in the
+// TradingView mobile app, read on light and dark themes (fill vs background >= 3.6:1,
+// text vs fill ~4.9:1), and the label's pointer marks the candle. yloc below/above bar
+// keeps them clear of the wick. Nothing else is drawn.
 colBull = #2962FF
-colBear = #F23645
+colBear = #D32F2F
 
-// The signal itself is unchanged; this only decides which signals get an arrow.
+// The signal itself is unchanged; this only decides which signals get a marker.
 bool showSig = isSig and (isMajor or showCont)
-bool bullSig = showSig and dir > 0
-bool bearSig = showSig and dir < 0
-bool prov = not barstate.isconfirmed
+bool bullSig = showSig and sigDir > 0
+bool bearSig = showSig and sigDir < 0
 
-plotshape(bullSig, "Bullish", shape.arrowup, location.belowbar, color = prov ? color.new(colBull, 60) : colBull,
-     text = "Bullish", textcolor = prov ? color.new(chart.fg_color, 50) : chart.fg_color, size = size.small, display = display.pane)
-plotshape(bearSig, "Bearish", shape.arrowdown, location.abovebar, color = prov ? color.new(colBear, 60) : colBear,
-     text = "Bearish", textcolor = prov ? color.new(chart.fg_color, 50) : chart.fg_color, size = size.small, display = display.pane)
+if bullSig
+    label.new(bar_index, low, "▲ BULLISH", yloc = yloc.belowbar, style = label.style_label_up,
+         color = colBull, textcolor = color.white, size = size.normal, text_formatting = text.format_bold)
+if bearSig
+    label.new(bar_index, high, "▼ BEARISH", yloc = yloc.abovebar, style = label.style_label_down,
+         color = colBear, textcolor = color.white, size = size.normal, text_formatting = text.format_bold)
 
 // parity export: one number per candle per item, readable from "Export chart data"
-plot(parity ? (isSig ? dir * (isMajor ? 2 : 1) : 0) : na, "parity_signal", display = display.data_window)
+plot(parity ? (isSig ? sigDir * (isMajor ? 2 : 1) : 0) : na, "parity_signal", display = display.data_window)
 plot(parity ? (isWarn ? wDir : 0) : na, "parity_warning", display = display.data_window)
 plot(parity ? (isWatch ? dir : 0) : na, "parity_watch", display = display.data_window)
 plot(parity ? met : na, "parity_met", display = display.data_window)
@@ -332,7 +359,7 @@ plot(parity ? ltfMom : na, "parity_ltf_mom", display = display.data_window)
 plot(parity ? ltfStr : na, "parity_ltf_struct", display = display.data_window)
 
 // ── alerts: the same two signal types ────────────────────────────────────────
-alertcondition(bullSig, "Bullish", "HC-MTF Bullish ▲ {{ticker}} {{interval}} {{close}}")
-alertcondition(bearSig, "Bearish", "HC-MTF Bearish ▼ {{ticker}} {{interval}} {{close}}")
+alertcondition(bullSig, "BULLISH", "HC-MTF BULLISH ▲ {{ticker}} {{interval}} {{close}}")
+alertcondition(bearSig, "BEARISH", "HC-MTF BEARISH ▼ {{ticker}} {{interval}} {{close}}")
 if showSig
-    alert('{"ticker":"' + syminfo.tickerid + '","tf":"' + timeframe.period + '","signal":"' + (dir > 0 ? "Bullish" : "Bearish") + '","close":' + str.tostring(close) + '}', alert.freq_once_per_bar_close)
+    alert('{"ticker":"' + syminfo.tickerid + '","tf":"' + timeframe.period + '","signal":"' + (sigDir > 0 ? "BULLISH" : "BEARISH") + '","close":' + str.tostring(close) + '}', alert.freq_once_per_bar_close)

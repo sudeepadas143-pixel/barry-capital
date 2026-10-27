@@ -73,23 +73,29 @@ reports/
 
    | mark | meaning |
    |---|---|
-   | **▲ Bullish** (blue arrow below the candle, word underneath) | The chart-timeframe structure turned back up into the higher-timeframe direction after a pullback (HTF1 + HTF2 with it, neither against). At most one per pullback. |
-   | **▼ Bearish** (red arrow above the candle, word on top) | The same, downward. |
+   | **▲ BULLISH** (solid blue label below the candle, pointer up) | The chart-timeframe structure turned back up into the higher-timeframe direction after a pullback (HTF1 + HTF2 with it, neither against). At most one per pullback. |
+   | **▼ BEARISH** (solid red label above the candle, pointer down) | The same, downward. |
    | nothing | Neutral: most candles. |
 
-   Drawn with native `plotshape(shape.arrowup / shape.arrowdown)` at `location.belowbar /
-   abovebar`, so arrows sit clear of the wick; the word uses the chart's text colour. No dashboard,
-   no tables, no swing lines, no status-line values, no diagnostics. *Also mark continuation
-   breaks* (off by default) adds the same arrows for further breaks in the HTF direction.
-   Preview (rendered offline from the engine's signals, not a TradingView screenshot):
-   [`reports/preview_BTCUSDT_1H.png`](reports/preview_BTCUSDT_1H.png).
-4. Alerts: Bullish and Bearish (exactly the arrows shown), plus a JSON `alert()` payload. Once per
-   closed candle.
-5. The diagnostics that used to be on the chart (HTF/LTF trends, alignment, out-of-sample record)
-   are documented here and in `reports/`; the optional *Parity export* writes codes to the data
-   window only, for `scripts/compare_tv_export.py`.
-6. *Use the tested configuration* (default on). Off lets you switch the context conditions into
-   gates and set thresholds, for research. The dashboard then says **CUSTOM — unvalidated**.
+   Markers are `label.new(..., style = label.style_label_up / _down, yloc = yloc.belowbar /
+   abovebar, size = size.normal)` with white bold text on a solid fill (#2962FF / #D32F2F): no
+   transparency, no thin glyphs, no chart-theme-dependent colours, so they render the same in the
+   TradingView mobile app and read on light and dark themes (fill vs background ≥ 3.6:1, text vs
+   fill ≈ 4.9:1). Previews (rendered offline from the engine's signals, not TradingView
+   screenshots): `reports/preview_BTC-USD_1D_{light,dark}{,_phone}.png`. No dashboard, tables,
+   swing lines, status-line values or diagnostics. The last 500 markers are kept (Pine's label cap).
+   *Also mark continuation breaks* (off by default) adds the same markers for further breaks in the
+   HTF direction.
+4. Alerts: BULLISH and BEARISH (exactly the markers shown), plus a JSON `alert()` payload. Once
+   per closed candle.
+5. *Require next-candle acceptance* (off by default): signals only if the next candle also closes
+   beyond the broken level, printing on that candle. See [`reports/AUDIT.md`](reports/AUDIT.md)
+   for what it does and does not improve.
+6. The script is an `indicator()` (not a `strategy()`): it draws and alerts, it places no orders.
+   Diagnostics live in this README and `reports/`; the optional *Parity export* writes codes to
+   the data window only, for `scripts/compare_tv_export.py`.
+7. *Use the tested configuration* (default on). Off lets you switch the context conditions into
+   gates and set thresholds, for research (unvalidated).
 
 ### Crypto first, every market
 

@@ -135,19 +135,22 @@ def test_percentrank_matches_pine_definition():
     assert r[5] == 50.0                       # 3 vs [2,3,4,5]: 2 and 3 are <= 3
 
 
-@pytest.mark.parametrize("profile,evidence,filters,seed", [
-    ("1H", ("momentum", "strength", "displacement", "volume"), (), 11),
-    ("1H", ALL_EVIDENCE[:7], tuple(G.FILTERS), 12),
-    ("1D", ("momentum", "displacement", "fvg", "sweep", "ltf_momentum"), ("not_range", "not_spike_wick"), 13),
-    ("4H", ("strength", "volume", "sweep"), ("not_shock", "not_weekend"), 14),
+@pytest.mark.parametrize("profile,evidence,filters,seed,accept", [
+    ("1H", (), (), 15, True),
+    ("4H", (), ("not_shock",), 16, True),
+    ("1H", ("momentum", "strength", "displacement", "volume"), (), 11, False),
+    ("1H", ALL_EVIDENCE[:7], tuple(G.FILTERS), 12, False),
+    ("1D", ("momentum", "displacement", "fvg", "sweep", "ltf_momentum"), ("not_range", "not_spike_wick"), 13, False),
+    ("4H", ("strength", "volume", "sweep"), ("not_shock", "not_weekend"), 14, False),
 ])
-def test_pine_v2_logic_matches_engine(profile, evidence, filters, seed):
+def test_pine_v2_logic_matches_engine(profile, evidence, filters, seed, accept):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     import pine_mirror_v2
     m15 = minute_bars(seed=seed)
     end = m15.index[-1] + pd.Timedelta(minutes=15)
     ctx = ctx_upto(m15, end, perp_frames(m15, seed))
-    p = G.with_(G.DEFAULTS[profile], evidence=evidence, filters=filters, confirm=0.4, major=0.6)
+    p = G.with_(G.DEFAULTS[profile], evidence=evidence, filters=filters, confirm=0.4 if evidence else 0.0,
+                major=0.6 if evidence else 0.0, accept=accept)
     f, t, s, w = G.run(ctx, p)
     ps, pw = pine_mirror_v2.run(f, profile, p)
     ours = [(int(a), int(b), c, d, float(e), float(g)) for a, b, c, d, e, g in
@@ -210,3 +213,21 @@ def test_tradingview_parity_script_round_trip(tmp_path):
     bad = subprocess.run([sys.executable, str(script), str(path), "--profile", "1H", "--crypto", "--warmup", "0"],
                          capture_output=True, text=True)
     assert bad.returncode == 1 and "signal mismatches: 1" in bad.stdout
+
+
+
+def test_acceptance_mode_never_changes_after_print():
+    """Truncation test for the acceptance option: a signal prints on the candle after the
+    break, using that candle's close, and never moves once printed."""
+    m15 = minute_bars(seed=31)
+    extras = perp_frames(m15, 31)
+    p = G.with_(G.DEFAULTS["1H"], accept=True)
+    end = m15.index[-1] + pd.Timedelta(minutes=15)
+    f_full, _, s_full, _ = G.run(ctx_upto(m15, end, extras), p)
+    s_full = s_full[s_full["tier"] != "watch"]
+    assert len(s_full) > 5 and (s_full["i"] == s_full["break_i"] + 1).all()
+    for k in [800, 1600, 2400]:
+        _, _, s_k, _ = G.run(ctx_upto(m15, f_full.index[k] + pd.Timedelta(hours=1), extras), p)
+        s_k = s_k[s_k["tier"] != "watch"]
+        a = s_full[s_full["i"] <= k][["i", "dir", "tier"]].reset_index(drop=True)
+        pd.testing.assert_frame_equal(a, s_k[["i", "dir", "tier"]].reset_index(drop=True), check_dtype=False)

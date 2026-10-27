@@ -33,6 +33,7 @@ def main():
     ap.add_argument("--crypto", action="store_true")
     ap.add_argument("--no-volume", action="store_true")
     ap.add_argument("--warmup", type=int, default=250)
+    ap.add_argument("--accept", action="store_true", help="the chart had 'Require next-candle acceptance' on")
     a = ap.parse_args()
 
     raw = pd.read_csv(a.csv)
@@ -43,7 +44,7 @@ def main():
     df["volume"] = raw[vol_col].astype(float).to_numpy() if vol_col else 0.0
 
     from hcmtf.report2 import active_params
-    p = active_params(a.profile)
+    p = G.with_(active_params(a.profile), accept=a.accept)
     ctx = G.Ctx(df, None, None, None, not a.no_volume, a.crypto)
     f = G.features(ctx, p)
     get = lambda name: pd.to_numeric(raw[name], errors="coerce").to_numpy(float) if name in raw else np.full(len(df), np.nan)

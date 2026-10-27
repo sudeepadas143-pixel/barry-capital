@@ -219,7 +219,7 @@ def test_E2_holding_time_excludes_the_overnight_gap_after_the_exit_candle():
 
 # ----------------------------------------------------------------------------- L ledger
 
-CFG = "reports/V5_VALIDATION_PROTOCOL.md"
+CFG = "research/v5_labels.py"     # frozen and committed (test P2), so always clean: stands in for a config file
 
 
 def _rec(path, tid, **kw):

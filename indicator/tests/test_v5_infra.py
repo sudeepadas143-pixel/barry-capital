@@ -369,7 +369,7 @@ def test_trade_stops_time_exit_costs_and_data_end():
 
 # ----------------------------------------------------------------------------- ledger
 
-CFG = "reports/V5_VALIDATION_PROTOCOL.md"     # any committed, unmodified file serves as config in tests
+CFG = "research/v5_labels.py"     # frozen and committed (test P2), so always clean: stands in for a config file
 
 
 def rec(path, tid, **kw):

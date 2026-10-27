@@ -171,3 +171,9 @@ Every result document states:
 * failures and inconclusive cells, with the same prominence as passes.
 
 A passing software test is never presented as evidence of predictive value.
+
+## Amendments
+
+| no. | subject | status | document |
+|---|---|---|---|
+| 1 | small-cluster inference: wild cluster bootstrap and t(G−1) as the decision statistics; G ≥ 10 for exploratory decisions and G ≥ 20 for confirmatory cells | **PROPOSED, not in force** (needs external review approval; must be resolved before any G3) | [`V5_PROTOCOL_AMENDMENT_1.md`](V5_PROTOCOL_AMENDMENT_1.md) |

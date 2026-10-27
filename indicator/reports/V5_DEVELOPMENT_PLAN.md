@@ -187,6 +187,22 @@ A, B, C and D can run in parallel after E0. None waits for another, and none is 
     * B5 committed C exploration configuration.
   * A protocol amendment on small-cluster inference (S1) is required before any G3.
 
+* **2026-10-27: pre-experiment work for family C** (no detector built or evaluated):
+  * B2 done: `research/v5_baselines.py` (HTF flip, EMA cross, Supertrend flip, counter-reversal;
+    matched-frequency thinning per instrument and block).
+  * B4 done: `reports/V5_EXPLORATION_DATA_MANIFEST.json`, 270 files, combined sha256 `57e107b0…`
+    (`research/v5_manifest.py` builds and verifies it).
+  * B3 decided: FX excluded (causal daily alignment not demonstrably safe).
+  * B5 drafted: `reports/V5_C_EXPLORATION_CONFIG.md` (Status: DRAFT).
+  * Small-cluster inference: `research/v5_inference.py`, plus **proposed** protocol Amendment 1
+    (`V5_PROTOCOL_AMENDMENT_1.md`, not in force).
+  * Readiness gate: `research/v5_gate.py`; `require_c_ready()` currently refuses.
+  * Status report: [`V5_PRE_EXPERIMENT_STATUS.md`](V5_PRE_EXPERIMENT_STATUS.md).
+  * **Still blocked:**
+    * B1 external review;
+    * freezing the configuration after review;
+    * writing and committing `research/v5_detect_c.py`.
+
 ## 9. Next executable task (original wording, kept for the record)
 
 *Done 2026-10-27 (see §8).* Build **E0**: `research/v5_state.py` and `research/v5_eval.py`. They need:
@@ -218,8 +234,20 @@ starts only after E0 is merged and the trial ledger exists.
    * ledger trial ids.
 3. Only then run the first exploratory family-C trial through `research.v5_ledger.record`.
 
-## 11. Next executable task (current, after the audit)
+## 11. Next executable task (after the audit; superseded, kept for the record)
 
 * Close audit blockers B1–B5 (`V5_INDEPENDENT_AUDIT.md` §5) without computing any detector output.
 * Then, and only then, record the first exploratory family-C trial through
   `research.v5_ledger.record`.
+
+## 12. Next executable task (current)
+
+1. **External review** (B1) of the audit fixes and of this pre-experiment work, at the commit
+   that adds them, using `V5_PRE_EXPERIMENT_STATUS.md` as the checklist. The reviewer records the
+   outcome in `reports/V5_EXTERNAL_REVIEW.md`, in the format `research/v5_gate.py` requires, and
+   decides on Amendment 1.
+2. After approval:
+   * freeze `V5_C_EXPLORATION_CONFIG.md` (status line, own commit);
+   * implement `research/v5_detect_c.py` exactly as §3, with causality tests on synthetic data;
+   * commit, and run the full suite.
+3. Only when `require_c_ready()` passes, run the first trial `c-x1-C1a-W-1H`.

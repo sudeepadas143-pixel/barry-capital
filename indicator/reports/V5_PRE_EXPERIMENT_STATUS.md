@@ -50,3 +50,15 @@
   These cells meet the exploration minimum of G ≥ 10, but not the proposed confirmatory minimum
   of G ≥ 20.
 * All exploration data was examined before; any result remains exploratory.
+
+## Update 2026-10-27: external review unavailable (explicit limitation)
+
+* **External review.** No reviewer other than the author is available, and the project owner
+  instructed not to wait for one.
+  * Independent review is **not complete**, and nothing here says it is.
+  * Replaced, for exploration only, by a documented self-audit (`V5_SELF_AUDIT.md`) and a waiver
+    (`V5_REVIEW_WAIVER.md`).
+* **What that limits.** Results of the first family-C exploration are labelled
+  `self_audited_exploration_only`. They cannot be used for G2 selection, G3 or any confirmatory
+  claim until an independent review happens (`research.v5_gate.confirmatory_blockers()`).
+* **Protocol Amendment 1.** Adopted for exploration scope only; confirmatory scope not adopted.

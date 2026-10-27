@@ -351,6 +351,64 @@ def match_alerts(alerts, events, kind: str, K: int, W: int) -> tuple[list[tuple[
     return pairs, status
 
 
+class FrozenLabels:
+    """Frozen major-top/bottom labels of one instrument (register §2.2), computed ONCE and reused
+    for any number of alert sets (self-audit SA4). Only frozen_labels() builds it: ATR14 is
+    computed inside, the symbol and the freeze are checked, the parameters come from
+    v5_labels.TOP_PARAMS / BOTTOM_PARAMS."""
+
+    __slots__ = ("sym", "family", "tf", "h", "l", "c", "n", "events", "L", "F")
+
+
+def frozen_labels(sym: str, h, l, c, family: str, tf: str, index: pd.DatetimeIndex) -> FrozenLabels:
+    check_symbol(sym)
+    check_partition(index, tf)
+    if family not in ("top", "bottom"):
+        raise ValueError(family)
+    h, l, c = (np.asarray(x, float) for x in (h, l, c))
+    atr = ta.atr(h, l, c, 14)
+    p = (TOP_PARAMS if family == "top" else BOTTOM_PARAMS)[tf]
+    lab = FrozenLabels()
+    lab.sym, lab.family, lab.tf, lab.h, lab.l, lab.c, lab.n = sym, family, tf, h, l, c, len(c)
+    lab.events = (major_tops if family == "top" else major_bottoms)(h, l, atr, **p)
+    lab.L, lab.F = p["L"], p["F"]
+    return lab
+
+
+def scorable_region(lab: FrozenLabels, start_i: int = 0) -> tuple[int, int]:
+    """[lo, hi]: events fully observable (L before, max(L, F) after) and not before start_i."""
+    return max(lab.L, int(start_i)), lab.n - 1 - max(lab.L, lab.F)
+
+
+def score_alerts(lab: FrozenLabels, alerts, kind: str, start_i: int = 0) -> dict:
+    """Detection metrics of one alert set against frozen labels (see score_instrument).
+    start_i: first candle of the evaluation window; earlier events and alerts whose eligible range
+    starts before it are excluded (censored)."""
+    K, W = windows(kind, lab.L)
+    lo, hi = scorable_region(lab, start_i)
+    ev = lab.events
+    ev_ok = ev[(ev >= lo) & (ev <= hi)]
+    al = np.unique(np.asarray(alerts, int))
+    rng = np.array([eligible_range(int(s), kind, K, W) for s in al]).reshape(-1, 2)
+    al_ok = al[(rng[:, 0] >= lo) & (rng[:, 1] <= hi)] if len(al) else al
+    pairs, status = match_alerts(al_ok, ev_ok, kind, K, W)
+    leads, remain = [], []
+    h, l, c, F = lab.h, lab.l, lab.c, lab.F
+    for s, t in pairs:
+        leads.append(t - s)
+        if lab.family == "top":
+            final = l[t:t + F + 1].min()
+            remain.append(remaining_fraction(h[t], c[s], final))
+        else:
+            final = h[t:t + F + 1].max()
+            remain.append(remaining_fraction(l[t], c[s], final))
+    span = max(hi - lo + 1, 0)
+    return {"events": ev_ok, "events_censored": int(len(ev) - len(ev_ok)), "alerts": al_ok,
+            "alerts_censored": int(len(al) - len(al_ok)), "pairs": pairs, "status": status,
+            "leads": np.array(leads, float), "remaining": np.array(remain, float), "scorable_candles": int(span),
+            "L": lab.L, "F": F, "K": K, "W": W, "lo": int(lo)}
+
+
 def score_instrument(sym: str, h, l, c, alerts, family: str, kind: str, tf: str, index: pd.DatetimeIndex) -> dict:
     """Detection metrics for one instrument against the frozen labels (register §2.2).
 
@@ -361,37 +419,29 @@ def score_instrument(sym: str, h, l, c, alerts, family: str, kind: str, tf: str,
     ATR14 is computed here (Pine-exact, hcmtf.ta) so labels always use the frozen definition;
     a caller cannot substitute another volatility measure (audit finding B2).
     """
-    check_symbol(sym)
-    check_partition(index, tf)
-    h, l, c = (np.asarray(x, float) for x in (h, l, c))
-    atr = ta.atr(h, l, c, 14)
-    if family not in ("top", "bottom"):
-        raise ValueError(family)
-    p = (TOP_PARAMS if family == "top" else BOTTOM_PARAMS)[tf]
-    L, F = p["L"], p["F"]
-    K, W = windows(kind, L)
-    n = len(c)
-    ev = (major_tops if family == "top" else major_bottoms)(h, l, atr, **p)
-    lo, hi = L, n - 1 - max(L, F)
-    ev_ok = ev[(ev >= lo) & (ev <= hi)]
-    al = np.unique(np.asarray(alerts, int))
-    rng = np.array([eligible_range(int(s), kind, K, W) for s in al]).reshape(-1, 2)
-    al_ok = al[(rng[:, 0] >= lo) & (rng[:, 1] <= hi)] if len(al) else al
-    pairs, status = match_alerts(al_ok, ev_ok, kind, K, W)
-    leads, remain = [], []
-    for s, t in pairs:
-        leads.append(t - s)
-        if family == "top":
-            final = l[t:t + F + 1].min()
-            remain.append(remaining_fraction(h[t], c[s], final))
-        else:
-            final = h[t:t + F + 1].max()
-            remain.append(remaining_fraction(l[t], c[s], final))
-    span = max(hi - lo + 1, 0)
-    return {"events": ev_ok, "events_censored": int(len(ev) - len(ev_ok)), "alerts": al_ok,
-            "alerts_censored": int(len(al) - len(al_ok)), "pairs": pairs, "status": status,
-            "leads": np.array(leads, float), "remaining": np.array(remain, float), "scorable_candles": int(span),
-            "L": L, "F": F, "K": K, "W": W}
+    return score_alerts(frozen_labels(sym, h, l, c, family, tf, index), alerts, kind)
+
+
+def lift_units(lab: FrozenLabels, scored: dict, kind: str, state, warm, start_i: int = 0) -> pd.DataFrame:
+    """Per-alert lift units with the configuration's eligibility (self-audit SA3): benchmark =
+    the "event in eligible range" rate over WARM and scorable candles of the same instrument and
+    state; units = scorable alerts on warm candles. Returns i, state, near, bench, excess."""
+    K, W = scored["K"], scored["W"]
+    lo, hi = scorable_region(lab, start_i)
+    n = lab.n
+    s = np.arange(n)
+    a, b = s - K, (s + W if kind == "warning" else s)
+    scorable = (a >= lo) & (b <= hi) & np.asarray(warm, bool)
+    near = near_event(n, scored["events"], kind, K, W)
+    st = np.asarray(state, object)
+    df = pd.DataFrame({"i": s[scorable], "state": st[scorable], "near": near[scorable]})
+    rate = df.groupby("state")["near"].mean()
+    al = np.asarray(scored["alerts"], int)
+    al = al[scorable[al]] if len(al) else al
+    u = pd.DataFrame({"i": al, "state": st[al], "near": near[al]})
+    u["bench"] = u["state"].map(rate).astype(float)
+    u["excess"] = u["near"] - u["bench"]
+    return u
 
 
 def near_event(n: int, events, kind: str, K: int, W: int) -> np.ndarray:
@@ -493,7 +543,7 @@ def detection_report(per_instrument: dict, times: dict, tf: str, kind: str, reps
         for (s, t), x, y in zip(r["pairs"], r["leads"], r["remaining"]):
             lead.append(x); lead_cl.append(cl[s]); rem.append(y); rem_cl.append(cl[s])
         if r["scorable_candles"] > 0:
-            lo = r["L"]
+            lo = r.get("lo", r["L"])
             hi = lo + r["scorable_candles"] - 1
             years += (idx[hi] - idx[lo]).total_seconds() / (365.25 * 86400)
     f = lambda v: np.asarray(v, float)

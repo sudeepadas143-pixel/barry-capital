@@ -1,10 +1,10 @@
-# V5 validation protocol, Amendment 1: small-cluster inference (PROPOSED, NOT IN FORCE)
+# V5 validation protocol, Amendment 1: small-cluster inference (exploration scope ADOPTED; confirmatory scope NOT ADOPTED)
 
 | | |
 |---|---|
 | amends | [`V5_VALIDATION_PROTOCOL.md`](V5_VALIDATION_PROTOCOL.md) §5 (sample minimums and dependence) and the inference parts of §6 |
 | version | protocol 1.0 → 1.1 if adopted |
-| status | **PROPOSED.** Not applied to any confirmatory result. Adoption requires the external review (audit blocker B1) to approve it in writing, then a commit that changes this status line to "ADOPTED" and records the date. It must be adopted, or replaced, before any G3 (confirmatory) run |
+| status | **Split decision, recorded 2026-10-27:** EXPLORATION SCOPE: ADOPTED as protocol v1.1-exploration (owner instruction to proceed without an external reviewer; self-audit `V5_SELF_AUDIT.md`). CONFIRMATORY SCOPE: NOT ADOPTED. That still requires an independent review, then a commit that records it explicitly; until then `research.v5_gate.confirmatory_blockers()` refuses every G3 run |
 | motivation | audit finding S1 (`V5_INDEPENDENT_AUDIT.md`): the percentile cluster bootstrap is anti-conservative with few clusters, and the protocol allows G = 8 |
 | written | 2026-10-27, before any V5 detector output existed |
 
@@ -62,3 +62,15 @@
 * 1D/1W label windows longer than their blocks (audit U5): those need longer blocks before any
   1D/1W evaluation.
 * The trial count of exploration. It is disclosed, not corrected for.
+
+## Resolution record
+
+* **2026-10-27, exploration scope adopted.**
+  * Exploratory decisions (variant selection and rejection at exploration) use the wild cluster
+    bootstrap p and the t(G−1) interval.
+  * They need G ≥ 10 clusters.
+  * The percentile bootstrap is reported as secondary.
+  * Reason: the method is better calibrated than the percentile bootstrap (synthetic check above).
+    Exploration makes no confirmatory claim.
+* **Confirmatory scope: not adopted.** Without an independent review the G ≥ 20 rule and the
+  method are not in force for G3. No confirmatory run is possible until they are.

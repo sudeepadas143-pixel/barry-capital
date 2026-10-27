@@ -176,4 +176,4 @@ A passing software test is never presented as evidence of predictive value.
 
 | no. | subject | status | document |
 |---|---|---|---|
-| 1 | small-cluster inference: wild cluster bootstrap and t(G−1) as the decision statistics; G ≥ 10 for exploratory decisions and G ≥ 20 for confirmatory cells | **PROPOSED, not in force** (needs external review approval; must be resolved before any G3) | [`V5_PROTOCOL_AMENDMENT_1.md`](V5_PROTOCOL_AMENDMENT_1.md) |
+| 1 | small-cluster inference: wild cluster bootstrap and t(G−1) as the decision statistics; G ≥ 10 for exploratory decisions and G ≥ 20 for confirmatory cells | **exploration scope ADOPTED 2026-10-27 (v1.1-exploration); confirmatory scope NOT ADOPTED** (needs independent review before any G3) | [`V5_PROTOCOL_AMENDMENT_1.md`](V5_PROTOCOL_AMENDMENT_1.md) |

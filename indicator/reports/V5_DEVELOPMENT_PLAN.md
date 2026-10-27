@@ -212,6 +212,15 @@ A, B, C and D can run in parallel after E0. None waits for another, and none is 
     [`V5_C_EXPLORATION_RESULTS.md`](V5_C_EXPLORATION_RESULTS.md).
   * Recommendation: reject all eight variants at x1; nominate none for an untouched-data test.
 
+* **2026-10-27: workstream M, stages A/B (crypto BTC-regime context), EXPLORATORY ONLY**:
+  * Configuration [`V5_M_B_CONFIG.md`](V5_M_B_CONFIG.md) frozen in `498292f`; code committed in
+    `6fffd0c`.
+  * 10 trials recorded and committed before computation; ledger chain verified; 36/36 pairs at
+    1H and 4H; exit 0.
+  * Result: no cell ADDS VALUE. All four hypotheses are INCONCLUSIVE under both Holm scopes
+    (22 cells NO VALUE, 14 INCONCLUSIVE).
+  * Summary: [`V5_M_B_SUMMARY.md`](V5_M_B_SUMMARY.md).
+
 ## 9. Next executable task (original wording, kept for the record)
 
 *Done 2026-10-27 (see §8).* Build **E0**: `research/v5_state.py` and `research/v5_eval.py`. They need:
@@ -261,9 +270,16 @@ starts only after E0 is merged and the trial ledger exists.
    * commit, and run the full suite.
 3. Only when `require_c_ready()` passes, run the first trial `c-x1-C1a-W-1H`.
 
-## 13. Next executable task (current)
+## 13. Next executable task (superseded by workstream M; kept for the record)
 
 1. Review of [`V5_C_EXPLORATION_SUMMARY.md`](V5_C_EXPLORATION_SUMMARY.md) by the project owner.
 2. Do not start any other experiment, redesign (x2) or Pine change until that review decides between:
    * closing family C at x1;
    * a new configuration version, with these 18 trials counted against it.
+
+## 14. Next executable task (current)
+
+Review of [`V5_M_B_SUMMARY.md`](V5_M_B_SUMMARY.md) by the project owner. Until then:
+* no follow-up experiment;
+* no new configuration version;
+* no Pine change.

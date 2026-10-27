@@ -295,4 +295,22 @@ case gives INCONCLUSIVE, never RETAIN.
 
 ## Amendments
 
-(none)
+### Amendment 1 (committed 2026-10-27, after the stage D debug run, before any holdout computation)
+
+* **Trigger.** Stage D's trading view showed an always-long crypto volatility of ~3,967% a year.
+  The cause is LUNAUSDT: its daily open-to-open price moves ×3,124 on 2022-05-13, and the ticker
+  later trades a different token (LUNA 2.0). That is a token swap or relisting, not a market move.
+* **Rule.** For every instrument, find the first day whose next daily open is more than 20× or
+  less than 1/20 of its own open. All its candles from that day on are excluded on every TF,
+  together with their HTF frames (`research.v41.integrity_cut`).
+* **Scope.** Applied to both stages.
+* **Thresholds.** The 20× threshold is fixed here. Moves that are large but real stay in. In the
+  seen data:
+  * DOGE ×4.9 (2021-01-28);
+  * FIL ×6.3 (2020-10-15);
+  * SRM ×14.2 on its first trading day.
+* **What it changes.** Only LUNAUSDT is affected in the seen data, from 2022-05-12. Holdout
+  instruments are screened by the same code at run time, and any cut is reported. No definition
+  in §2–§6 changes.
+* **Disclosure.** The same LUNAUSDT artifact is present in the v3 and V4 data. It is noted in the
+  V4.1 reports and was not re-run.

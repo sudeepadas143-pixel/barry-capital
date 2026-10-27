@@ -69,26 +69,25 @@ reports/
    | ≤2D → 1D | 4H | 1W | 1M | 5 / 2 | 5 |
    | longer → 1W | 1D | 1M | 3M | 4 / 2 | 4 |
 
-3. What appears on the chart:
+3. What appears on the chart: two signal types, nothing else.
 
    | mark | meaning |
    |---|---|
-   | **MAJOR BULL/BEAR · REALIGNMENT** (solid) | The chart-timeframe structure turned back into the higher-timeframe direction after a counter move: a pullback ended. HTF1 + HTF2 with it, neither against. At most one per pullback. |
-   | **CONFIRMED · CONTINUATION** (faded) | Another structure break in the HTF direction. |
-   | **WATCH** (orange) | The chart structure broke *against* the higher timeframes: a possible HTF reversal developing, recognised before the HTF trend itself changes. **Not a signal**: these lost money on average in testing, so they are information, not a call. |
-   | `!` (small, orange) | Early warning from the LTF: the lower-timeframe structure flipped against the chart structure. Earliest and least reliable. |
-   | nothing | Neutral: no break, HTFs flat or conflicting, or a counter-HTF continuation. Most candles. |
+   | **▲ BULLISH** (green arrow below the candle) | The chart-timeframe structure turned back up into the higher-timeframe direction after a pullback (HTF1 + HTF2 with it, neither against). At most one per pullback. |
+   | **▼ BEARISH** (red arrow above the candle) | The same, downward. |
+   | nothing | Neutral: no qualifying break, HTFs flat or conflicting, or a break against the HTFs. Most candles. |
 
-   Hover any label: the level broken, both HTF trends, LTF momentum and structure, RSI/MACD, ADX,
-   body size in ATR, fair-value gap, relative volume, whether a liquidity sweep preceded the break,
-   and the out-of-sample record of this profile. The `ctx` letters (M S D V L T) show which context
-   conditions held. **They are context, not a score and not a probability**: none of them improved
-   outcomes in testing, so none gates a signal.
+   Arrows sit outside the candle's wick (`yloc.belowbar` / `yloc.abovebar`) so they never cover price;
+   size is selectable (Small / Normal / Large). Hover an arrow for the level broken, both HTF trends,
+   the LTF reading and this profile's out-of-sample record. *Also mark continuation breaks* (off by
+   default) adds arrows for further breaks in the HTF direction, using the same two arrows. The
+   counter-HTF "watch" and LTF early-warning conditions are still computed by the unchanged engine
+   but are no longer drawn or alerted; they appear only in the off-by-default parity export.
 4. The dashboard shows the 1H/4H/1D/1W trends from completed candles (timeframes below the chart show
    `—`), LTF readings, MTF structure, an alignment line that says **HTF CONFLICT — neutral** or
    **NEUTRAL / mixed** unless everything lines up, the last signal, the configuration and the record.
-5. Alerts: MAJOR bullish/bearish, CONFIRMED bullish/bearish, WATCH, early warning, and a JSON
-   `alert()` payload. All once per closed candle.
+5. Alerts: BULLISH and BEARISH (the arrows shown), plus a JSON `alert()` payload. Once per closed
+   candle.
 6. *Use the tested configuration* (default on). Off lets you switch the context conditions into
    gates and set thresholds, for research. The dashboard then says **CUSTOM — unvalidated**.
 

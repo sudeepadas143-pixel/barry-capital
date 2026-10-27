@@ -134,7 +134,9 @@ def portfolio(series, events_by_symbol: dict, windows: list, max_hold: int) -> d
         if ev is None or len(ev) == 0:
             continue
         t = E.simulate(ev, s.f, s.cost, max_hold)
-        r = E.bar_returns(t, s.f, s.cost)
+        # a position cannot lose more than the capital behind it (a short through a
+        # several-fold squeeze would otherwise go below -100%)
+        r = np.maximum(E.bar_returns(t, s.f, s.cost), -0.9999)
         mask = np.zeros(len(r), bool)
         for a, b in windows:
             mask |= (s.index >= a) & (s.index < b)

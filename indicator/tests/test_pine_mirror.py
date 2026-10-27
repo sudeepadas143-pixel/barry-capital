@@ -30,7 +30,7 @@ def test_pine_logic_matches_research_engine(seed, vol, profile):
 
 def test_pine_file_has_the_same_constants():
     """Spot-check that the Pine source still uses the parameters the research code tests."""
-    src = (Path(__file__).resolve().parent.parent / "pine" / "HighConvictionMTF.pine").read_text()
+    src = (Path(__file__).resolve().parent.parent / "pine" / "v1" / "HighConvictionMTF_v1.pine").read_text()
     for needle in ["ta.atr(14)", "ta.ema(close, 21)", "ta.rsi(close, 14)", "ta.macd(close, 12, 26, 9)",
                    "ta.dmi(14, 14)", "ta.sma(volume, 20)", "htfTrend()[1], lookahead = barmerge.lookahead_on",
                    'input.float(20.0, "ADX minimum"', 'input.float(0.5, "Displacement', 'input.float(1.3, "Volume multiple',

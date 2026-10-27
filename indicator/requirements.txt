@@ -3,4 +3,5 @@ pandas>=2.2
 yfinance>=0.2.50
 requests>=2.31
 pytest>=8
-pynescript>=0.2  # optional: Pine syntax check
+pynescript>=0.2   # optional: Pine syntax check
+backtrader>=1.9.78   # optional: crosscheck/ only (GPL-3.0)

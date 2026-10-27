@@ -17,6 +17,7 @@ class Asset:
     source: str     # yahoo or binance
     volume: bool    # does the feed carry real traded volume?
     session: str    # "rth" (exchange hours) or "24h"
+    tier: str = ""  # crypto only: large / mid / small / defunct
 
 
 # Round-trip cost in basis points of notional (commission + half-spread both ways + slippage).
@@ -53,13 +54,61 @@ UNIVERSE = [
     Asset("USDJPY=X", "fx", "yahoo", False, "24h"),
     Asset("GBPUSD=X", "fx", "yahoo", False, "24h"),
     Asset("AUDUSD=X", "fx", "yahoo", False, "24h"),
-    Asset("BTCUSDT", "crypto", "binance", True, "24h"),
-    Asset("ETHUSDT", "crypto", "binance", True, "24h"),
-    Asset("XRPUSDT", "crypto", "binance", True, "24h"),
-    Asset("LTCUSDT", "crypto", "binance", True, "24h"),
-    Asset("ADAUSDT", "crypto", "binance", True, "24h"),
-    Asset("BNBUSDT", "crypto", "binance", True, "24h"),
-    Asset("LINKUSDT", "crypto", "binance", True, "24h"),
+    Asset("BTCUSDT", "crypto", "binance", True, "24h", "large"),
+    Asset("ETHUSDT", "crypto", "binance", True, "24h", "large"),
+    Asset("XRPUSDT", "crypto", "binance", True, "24h", "large"),
+    Asset("LTCUSDT", "crypto", "binance", True, "24h", "mid"),
+    Asset("ADAUSDT", "crypto", "binance", True, "24h", "mid"),
+    Asset("BNBUSDT", "crypto", "binance", True, "24h", "large"),
+    Asset("LINKUSDT", "crypto", "binance", True, "24h", "mid"),
 ]
 
-BY_SYMBOL = {a.symbol: a for a in UNIVERSE}
+# FRESH: symbols added for v2 BEFORE any v2 result existed, and never used to design,
+# screen or tune anything. They are the cross-sectional out-of-sample test. The crypto
+# list spans large caps, mid caps, thin small caps and coins that collapsed or were
+# delisted (LUNA, FTT, SRM, WAVES; MATIC was migrated to POL), which is the closest free
+# data gets to a survivorship-free sample.
+FRESH = [
+    Asset("SOLUSDT", "crypto", "binance", True, "24h", "large"),
+    Asset("DOGEUSDT", "crypto", "binance", True, "24h", "large"),
+    Asset("TRXUSDT", "crypto", "binance", True, "24h", "large"),
+    Asset("BCHUSDT", "crypto", "binance", True, "24h", "large"),
+    Asset("DOTUSDT", "crypto", "binance", True, "24h", "mid"),
+    Asset("ATOMUSDT", "crypto", "binance", True, "24h", "mid"),
+    Asset("ETCUSDT", "crypto", "binance", True, "24h", "mid"),
+    Asset("XLMUSDT", "crypto", "binance", True, "24h", "mid"),
+    Asset("FILUSDT", "crypto", "binance", True, "24h", "mid"),
+    Asset("ALGOUSDT", "crypto", "binance", True, "24h", "mid"),
+    Asset("NEOUSDT", "crypto", "binance", True, "24h", "small"),
+    Asset("ZECUSDT", "crypto", "binance", True, "24h", "small"),
+    Asset("ICXUSDT", "crypto", "binance", True, "24h", "small"),
+    Asset("ZILUSDT", "crypto", "binance", True, "24h", "small"),
+    Asset("LUNAUSDT", "crypto", "binance", True, "24h", "defunct"),
+    Asset("FTTUSDT", "crypto", "binance", True, "24h", "defunct"),
+    Asset("SRMUSDT", "crypto", "binance", True, "24h", "defunct"),
+    Asset("WAVESUSDT", "crypto", "binance", True, "24h", "defunct"),
+    Asset("MATICUSDT", "crypto", "binance", True, "24h", "defunct"),
+    Asset("MSFT", "equity", "yahoo", True, "rth"),
+    Asset("KO", "equity", "yahoo", True, "rth"),
+    Asset("WMT", "equity", "yahoo", True, "rth"),
+    Asset("CVX", "equity", "yahoo", True, "rth"),
+    Asset("C", "equity", "yahoo", True, "rth"),
+    Asset("DIS", "equity", "yahoo", True, "rth"),
+    Asset("VZ", "equity", "yahoo", True, "rth"),
+    Asset("NKE", "equity", "yahoo", True, "rth"),
+    Asset("DIA", "equity_index", "yahoo", True, "rth"),
+    Asset("EWJ", "equity_index", "yahoo", True, "rth"),
+    Asset("FXI", "equity_index", "yahoo", True, "rth"),
+    Asset("EWZ", "equity_index", "yahoo", True, "rth"),
+    Asset("HYG", "bond", "yahoo", True, "rth"),
+    Asset("LQD", "bond", "yahoo", True, "rth"),
+    Asset("UNG", "commodity", "yahoo", True, "rth"),
+    Asset("CPER", "commodity", "yahoo", True, "rth"),
+    Asset("CORN", "commodity", "yahoo", True, "rth"),
+    Asset("USDCAD=X", "fx", "yahoo", False, "24h"),
+    Asset("USDCHF=X", "fx", "yahoo", False, "24h"),
+    Asset("NZDUSD=X", "fx", "yahoo", False, "24h"),
+    Asset("EURJPY=X", "fx", "yahoo", False, "24h"),
+]
+
+BY_SYMBOL = {a.symbol: a for a in UNIVERSE + FRESH}

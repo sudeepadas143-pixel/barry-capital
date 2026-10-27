@@ -39,7 +39,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LEDGER = ROOT / "reports" / "V5_TRIAL_LEDGER.jsonl"
 HYPOTHESES = ("A1", "A2", "B1", "B2", "B3", "C1", "C2", "C3", "C4", "C5",
-              "D1", "D2", "D3", "D4", "D5", "E1", "E2", "E3")
+              "D1", "D2", "D3", "D4", "D5", "E1", "E2", "E3",
+              "M-A", "M-B1", "M-B2", "M-B3", "M-B4")          # workstream M: reports/V5_M_B_CONFIG.md
 PARTITIONS = ("exploration", "reserve_xs", "forward")
 GENESIS = "0" * 64
 

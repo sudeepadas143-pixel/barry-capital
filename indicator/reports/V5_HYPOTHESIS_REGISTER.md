@@ -208,4 +208,19 @@ reversal detector against labelled bottoms instead.
 
 ## Amendments
 
-(none)
+### Amendment M1 (2026-10-27): workstream M, crypto market context
+
+Hypotheses added for the crypto-only workstream M, stages A and B. They are defined, with gates,
+cells, statistics and decision rules, in [`V5_M_B_CONFIG.md`](V5_M_B_CONFIG.md), which was
+frozen before any M code was written or any M outcome computed. All start **untested**, at stage
+**exploration**.
+
+| id | statement (short) |
+|---|---|
+| M-A | price-only reference (S-eng, S-htf, S-ema, S-st, R-cr): no pass/fail rule |
+| M-B1 | long continuation signals do better when BTC is bull, within the pair's own state |
+| M-B2 | short continuation signals do better when BTC is bear, after short costs |
+| M-B3 | continuation signals do better outside BTC high-volatility periods |
+| M-B4 | reversal alerts land near labelled major turns more often when BTC is not with the old trend |
+
+They do not change any earlier hypothesis, label or event definition.

@@ -35,6 +35,9 @@ CONFIG = "reports/V5_C_EXPLORATION_CONFIG.md"
 MANIFEST = "reports/V5_EXPLORATION_DATA_MANIFEST.json"
 BASELINES = "research/v5_baselines.py"
 DETECTORS = "research/v5_detect_c.py"
+# workstream M (reports/V5_M_B_CONFIG.md §10.5)
+M_CONFIG = "reports/V5_M_B_CONFIG.md"
+M_CODE = ("research/v5_context.py", "research/v5_inference.py", "scripts/v5_m_explore.py")
 
 
 class NotReady(RuntimeError):
@@ -97,6 +100,39 @@ def require_c_ready(root: Path = ROOT) -> str:
     b = c_blockers(root)
     if b:
         raise NotReady("family-C evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def m_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    """Workstream M (crypto BTC-regime context) exploration gate: review mode valid (independent
+    or the self-audited exploration waiver), the M configuration committed, unmodified and
+    FROZEN, baselines and the M code committed and unmodified, and the cache equal to the
+    manifest. c_blockers() and confirmatory_blockers() are unaffected."""
+    out = []
+    if review_mode(root) is None:
+        out += _review_problems(root) + _waiver_problems(root)
+    if not committed_and_clean(M_CONFIG, root):
+        out.append(f"M1: {M_CONFIG} missing, uncommitted or modified")
+    elif "Status: FROZEN" not in (root / M_CONFIG).read_text():
+        out.append(f"M1: {M_CONFIG} is not frozen (Status: FROZEN absent)")
+    for f in (BASELINES, *M_CODE):
+        if not committed_and_clean(f, root):
+            out.append(f"M2: {f} missing, uncommitted or modified")
+    if not committed_and_clean(MANIFEST, root):
+        out.append(f"M3: {MANIFEST} missing, uncommitted or modified")
+    elif check_cache:
+        from .v5_manifest import verify
+        v = verify(root / MANIFEST)
+        if any(v.values()):
+            out.append(f"M3: cache differs from the manifest: {v}")
+    return out
+
+
+def require_m_ready(root: Path = ROOT) -> str:
+    """Raise if any workstream-M blocker remains; otherwise return the review mode."""
+    b = m_blockers(root)
+    if b:
+        raise NotReady("workstream-M evaluation is blocked:\n  " + "\n  ".join(b))
     return review_mode(root)
 
 

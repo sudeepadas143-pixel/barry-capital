@@ -177,3 +177,4 @@ A passing software test is never presented as evidence of predictive value.
 | no. | subject | status | document |
 |---|---|---|---|
 | 1 | small-cluster inference: wild cluster bootstrap and t(G−1) as the decision statistics; G ≥ 10 for exploratory decisions and G ≥ 20 for confirmatory cells | **exploration scope ADOPTED 2026-10-27 (v1.1-exploration); confirmatory scope NOT ADOPTED** (needs independent review before any G3) | [`V5_PROTOCOL_AMENDMENT_1.md`](V5_PROTOCOL_AMENDMENT_1.md) |
+| M1 | workstream M (crypto-only, stages A/B): universe of 35 non-BTC cached crypto pairs with point-in-time eligibility; per-pair reporting; Δ test with time clusters (calendar blocks and BTC episodes, larger p decides); Holm within each hypothesis, with all-cell Holm as a sensitivity | **exploration scope, 2026-10-27**; no confirmatory scope | [`V5_M_B_CONFIG.md`](V5_M_B_CONFIG.md) |

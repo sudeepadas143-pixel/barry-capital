@@ -105,3 +105,62 @@ def cluster_mean_test(x, clusters, reps: int = 9999, seed: int = 20261027, alter
                 "alternative": alternative, "valid": bool(G >= 10),
                 "why": None if G >= 10 else "fewer than 10 clusters: report, do not decide"})
     return out
+
+
+def cluster_diff_test(x, kept, clusters, reps: int = 9999, seed: int = 20261027, weights: str | None = None) -> dict:
+    """Difference in means Δ = mean(x | kept) - mean(x | not kept), as the slope of OLS x on
+    [1, kept], with a CR1 cluster-robust t (G-1 df) and a wild cluster RESTRICTED bootstrap
+    (Δ = 0 imposed: x* = mean(x) + w_g (x - mean(x)), one weight per cluster shared by every unit
+    in it). One-sided H1: Δ > 0. Used by workstream M (reports/V5_M_B_CONFIG.md §7), where the
+    clusters are time units shared by all pairs, so cross-pair dependence stays inside a cluster.
+
+    With c = the slope row of (X'X)^-1 X', Δ = c'x and the CR1 variance is
+    G/(G-1) * sum_g (sum_{u in g} c_u e_u)^2 with e the OLS residuals. Under the restricted
+    bootstrap the per-cluster scores are linear in the weights, so replicates are vectorised."""
+    x = np.asarray(x, float)
+    k = np.asarray(kept, bool).astype(float)
+    cl = np.asarray(clusters)
+    ok = ~np.isnan(x)
+    x, k, cl = x[ok], k[ok], cl[ok]
+    n = len(x)
+    u, inv = _cluster_sums(x, cl)
+    G = len(u)
+    n1 = int(k.sum())
+    out = {"n": int(n), "n_kept": n1, "n_removed": int(n - n1), "clusters": int(G)}
+    if G < 2 or n1 == 0 or n1 == n:
+        out.update({"delta": None, "valid": False, "why": "fewer than 2 clusters or an empty group"})
+        return out
+    m1, m0 = x[k == 1].mean(), x[k == 0].mean()
+    delta = float(m1 - m0)
+    # slope row of (X'X)^-1 X' for X = [1, k]: c_u = (k_u - kbar) / sum (k - kbar)^2
+    kb = k.mean()
+    c = (k - kb) / np.sum((k - kb) ** 2)
+    a_row = 1.0 / n - kb * c                           # intercept row: a = sum a_row_u x_u
+    resid = x - (m0 + delta * k)
+    score = np.bincount(inv, weights=c * resid, minlength=G)
+    se = float(np.sqrt(G / (G - 1) * np.sum(score ** 2)))
+    t = delta / se if se > 0 else np.inf * np.sign(delta)
+    q = stats.t.ppf(0.975, G - 1)
+    wkind = weights or ("rademacher" if G >= 12 else "webb")
+    rng = np.random.default_rng(seed)
+    W = rng.choice([-1.0, 1.0], size=(reps, G)) if wkind == "rademacher" else rng.choice(WEBB, size=(reps, G))
+    xb = x.mean()
+    r = x - xb                                          # restricted residuals (Δ = 0)
+    s_c = np.bincount(inv, weights=c * r, minlength=G)  # Δ*  = W @ s_c   (c sums to 0)
+    s_a = np.bincount(inv, weights=a_row * r, minlength=G)
+    C_g = np.bincount(inv, weights=c, minlength=G)
+    D_g = np.bincount(inv, weights=c * k, minlength=G)
+    d_star = W @ s_c
+    a_star = xb + W @ s_a                               # a_row sums to 1
+    # per-cluster score of the refit: sum_{u in g} c_u (x*_u - a* - Δ* k_u)
+    #   = xb C_g + w_g s_c_g - a* C_g - Δ* D_g
+    sc_star = xb * C_g[None, :] + W * s_c[None, :] - a_star[:, None] * C_g[None, :] - d_star[:, None] * D_g[None, :]
+    se_star = np.sqrt(G / (G - 1) * np.sum(sc_star ** 2, axis=1))
+    with np.errstate(divide="ignore", invalid="ignore"):
+        t_star = np.where(se_star > 0, d_star / se_star, 0.0)
+    p_w = float((1 + np.sum(t_star >= t)) / (reps + 1))
+    out.update({"delta": delta, "mean_kept": float(m1), "mean_removed": float(m0), "se_cr1": se, "t": float(t),
+                "df": int(G - 1), "ci95": [delta - q * se, delta + q * se], "p_t": float(stats.t.sf(t, G - 1)),
+                "p_wild": p_w, "wild_weights": wkind, "valid": bool(G >= 10),
+                "why": None if G >= 10 else "fewer than 10 clusters: report, do not decide"})
+    return out

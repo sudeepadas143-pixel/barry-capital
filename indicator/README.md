@@ -176,7 +176,24 @@ at Holm p < 0.05, beats unfiltered breaks, and the DEV record also beat random (
 
 ## Results
 
-### Latest: V4 root-cause audit. Decision: REPLACE HYPOTHESIS
+### Latest: V4.1 hypothesis tests on 38 new instruments
+
+[`reports/V4_1_FINAL_RECOMMENDATION.md`](reports/V4_1_FINAL_RECOMMENDATION.md).
+
+Decisions:
+
+| hypothesis | decision |
+|---|---|
+| H6 (trend state alone) | INCONCLUSIVE |
+| H7v (more volatility after compression) | INCONCLUSIVE |
+| H7d (breakout direction) | INCONCLUSIVE |
+| H1r (structure-break increment) | INCONCLUSIVE |
+| H1r target cell | REJECT |
+
+No hypothesis showed credible incremental value, so no new indicator was built. Crypto 1H/4H
+trend state and crypto 1H compression range are left for the pre-registered forward test.
+
+### V4 root-cause audit. Decision: REPLACE HYPOTHESIS
 
 [`reports/V4_FINAL_HANDOFF_REPORT.md`](reports/V4_FINAL_HANDOFF_REPORT.md) (start here) ·
 [`reports/V4_ROOT_CAUSE_AUDIT.md`](reports/V4_ROOT_CAUSE_AUDIT.md) ·

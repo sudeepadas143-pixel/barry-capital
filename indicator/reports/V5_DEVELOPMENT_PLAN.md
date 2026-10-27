@@ -158,9 +158,25 @@ A, B, C and D can run in parallel after E0. None waits for another, and none is 
 | TradingView data and runtime differ from Python | G5 export parity is mandatory |
 | Pressure to ship four families | the plan explicitly allows rejecting any family |
 
-## 8. Next executable task
+## 8. Progress log
 
-Build **E0**: `research/v5_state.py` and `research/v5_eval.py`. They need:
+* **2026-10-27: E0 shared infrastructure implemented** (`research/v5_state.py`, `v5_eval.py`,
+  `v5_costs.py`, `v5_ledger.py`, `v5_data.py`; tests in `tests/test_v5_infra.py`).
+  * Full suite 75 passed. Mutation checks confirm the lookahead, double-claim and freeze tests
+    fail when the protections are removed.
+  * Design, review findings and limitations: [`V5_INFRASTRUCTURE_REPORT.md`](V5_INFRASTRUCTURE_REPORT.md).
+  * No detector built, nothing evaluated, no trial recorded.
+  * Format change, recorded here: the trial ledger is `reports/V5_TRIAL_LEDGER.jsonl`
+    (hash-chained JSON Lines), not the `.md` named in the register.
+* **Blockers before the first family evaluation (C, major tops, 1H/4H exploration):**
+  * (1) an independent review of the E0 modules for leakage and statistical errors;
+  * (2) a committed evaluation configuration (variants, cells, metrics, trial ids).
+
+  Both are open.
+
+## 9. Next executable task (original wording, kept for the record)
+
+*Done 2026-10-27 (see §8).* Build **E0**: `research/v5_state.py` and `research/v5_eval.py`. They need:
 
 * the causal state classifier;
 * matched-benchmark builders for A/B;
@@ -177,3 +193,14 @@ Its tests must cover:
 
 No detector is evaluated in that task. The first evaluation, family C on 1H/4H exploration data,
 starts only after E0 is merged and the trial ledger exists.
+
+## 10. Next executable task (current)
+
+1. **Independent review** of the E0 modules against `V5_INFRASTRUCTURE_REPORT.md`, with every
+   finding fixed and logged.
+2. **Write and commit** `reports/V5_C_EXPLORATION_CONFIG.md`:
+   * detectors C1–C5 as registered;
+   * 1H/4H cells on exploration data;
+   * the metrics requested from `research.v5_eval`;
+   * ledger trial ids.
+3. Only then run the first exploratory family-C trial through `research.v5_ledger.record`.

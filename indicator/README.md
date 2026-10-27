@@ -176,7 +176,16 @@ at Holm p < 0.05, beats unfiltered breaks, and the DEV record also beat random (
 
 ## Results
 
-### Latest: V4.1 hypothesis tests on 38 new instruments
+### Roadmap: V5, four signal families (planning only; no new signals yet)
+
+[`reports/V5_DEVELOPMENT_PLAN.md`](reports/V5_DEVELOPMENT_PLAN.md) is the canonical roadmap.
+
+* **Four families**: bullish continuation, bearish continuation, major tops, major bottoms.
+* **Supporting documents**: hypothesis register, validation protocol, data audit.
+* **Every family must pass its own gates and may be rejected.** The production indicator is
+  unchanged.
+
+### V4.1 hypothesis tests on 38 new instruments
 
 [`reports/V4_1_FINAL_RECOMMENDATION.md`](reports/V4_1_FINAL_RECOMMENDATION.md).
 

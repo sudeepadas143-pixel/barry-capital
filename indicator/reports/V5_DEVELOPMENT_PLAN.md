@@ -203,6 +203,15 @@ A, B, C and D can run in parallel after E0. None waits for another, and none is 
     * freezing the configuration after review;
     * writing and committing `research/v5_detect_c.py`.
 
+* **2026-10-27: family C 1H/4H exploration run (EXPLORATORY ONLY, self-audited, no external review)**:
+  * 18 trials recorded and committed before computation; ledger chain verified; 96/96 instruments at each
+    TF; no execution failures.
+  * Frozen §8 outcome: no variant qualifies, so family C at x1 is **REJECTED at exploration or REDESIGN**.
+    §9 drops none (formally inconclusive).
+  * Summary: [`V5_C_EXPLORATION_SUMMARY.md`](V5_C_EXPLORATION_SUMMARY.md); full tables:
+    [`V5_C_EXPLORATION_RESULTS.md`](V5_C_EXPLORATION_RESULTS.md).
+  * Recommendation: reject all eight variants at x1; nominate none for an untouched-data test.
+
 ## 9. Next executable task (original wording, kept for the record)
 
 *Done 2026-10-27 (see §8).* Build **E0**: `research/v5_state.py` and `research/v5_eval.py`. They need:
@@ -240,7 +249,7 @@ starts only after E0 is merged and the trial ledger exists.
 * Then, and only then, record the first exploratory family-C trial through
   `research.v5_ledger.record`.
 
-## 12. Next executable task (current)
+## 12. Next executable task (superseded by the family C run; kept for the record)
 
 1. **External review** (B1) of the audit fixes and of this pre-experiment work, at the commit
    that adds them, using `V5_PRE_EXPERIMENT_STATUS.md` as the checklist. The reviewer records the
@@ -251,3 +260,10 @@ starts only after E0 is merged and the trial ledger exists.
    * implement `research/v5_detect_c.py` exactly as §3, with causality tests on synthetic data;
    * commit, and run the full suite.
 3. Only when `require_c_ready()` passes, run the first trial `c-x1-C1a-W-1H`.
+
+## 13. Next executable task (current)
+
+1. Review of [`V5_C_EXPLORATION_SUMMARY.md`](V5_C_EXPLORATION_SUMMARY.md) by the project owner.
+2. Do not start any other experiment, redesign (x2) or Pine change until that review decides between:
+   * closing family C at x1;
+   * a new configuration version, with these 18 trials counted against it.

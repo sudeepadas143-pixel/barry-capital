@@ -20,7 +20,7 @@ indicator("High-Conviction MTF Trend Signals", shorttitle = "HC-MTF", overlay = 
 //   tooltip as context. They do NOT gate signals: none of them improved outcomes in the
 //   pre-registered screening (reports/SCREENING.md). Gating on them would make signals
 //   rarer without making them better. The evidence count is not a probability.
-//   Each profile's out-of-sample record is in the dashboard and label tooltip.
+//   On the chart: only Bullish ▲ / Bearish ▼ arrows. No dashboard, no diagnostics.
 //
 // Integrity: closed candles only (default); HTF via f()[1] + lookahead_on (previous
 // completed HTF candle); LTF via request.security_lower_tf read on the closed chart
@@ -91,12 +91,7 @@ volMode = input.string("Auto", "Volume", options = ["Auto", "On", "Off"], group 
 G4 = "Display"
 onClose   = input.bool(true, "Signals on closed candles only", group = G4)
 showCont  = input.bool(false, "Also mark continuation breaks", group = G4,
-     tooltip = "Off (default): arrows mark the high-conviction signals only (structure turning back into the higher-timeframe direction). On: further breaks in the HTF direction are marked too, with the same BULLISH/BEARISH arrows.")
-arrowSize = input.string("Normal", "Arrow size", options = ["Small", "Normal", "Large"], group = G4)
-textStyle = input.string("Chart text colour", "Label text", options = ["Chart text colour", "Same as arrow"], group = G4,
-     tooltip = "Chart text colour keeps BULLISH/BEARISH readable on light and dark themes, with the arrow carrying the colour.")
-showLvls  = input.bool(true, "Show unbroken swing levels", group = G4)
-showDash  = input.bool(true, "Show dashboard", group = G4)
+     tooltip = "Off (default): arrows mark the high-conviction signals only (structure turning back into the higher-timeframe direction). On: further breaks in the HTF direction are marked too, with the same Bullish/Bearish arrows.")
 parity    = input.bool(false, "Parity export (plots codes for scripts/compare_tv_export.py)", group = G4)
 
 // ── profile and ladder ───────────────────────────────────────────────────────
@@ -119,7 +114,6 @@ confirmT = useValidated ? pick(VAL_CONFIRM_1H, VAL_CONFIRM_4H, VAL_CONFIRM_1D, V
 majorT   = useValidated ? pick(VAL_MAJOR_1H, VAL_MAJOR_4H, VAL_MAJOR_1D, VAL_MAJOR_1W) : majorIn
 
 isCrypto = syminfo.type == "crypto"
-valText = isCrypto ? pick(VAL_TEXT_1H_C, VAL_TEXT_4H_C, VAL_TEXT_1D_C, VAL_TEXT_1W_C) : pick(VAL_TEXT_1H_O, VAL_TEXT_4H_O, VAL_TEXT_1D_O, VAL_TEXT_1W_O)
 // items listed in CRYPTO_ONLY were kept by screening for crypto only; elsewhere they are off
 ok(string name, bool use) => use and (isCrypto or not str.contains(CRYPTO_ONLY, "|" + name + "|"))
 uMom  = useValidated ? ok("momentum", USE_MOMENTUM) : cMomIn
@@ -282,8 +276,6 @@ bool warm = not na(atr) and not na(rsi) and not na(hist) and not na(adx)
 // ── tiers and cooldown ───────────────────────────────────────────────────────
 var int lastDir = 0
 var int lastBar = na
-var string lastText = "none yet"
-var int lastSigBar = na
 bool gate = onClose ? barstate.isconfirmed : true
 bool isSig = false
 bool isMajor = false
@@ -311,39 +303,23 @@ if trend != 0 and wFire and armed != leg and gate
     isWarn := true
     armed := leg
 
-// ── drawing: two signal types only, BULLISH ▲ and BEARISH ▼ ─────────────────
-colBull = #089981
+// ── drawing: two signal types only — Bullish ▲ below the candle, Bearish ▼ above ─
+// Native plotshape arrows (see the Pine "Text and shapes" docs). location.belowbar /
+// abovebar keeps each arrow and its word clear of the wick; display.pane keeps the
+// values out of the status line, so nothing but the arrows sits on the chart.
+colBull = #2962FF
 colBear = #F23645
-colWarn = #FF9800
-tw(float t) => na(t) ? "n/a" : t > 0 ? "up" : t < 0 ? "down" : "flat"
 
 // The signal itself is unchanged; this only decides which signals get an arrow.
 bool showSig = isSig and (isMajor or showCont)
 bool bullSig = showSig and dir > 0
 bool bearSig = showSig and dir < 0
-lblSize = arrowSize == "Small" ? size.small : arrowSize == "Large" ? size.large : size.normal
+bool prov = not barstate.isconfirmed
 
-if showSig
-    side = dir > 0 ? "BULLISH" : "BEARISH"
-    tip = side + " — " + (cls == "REALIGNMENT" ? "the " + timeframe.period + " structure turned back into the higher-timeframe direction" : "the " + timeframe.period + " structure broke again in the higher-timeframe direction") +
-         "\nBroke " + (dir > 0 ? "swing high " : "swing low ") + str.tostring(level, format.mintick) +
-         "\nHTF1 " + htf1TF + ": " + tw(t1) + " · HTF2 " + htf2TF + ": " + tw(t2) +
-         "\nLTF " + ltfTF + ": momentum " + tw(ltfMom) + ", structure " + tw(ltfStr) +
-         "\nRecord (" + profile + "): " + valText
-    prov = not barstate.isconfirmed
-    c = dir > 0 ? colBull : colBear
-    // Arrow styles draw the arrow at the candle's low/high with the text on the far side,
-    // and yloc above/below bar keeps both clear of the wick.
-    label.new(bar_index, dir > 0 ? low : high, (prov ? "? " : "") + side, xloc = xloc.bar_index,
-         yloc = dir > 0 ? yloc.belowbar : yloc.abovebar,
-         style = dir > 0 ? label.style_arrowup : label.style_arrowdown,
-         color = prov ? color.new(c, 60) : c, textcolor = color.new(textStyle == "Same as arrow" ? c : chart.fg_color, prov ? 50 : 0),
-         size = lblSize, text_formatting = text.format_bold, tooltip = tip)
-    lastText := side
-    lastSigBar := bar_index
-
-plot(showLvls and not shUsed ? sh : na, "Unbroken swing high", color = color.new(colBear, 40), style = plot.style_linebr)
-plot(showLvls and not slUsed ? sl : na, "Unbroken swing low", color = color.new(colBull, 40), style = plot.style_linebr)
+plotshape(bullSig, "Bullish", shape.arrowup, location.belowbar, color = prov ? color.new(colBull, 60) : colBull,
+     text = "Bullish", textcolor = prov ? color.new(chart.fg_color, 50) : chart.fg_color, size = size.small, display = display.pane)
+plotshape(bearSig, "Bearish", shape.arrowdown, location.abovebar, color = prov ? color.new(colBear, 60) : colBear,
+     text = "Bearish", textcolor = prov ? color.new(chart.fg_color, 50) : chart.fg_color, size = size.small, display = display.pane)
 
 // parity export: one number per candle per item, readable from "Export chart data"
 plot(parity ? (isSig ? dir * (isMajor ? 2 : 1) : 0) : na, "parity_signal", display = display.data_window)
@@ -355,41 +331,8 @@ plot(parity ? t2 : na, "parity_htf2", display = display.data_window)
 plot(parity ? ltfMom : na, "parity_ltf_mom", display = display.data_window)
 plot(parity ? ltfStr : na, "parity_ltf_struct", display = display.data_window)
 
-// ── dashboard ────────────────────────────────────────────────────────────────
-trendAt(string tf) => request.security(syminfo.tickerid, tf, htfTrend()[1], lookahead = barmerge.lookahead_on)
-tH1 = trendAt("60")
-tH4 = trendAt("240")
-tD  = trendAt("D")
-tW  = trendAt("W")
-cellT(float t, bool lower) => lower ? "—" : na(t) ? "n/a" : t > 0 ? "▲ up" : t < 0 ? "▼ down" : "◆ flat"
-cellC(float t, bool lower) => lower or na(t) ? color.gray : t > 0 ? colBull : t < 0 ? colBear : color.gray
-
-bullN = (t1 == 1 ? 1 : 0) + (t2 == 1 ? 1 : 0) + (trend == 1 ? 1 : 0) + (rsi > 50 and hist > 0 ? 1 : 0)
-bearN = (t1 == -1 ? 1 : 0) + (t2 == -1 ? 1 : 0) + (trend == -1 ? 1 : 0) + (rsi < 50 and hist < 0 ? 1 : 0)
-bullC = barstate.isconfirmed ? bullN : bullN[1]
-bearC = barstate.isconfirmed ? bearN : bearN[1]
-alignTxt = bullC == 4 ? "ALIGNED BULLISH" : bearC == 4 ? "ALIGNED BEARISH" : (t1 == 1 or t2 == 1) and (t1 == -1 or t2 == -1) ? "HTF CONFLICT — neutral" : "NEUTRAL / mixed"
-alignC = bullC == 4 ? colBull : bearC == 4 ? colBear : color.gray
-
-var table dash = table.new(position.top_right, 2, 11, bgcolor = color.new(#131722, 10), border_color = color.new(color.gray, 70), border_width = 1)
-row(int r, string k, string v, color c) =>
-    table.cell(dash, 0, r, k, text_color = color.gray, text_size = size.small, text_halign = text.align_left)
-    table.cell(dash, 1, r, v, text_color = c, text_size = size.small, text_halign = text.align_right)
-if showDash and barstate.islast
-    row(0, "HC-MTF · " + profile, "LTF " + ltfTF + " · HTF " + htf1TF + "/" + htf2TF, color.white)
-    row(1, "1H", cellT(tH1, chartSec > 3600), cellC(tH1, chartSec > 3600))
-    row(2, "4H", cellT(tH4, chartSec > 14400), cellC(tH4, chartSec > 14400))
-    row(3, "1D", cellT(tD, chartSec > 86400), cellC(tD, chartSec > 86400))
-    row(4, "1W", cellT(tW, chartSec > 604800), cellC(tW, chartSec > 604800))
-    row(5, "LTF " + ltfTF, "momentum " + tw(ltfMom) + " · structure " + tw(ltfStr), color.white)
-    row(6, "MTF structure", trend > 0 ? "bullish" : trend < 0 ? "bearish" : "undefined", trend > 0 ? colBull : trend < 0 ? colBear : color.gray)
-    row(7, "Alignment", alignTxt, alignC)
-    row(8, "Last signal", (lastText == "BULLISH" ? "▲ " : lastText == "BEARISH" ? "▼ " : "") + lastText + (na(lastSigBar) ? "" : " (" + str.tostring(bar_index - lastSigBar) + " ago)"), lastText == "BULLISH" ? colBull : lastText == "BEARISH" ? colBear : color.white)
-    row(9, "Configuration", useValidated ? "tested (HTF-gated, no evidence gate)" : "CUSTOM evidence gate — unvalidated", useValidated ? color.white : colWarn)
-    row(10, "Out-of-sample record", valText, color.white)
-
 // ── alerts: the same two signal types ────────────────────────────────────────
-alertcondition(bullSig, "BULLISH", "HC-MTF BULLISH ▲ {{ticker}} {{interval}} {{close}}")
-alertcondition(bearSig, "BEARISH", "HC-MTF BEARISH ▼ {{ticker}} {{interval}} {{close}}")
+alertcondition(bullSig, "Bullish", "HC-MTF Bullish ▲ {{ticker}} {{interval}} {{close}}")
+alertcondition(bearSig, "Bearish", "HC-MTF Bearish ▼ {{ticker}} {{interval}} {{close}}")
 if showSig
-    alert('{"ticker":"' + syminfo.tickerid + '","tf":"' + timeframe.period + '","signal":"' + (dir > 0 ? "BULLISH" : "BEARISH") + '","close":' + str.tostring(close) + '}', alert.freq_once_per_bar_close)
+    alert('{"ticker":"' + syminfo.tickerid + '","tf":"' + timeframe.period + '","signal":"' + (dir > 0 ? "Bullish" : "Bearish") + '","close":' + str.tostring(close) + '}', alert.freq_once_per_bar_close)

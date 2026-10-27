@@ -73,23 +73,21 @@ reports/
 
    | mark | meaning |
    |---|---|
-   | **▲ BULLISH** (green arrow below the candle) | The chart-timeframe structure turned back up into the higher-timeframe direction after a pullback (HTF1 + HTF2 with it, neither against). At most one per pullback. |
-   | **▼ BEARISH** (red arrow above the candle) | The same, downward. |
-   | nothing | Neutral: no qualifying break, HTFs flat or conflicting, or a break against the HTFs. Most candles. |
+   | **▲ Bullish** (blue arrow below the candle, word underneath) | The chart-timeframe structure turned back up into the higher-timeframe direction after a pullback (HTF1 + HTF2 with it, neither against). At most one per pullback. |
+   | **▼ Bearish** (red arrow above the candle, word on top) | The same, downward. |
+   | nothing | Neutral: most candles. |
 
-   Arrows sit outside the candle's wick (`yloc.belowbar` / `yloc.abovebar`) so they never cover price.
-   The arrow carries the colour; the BULLISH/BEARISH text uses the chart's text colour (or the arrow
-   colour, selectable), so it reads well on light and dark themes;
-   size is selectable (Small / Normal / Large). Hover an arrow for the level broken, both HTF trends,
-   the LTF reading and this profile's out-of-sample record. *Also mark continuation breaks* (off by
-   default) adds arrows for further breaks in the HTF direction, using the same two arrows. The
-   counter-HTF "watch" and LTF early-warning conditions are still computed by the unchanged engine
-   but are no longer drawn or alerted; they appear only in the off-by-default parity export.
-4. The dashboard shows the 1H/4H/1D/1W trends from completed candles (timeframes below the chart show
-   `—`), LTF readings, MTF structure, an alignment line that says **HTF CONFLICT — neutral** or
-   **NEUTRAL / mixed** unless everything lines up, the last signal, the configuration and the record.
-5. Alerts: BULLISH and BEARISH (the arrows shown), plus a JSON `alert()` payload. Once per closed
-   candle.
+   Drawn with native `plotshape(shape.arrowup / shape.arrowdown)` at `location.belowbar /
+   abovebar`, so arrows sit clear of the wick; the word uses the chart's text colour. No dashboard,
+   no tables, no swing lines, no status-line values, no diagnostics. *Also mark continuation
+   breaks* (off by default) adds the same arrows for further breaks in the HTF direction.
+   Preview (rendered offline from the engine's signals, not a TradingView screenshot):
+   [`reports/preview_BTCUSDT_1H.png`](reports/preview_BTCUSDT_1H.png).
+4. Alerts: Bullish and Bearish (exactly the arrows shown), plus a JSON `alert()` payload. Once per
+   closed candle.
+5. The diagnostics that used to be on the chart (HTF/LTF trends, alignment, out-of-sample record)
+   are documented here and in `reports/`; the optional *Parity export* writes codes to the data
+   window only, for `scripts/compare_tv_export.py`.
 6. *Use the tested configuration* (default on). Off lets you switch the context conditions into
    gates and set thresholds, for research. The dashboard then says **CUSTOM — unvalidated**.
 

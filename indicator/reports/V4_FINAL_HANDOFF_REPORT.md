@@ -355,19 +355,20 @@ Baseline for V4: commit `84c9f13` (last commit before this phase).
 | `reports/V4_ANALYSIS_PLAN.md` | created (commit `e62033f`) | pre-declared diagnostic plan, before any V4 number | no |
 | `scripts/v4_root_cause.py` | created (commit `e9509b2`) | V4 diagnostics (read-only use of `hcmtf`) | no |
 | `reports/v4_root_cause.json` | created (commit `e9509b2`) | raw V4 output | no |
-| `scripts/v4_tables.py` | created (final commit) | renders `V4_TABLES.md` | no |
-| `reports/V4_TABLES.md` | created (final commit) | all cells | no |
-| `tests/test_v4_symmetry.py` | created (final commit) | bull/bear mirror test | no |
-| `reports/V4_ROOT_CAUSE_AUDIT.md`, `V4_HYPOTHESIS_REGISTER.md`, `V4_DATA_AND_VALIDATION_GAPS.md`, `V4_FINAL_HANDOFF_REPORT.md` | created (final commit) | deliverables | no |
+| `scripts/v4_tables.py` | created (commit `3638077`) | renders `V4_TABLES.md` | no |
+| `reports/V4_TABLES.md` | created (commit `3638077`) | all cells | no |
+| `tests/test_v4_symmetry.py` | created (commit `3638077`) | bull/bear mirror test | no |
+| `reports/V4_ROOT_CAUSE_AUDIT.md`, `V4_HYPOTHESIS_REGISTER.md`, `V4_DATA_AND_VALIDATION_GAPS.md`, `V4_FINAL_HANDOFF_REPORT.md` | created (commit `3638077`) | deliverables | no |
+| `README.md` | modified (commit `3638077`): a "Latest: V4" section pointing to these reports, noting the corrected v3 statements | documentation | no |
 
-* No file was deleted, and no existing file was modified.
+* No file was deleted. `README.md` is the only existing file modified, and it is documentation.
 * Production check: `git diff 84c9f13 -- pine hcmtf HC-MTF_TradingView.txt HC-MTF_StrategyTester.txt reports/active_config.json` returns 0 lines.
 * sha256 values, unchanged:
   * `pine/HighConvictionMTF.pine` = `HC-MTF_TradingView.txt` = `eb95dd5b…22c5`;
   * `pine/HighConvictionMTF_strategy.pine` = `HC-MTF_StrategyTester.txt` = `b7e7a367…b24c`;
   * `hcmtf/engine.py` = `8022e67a…3de1`.
-* The final commit hash is reported in the terminal summary. There are no uncommitted changes
-  after it.
+* Commits: `e62033f` (plan), `e9509b2` (diagnostics), `3638077` (reports, tables, symmetry test,
+  README), plus a follow-up commit correcting this change log. There are no uncommitted changes.
 
 ## Questions for Independent Review
 

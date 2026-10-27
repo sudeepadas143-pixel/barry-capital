@@ -1,0 +1,6 @@
+numpy>=2.0
+pandas>=2.2
+yfinance>=0.2.50
+requests>=2.31
+pytest>=8
+pynescript>=0.2  # optional: Pine syntax check

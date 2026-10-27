@@ -73,3 +73,12 @@ reported for every timeframe and overrides any "best configuration" language.
 | purgedcv (landtml) | MIT | Combinatorial purged CV splits with label end times and embargo. |
 | finlab-ml (landtml) | MIT | PBO (CSCV), deflated Sharpe, triple-barrier labelling cross-check. |
 | pinescript-strategy-template (baronguyen001) | MIT | `pinewf pine-lint` on the Pine files; Monte Carlo on trade lists; reference for a `strategy()` twin of the indicator for TradingView's Strategy Tester. |
+
+## Amendment 1 (before any v3 result was computed)
+
+* `purgedcv` requires a unique time index, and pooled events share timestamps across symbols, so
+  CPCV runs on time buckets of pooled events (weeks for 1H/4H, months for 1D/1W); a bucket's label
+  end time t1 is the bucket end plus the horizon.
+* A fixed rule such as C2 sees identical data in every CPCV path, so criterion 3 is applied to the
+  6 chronological CPCV groups instead: **C2's mean r_h must be positive in at least 4 of the 6
+  groups**. The CPCV paths are used, as stated, for the selection question.

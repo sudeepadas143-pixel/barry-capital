@@ -176,7 +176,19 @@ at Holm p < 0.05, beats unfiltered breaks, and the DEV record also beat random (
 
 ## Results
 
-### Latest: v3 (pre-registered, leakage-aware, deflated for repeated testing)
+### Latest: V4 root-cause audit. Decision: REPLACE HYPOTHESIS
+
+[`reports/V4_FINAL_HANDOFF_REPORT.md`](reports/V4_FINAL_HANDOFF_REPORT.md) (start here) ·
+[`reports/V4_ROOT_CAUSE_AUDIT.md`](reports/V4_ROOT_CAUSE_AUDIT.md) ·
+[`reports/V4_HYPOTHESIS_REGISTER.md`](reports/V4_HYPOTHESIS_REGISTER.md) ·
+[`reports/V4_DATA_AND_VALIDATION_GAPS.md`](reports/V4_DATA_AND_VALIDATION_GAPS.md).
+
+The software works as specified, but structure breaks show no predictive value once matched
+against random candles in the same higher-timeframe state. Some of the v3 statements below are
+corrected there: the PROMISING p-values ignored dependence, and the deflated-Sharpe explanation
+was wrong for two cells. The production indicator is unchanged.
+
+### v3 (pre-registered, leakage-aware, deflated for repeated testing)
 
 [`reports/V3_SUMMARY.md`](reports/V3_SUMMARY.md) · pre-registration
 [`reports/PREREG_V3.md`](reports/PREREG_V3.md) · tables [`reports/V3_RESULTS.md`](reports/V3_RESULTS.md) ·

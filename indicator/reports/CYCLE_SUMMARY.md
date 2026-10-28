@@ -86,7 +86,8 @@
 
 ## What ships
 
-* **Model choice.** `pine/HC_CycleEngine.pine` implements the **pre-registered,
+* **Model choice.** The CY-1 indicator (then `pine/HC_CycleEngine.pine`; now superseded by
+  `pine/Kenny_Divergence_Indicator.pine`, see `reports/KENNY_DIVERGENCE.md`) implemented the **pre-registered,
   validation-selected** models (config section 4), refit on train+validation, with their
   matched-rate thresholds. The test results were **not** used to switch models. Switching to the
   test winner would be test-set selection.
@@ -116,7 +117,8 @@
 
 ## Using the indicator
 
-1. In TradingView: Pine Editor > paste `pine/HC_CycleEngine.pine` > Add to chart. The production
+1. The CY-1 indicator is superseded: use `pine/Kenny_Divergence_Indicator.pine` and
+   `reports/KENNY_DIVERGENCE.md`. (Historical CY-1 usage:) In TradingView: Pine Editor > paste the indicator > Add to chart. The production
    HC-MTF indicator is unchanged.
 2. The timeframe sets the scale automatically: 1W = major cycles, 1D = intermediate, 4H/1H =
    swings. Below 1H, the 1H set is used (unvalidated).

@@ -46,6 +46,8 @@ CY_CONFIG = "reports/CYCLE_CONFIG.md"
 CY_CODE = ("research/cycle_features.py", "scripts/cycle_research.py", "research/v5_inference.py")
 CY2_CONFIG = "reports/CYCLE2_CONFIG.md"
 CY2_CODE = CY_CODE + ("research/cycle2_features.py", "scripts/cycle2_research.py")
+KB_CONFIG = "reports/KB_CONFIG.md"
+KB_CODE = CY2_CODE + ("research/kb_signals.py", "scripts/kb_bench.py")
 
 
 class NotReady(RuntimeError):
@@ -203,6 +205,17 @@ def cy_blockers(root: Path = ROOT, check_cache: bool = True, config: str = CY_CO
 
 def cy2_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
     return cy_blockers(root, check_cache, CY2_CONFIG, CY2_CODE)
+
+
+def kb_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KB_CONFIG, KB_CODE)
+
+
+def require_kb_ready(root: Path = ROOT) -> str:
+    b = kb_blockers(root)
+    if b:
+        raise NotReady("KB benchmark is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
 
 
 def require_cy2_ready(root: Path = ROOT) -> str:

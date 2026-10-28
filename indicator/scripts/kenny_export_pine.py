@@ -24,7 +24,7 @@ RESULTS = ROOT / "reports" / "cycle2_results.json"
 OUT = ROOT / "pine" / "Kenny_Divergence_Indicator.pine"
 BUCKET = {"1W": 3, "1D": 2, "4H": 1, "1H": 0}
 TIERS = ("warning", "standard", "high")
-CHUNK = 64
+CHUNK = 32
 
 _s = importlib.util.spec_from_file_location("cycle_export_pine", ROOT / "scripts" / "cycle_export_pine.py")
 _X = importlib.util.module_from_spec(_s)
@@ -72,33 +72,35 @@ def flat_logodds(fl: dict, x) -> float:
     return s
 
 
-def _fill(name: str, vals: list, fmt) -> list[str]:
-    out = [f"        {name} := array.new<{'float' if fmt is _f else 'int'}>()"]
+def _fill(name: str, vals: list, fmt, b: int) -> list[str]:
+    """One small `if` per chunk: TradingView rejects long if-blocks (CE10205 "if statement is too long")."""
+    out = []
     for i in range(0, len(vals), CHUNK):
-        out.append(f"        {name}.concat(array.from({', '.join(fmt(v) for v in vals[i:i + CHUNK])}))")
+        out += [f"if barstate.isfirst and bucket == {b}",
+                f"    {name}.concat(array.from({', '.join(fmt(v) for v in vals[i:i + CHUNK])}))"]
     return out
 
 
 def model_block(S: dict, d: str) -> str:
-    """Per-bucket model loading for direction d (runs once, on the first bar)."""
+    """Per-bucket model loading for direction d (runs once, on the first bar). Arrays start empty
+    (`var`), so only the active bucket's chunks fill them."""
     D = d.capitalize()
-    L = [f"if barstate.isfirst"]
+    L = []
     for tf, b in BUCKET.items():
         if tf not in S["tfs"]:
             continue
         sp = S["tfs"][tf]["models"][d]
-        L.append(f"    if bucket == {b}")
         th = sp["theta"]
-        L += [f"        th{D}W := {_f(th['warning'])}", f"        th{D}S := {_f(th['standard'])}", f"        th{D}H := {_f(th['high'])}",
-              f"        name{D} := \"{sp['model']}\""]
+        L += [f"if barstate.isfirst and bucket == {b}", f"    th{D}W := {_f(th['warning'])}", f"    th{D}S := {_f(th['standard'])}",
+              f"    th{D}H := {_f(th['high'])}", f"    name{D} := \"{sp['model']}\""]
         if sp["kind"] == "gb":
             FV_ORDER_PINE(sp["features"])                                # refuses unportable features
             fl = flatten(sp)
-            L += [f"        gb{D} := true", f"        base{D} := {_f(fl['base'])}"]
+            L += [f"    gb{D} := true", f"    base{D} := {_f(fl['base'])}"]
             for k, fmt in (("nf", str), ("nt", _f), ("nm", str), ("nl", str), ("nr", str), ("nv", _f), ("roots", str)):
-                L += _fill(f"{k}{D}", fl[k], fmt)
+                L += _fill(f"{k}{D}", fl[k], fmt, b)
         elif sp["kind"] == "base":
-            L += [f"        gb{D} := false", f"        sign{D} := {_f(sp['sign'])}"]
+            L += [f"    gb{D} := false", f"    sign{D} := {_f(sp['sign'])}"]
             if sp["feature"] != "ext_c":
                 raise ValueError("baseline must be B_ext")
         else:
@@ -175,14 +177,11 @@ indicator("Kenny's Divergence Indicator", shorttitle = "Kenny Div", overlay = tr
 
 // ---------------------------------------------------------------- inputs
 grpS = "Signal"
-buyMode  = input.string("__BUYDEF__", "BUY signal", options = [__BUYOPTS__], group = grpS,
-                        tooltip = "Internal state that draws the green BUY triangle. Early Warning = earliest, most false alerts; High Conviction = fewer, more precise, before the turn; Confirmed = after the turn, later entry. Defaults: reports/KENNY_DIVERGENCE.md.")
-sellMode = input.string("__SELLDEF__", "SELL signal", options = [__SELLOPTS__], group = grpS,
-                        tooltip = "Internal state that draws the red SELL triangle (same states as BUY).")
+buyMode  = input.string("__BUYDEF__", "BUY signal", options = [__BUYOPTS__], group = grpS, tooltip = "Internal state that draws the green BUY triangle. Early Warning = earliest, most false alerts; High Conviction = fewer, more precise, before the turn; Confirmed = after the turn, later entry. Defaults: reports/KENNY_DIVERGENCE.md.")
+sellMode = input.string("__SELLDEF__", "SELL signal", options = [__SELLOPTS__], group = grpS, tooltip = "Internal state that draws the red SELL triangle (same states as BUY).")
 showBuy  = input.bool(true, "BUY triangles", group = grpS)
 showSell = input.bool(true, "SELL triangles", group = grpS)
-volMode  = input.string("Auto", "Volume features", options = ["Auto", "Off"], group = grpS,
-                        tooltip = "Auto uses volume features when the feed has volume on >90% of the last 50 candles; otherwise they are treated as missing (as for no-volume instruments in the research).")
+volMode  = input.string("Auto", "Volume features", options = ["Auto", "Off"], group = grpS, tooltip = "Auto uses volume features when the feed has volume on >90% of the last 50 candles; otherwise they are treated as missing (as for no-volume instruments in the research).")
 grpA = "Advanced display (off by default)"
 showStates = input.bool(false, "Mark every internal state (dots and labels)", group = grpA)
 showBg     = input.bool(false, "Shade candles above the High Conviction threshold", group = grpA)
@@ -485,15 +484,25 @@ def generate(S: dict, R: dict | None = None, buy: str = DEFAULT_BUY, sell: str =
 def parse_arrays(src: str, d: str, bucket: int) -> dict:
     """Read the flat arrays for (direction, bucket) back out of generated Pine (for parity tests)."""
     D = d.capitalize()
-    blk = src.split(f"if barstate.isfirst")[1 if d == "top" else 2]
-    part = blk.split(f"    if bucket == {bucket}\n")[1].split("\n    if bucket")[0]
-    out = {}
-    for k in ("nf", "nt", "nm", "nl", "nr", "nv", "roots"):
-        vals = []
-        for m in re.finditer(rf"{k}{D}\.concat\(array\.from\(([^)]*)\)\)", part):
-            vals += [float(x) for x in m.group(1).split(", ")]
-        out[k] = [int(x) for x in vals] if k in ("nf", "nm", "nl", "nr", "roots") else vals
-    out["base"] = float(re.search(rf"base{D} := (\S+)", part).group(1))
+    out = {k: [] for k in ("nf", "nt", "nm", "nl", "nr", "nv", "roots")}
+    base, cur = None, None
+    for ln in src.splitlines():
+        m = re.match(r"if barstate\.isfirst and bucket == (\d)$", ln)
+        if m:
+            cur = int(m.group(1))
+            continue
+        if cur != bucket or not ln.startswith("    "):
+            if not ln.startswith("    "):
+                cur = None
+            continue
+        m = re.match(rf"    (nf|nt|nm|nl|nr|nv|roots){D}\.concat\(array\.from\((.*)\)\)$", ln)
+        if m:
+            out[m.group(1)] += [float(x) for x in m.group(2).split(", ")]
+        m = re.match(rf"    base{D} := (\S+)$", ln)
+        if m:
+            base = float(m.group(1))
+    out = {k: ([int(x) for x in v] if k in ("nf", "nm", "nl", "nr", "roots") else v) for k, v in out.items()}
+    out["base"] = base
     return out
 
 

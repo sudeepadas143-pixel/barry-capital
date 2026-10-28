@@ -61,6 +61,8 @@ KW4_CONFIG = "reports/KW4_CONFIG.md"
 KW4_CODE = KW3_CODE + ("scripts/kw4_eval.py",)
 KW5_CONFIG = "reports/KW5_CONFIG.md"
 KW5_CODE = KW3_CODE + ("scripts/kw5_eval.py",)
+KW6_CONFIG = "reports/KW6_SPEC.md"
+KW6_CODE = KW3_CODE + ("research/weekly_cycle.py", "scripts/kw6_eval.py")
 KC_CODE = KB_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "scripts/kc_eval.py", "scripts/kenny_export_pine.py")
 
 
@@ -292,6 +294,17 @@ def require_kw5_ready(root: Path = ROOT) -> str:
     b = kw5_blockers(root)
     if b:
         raise NotReady("KW-5 evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def kw6_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KW6_CONFIG, KW6_CODE)
+
+
+def require_kw6_ready(root: Path = ROOT) -> str:
+    b = kw6_blockers(root)
+    if b:
+        raise NotReady("KW-6 evaluation is blocked:\n  " + "\n  ".join(b))
     return review_mode(root)
 
 

@@ -55,9 +55,14 @@ CODE_FILES = ["research/cycle2_features.py", "scripts/cycle2_research.py", "rese
 
 def build(args):
     sym, tf = args
-    CR.ST.classify = lambda *a, **k: None          # CY-1 confirmation baselines are not used by CY-2: skip them
-    CR.B.generate = lambda *a, **k: {}
-    r = CR.build((sym, tf))
+    # CY-1's build also computes confirmation baselines, which CY-2 does not use: skip them for
+    # this call only (restored afterwards; the shared modules are never left patched)
+    keep = (CR.ST.classify, CR.B.generate)
+    CR.ST.classify, CR.B.generate = (lambda *a, **k: None), (lambda *a, **k: {})
+    try:
+        r = CR.build((sym, tf))
+    finally:
+        CR.ST.classify, CR.B.generate = keep
     if r is None:
         return None
     o, h, l, c = r["ohlc"]

@@ -88,7 +88,10 @@ def test_walk_forward_dry_run(monkeypatch):
     monkeypatch.setattr(M.CR.DG, "load", lambda sym, tf: frames[sym][tf])
     monkeypatch.setattr(M, "YEARS", {**M.YEARS, "1D": [2016, 2018, 2020, 2022]})
     monkeypatch.setattr(M, "VARIANTS", {"d2": M.VARIANTS["d2"]})
+    from research import v5_baselines as B, v5_state as ST
+    before = (ST.classify, B.generate)
     res = [M.build((s, "1D")) for s in SYMS]
+    assert (ST.classify, B.generate) == before                            # shared modules left unpatched
     assert all(r is not None for r in res)
     al = M.walk_forward(res, "1D", "bot", "GBB")
     n = sum(len(v["standard"]) for v in al.values())

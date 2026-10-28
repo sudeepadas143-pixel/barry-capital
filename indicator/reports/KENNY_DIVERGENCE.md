@@ -154,6 +154,16 @@ reach similar win rates at 4H and 1H only with far more false alerts.
   None lowered the premature rate (still about 60% before 2018 and 45% from 2018), so the
   warning-versus-false-alert trade-off is unresolved.
 
+  KW-5 (`reports/KW5_RESULTS.md`) tested a two-state design: an early warning (A), then a weekly
+  structure and momentum breakdown within 13 weeks.
+  * **Confirmation carries information about the warning.** Confirmed warnings were useful
+    28–29% of the time against 4–5% for unconfirmed ones (premature 30–40% vs 73–79%).
+  * **Acting on the confirmation itself is no better.** It arrives about 5 weeks later, after a
+    2–5% drop, and 14–29% of confirmations are already late. Measured from the confirmation week,
+    the useful rate falls to 15–18%, below the warning's own.
+  * Neither confirmation-only nor warning + confirmation passed the KW-3 rule, so the weekly SELL
+    is unchanged.
+
 ## How to test in TradingView
 
 1. Pine Editor → paste `pine/Kenny_Divergence_Indicator.pine` → Save → Add to chart. Report any

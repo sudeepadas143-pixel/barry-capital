@@ -149,6 +149,11 @@ reach similar win rates at 4H and 1H only with far more false alerts.
   the frozen adoption rule, so the shipped weekly SELL is unchanged. No tested weekly SELL is
   profitable as a short after costs.
 
+  KW-4 (`reports/KW4_RESULTS.md`) tested three refinements of A, each against one hypothesis for
+  its premature signals: stronger exhaustion, failed-breakout confirmation and regime awareness.
+  None lowered the premature rate (still about 60% before 2018 and 45% from 2018), so the
+  warning-versus-false-alert trade-off is unresolved.
+
 ## How to test in TradingView
 
 1. Pine Editor → paste `pine/Kenny_Divergence_Indicator.pine` → Save → Add to chart. Report any

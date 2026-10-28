@@ -46,6 +46,16 @@ not right by this rule.
 
 **BUY.** Mostly unchanged; slightly stricter on 1W and 4H.
 
+**Strong arrows only** (`reports/KS_CONFIG.md`, `reports/KS_RESULTS.md`). Each arrow gets a
+strength score: margin beyond its threshold, plus independent evidence (divergence, a price-action
+reversal, a volatility/volume burst), plus higher-timeframe agreement. Weak arrows are hidden only
+where strong arrows were measurably more often right:
+* **1W BUY:** right-rate 0.65 vs 0.59 in the check period, keeping about 80% of arrows. The
+  tuning period showed no gain, so the evidence is weak.
+* **1H-and-below BUY:** 0.44 vs 0.40, keeping about 45% of arrows.
+
+Everywhere else, every SELL included, strength did not predict being right, so all arrows stay.
+
 **Rollback.** Setting "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed
 everywhere.
 

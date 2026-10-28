@@ -456,7 +456,51 @@ kBuy  = __KBUY__
 kSell = __KSELL__
 optBuy  = onset(pBot, prevBot, thBotH * kBuy)
 optSell = bucket == 3 ? barstate.isconfirmed and wkTop : __SELLSTATE__
-rawBuy  = profile == "Optimized" ? optBuy : highBot
+// BUY strength (reports/KS_RESULTS.md, = research/kenny_strength.py): margin + independent evidence + HTF agreement;
+// "strong only" where it was more often right in retrospect (1W and 1H-and-below BUY)
+pivLo = low[5] < ta.lowest(low, 5)[6] and low[5] <= ta.lowest(low, 5)
+divScore(array<int> pb, array<float> pp, array<float> pr, array<float> ph, bool isPiv, float px, float rs, float hs) =>
+    float out = 0.0
+    if isPiv
+        int p = bar_index - 5
+        while pb.size() > 0 and p - pb.get(0) > 60
+            pb.shift()
+            pp.shift()
+            pr.shift()
+            ph.shift()
+        if pb.size() > 0
+            for j = pb.size() - 1 to 0
+                int q = pb.get(j)
+                if p - q >= 5
+                    float k = 0.0
+                    bool pxDiv = px < pp.get(j)
+                    if pxDiv and not na(rs) and not na(pr.get(j)) and rs > pr.get(j)
+                        k += 0.5
+                    if pxDiv and not na(hs) and not na(ph.get(j)) and hs > ph.get(j)
+                        k += 0.5
+                    out := k
+                    break
+        pb.push(p)
+        pp.push(px)
+        pr.push(rs)
+        ph.push(hs)
+    out
+var array<int> plB = array.new<int>()
+var array<float> plP = array.new<float>()
+var array<float> plR = array.new<float>()
+var array<float> plH = array.new<float>()
+float eDivBot = 0.0
+if barstate.isconfirmed
+    eDivBot := divScore(plB, plP, plR, plH, pivLo, low[5], r[5], hst[5])
+llPrev = ta.lowest(low, L)[1]
+posPrev = rngOf(L)[1]
+wdNow = rg > 0 ? (math.min(open, close) - low) / rg : 0.0
+paBot = (low < llPrev and close > llPrev) or (close > open and close[1] < open[1] and open <= close[1] and close >= open[1] and posPrev <= 0.1) or (wdNow >= 0.6 and low <= llPrev)
+burstBot = (nz(fRelVol, -9.0) >= 1.0 or nz(fVRatio, -9.0) >= 0.5) and wdNow >= 0.4
+evBot = (ta.highest(eDivBot > 0 ? 1.0 : 0.0, 8) > 0 ? 1 : 0) + (ta.highest(paBot ? 1.0 : 0.0, 3) > 0 ? 1 : 0) + (ta.highest(burstBot ? 1.0 : 0.0, 3) > 0 ? 1 : 0)
+strBuy = (not na(pBot) and pBot >= 1.1 * thBotH * kBuy ? 1 : 0) + evBot + (nz(htfTrend) > 0 ? 1 : 0)
+kStrongBuy = __KSBUY__
+rawBuy  = profile == "Optimized" ? optBuy and strBuy >= kStrongBuy : highBot
 rawSell = profile == "Optimized" ? optSell : confTop
 wkA     = profile == "Optimized" and bucket == 3                   // the weekly-A SELL is not cooled down (as researched)
 // as-shipped de-duplication (= research/kb_signals.dedupe_final): a candle with both is dropped;
@@ -535,13 +579,17 @@ KR_BUY_SCALE = {3: 1.1, 2: 1.0, 1: 1.1, 0: 1.0}                       # High Con
 KR_SELL = {2: ("H", 0.9), 1: ("W", 0.9), 0: ("W", 1.0)}              # bucket 3 uses weekly Candidate A
 
 
+KS_BUY_K = {3: 1, 2: 0, 1: 0, 0: 1}                                  # reports/KS_RESULTS.md adopted strength cut-offs (0 = all arrows)
+
+
 def kr_block() -> dict:
     kb = " : ".join(f"bucket == {b} ? {_f(KR_BUY_SCALE[b])}" for b in (3, 2, 1)) + f" : {_f(KR_BUY_SCALE[0])}"
     ks = " : ".join(f"bucket == {b} ? {_f(KR_SELL[b][1])}" for b in (2, 1)) + f" : {_f(KR_SELL[0][1])}"
     th = {"H": "thTopH", "W": "thTopW"}
     st = " : ".join(f"bucket == {b} ? onset(pTop, prevTop, {th[KR_SELL[b][0]]} * kSell)" for b in (2, 1)) \
         + f" : onset(pTop, prevTop, {th[KR_SELL[0][0]]} * kSell)"
-    return {"__KBUY__": kb, "__KSELL__": ks, "__SELLSTATE__": st}
+    kk = " : ".join(f"bucket == {b} ? {KS_BUY_K[b]}" for b in (3, 2, 1)) + f" : {KS_BUY_K[0]}"
+    return {"__KBUY__": kb, "__KSELL__": ks, "__SELLSTATE__": st, "__KSBUY__": kk}
 
 
 def generate(S: dict, R: dict | None = None) -> str:

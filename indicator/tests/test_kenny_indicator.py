@@ -120,7 +120,7 @@ def test_default_chart_is_only_buy_and_sell_triangles():
     for flag in ("showStates", "showBg", "showTbl"):
         assert re.search(rf"^{flag}\s+= input\.bool\(false", src, re.M), flag
     assert 'input.string("Optimized", "Signal profile", options = ["Optimized", "Previous"]' in src
-    assert 'rawBuy  = profile == "Optimized" ? optBuy : highBot' in src and 'rawSell = profile == "Optimized" ? optSell : confTop' in src
+    assert 'rawBuy  = profile == "Optimized" ? optBuy and strBuy >= kStrongBuy : highBot' in src and 'rawSell = profile == "Optimized" ? optSell : confTop' in src
     assert "buySig := bar_index - lastBuy > Q" in src and "not (rawBuy and rawSell)" in src
 
 
@@ -205,3 +205,18 @@ def test_weekly_sell_pine_mirrors_candidate_a_definition():
                 "math.sum(math.sign(close - close[1]), 52) / math.sqrt(52)", "failedW  = high > hh52p and close < hh52p"):
         assert tok in src, tok
     assert "sellSig := wkA or bar_index - lastSell > Q" in src
+
+
+def test_pine_strength_cutoffs_equal_the_ks_adopted_choices():
+    res = ROOT / "reports" / "ks_results.json"
+    if not res.exists():
+        pytest.skip("no KS results")
+    R = json.loads(res.read_text())
+    bucket = {"1W": 3, "1D": 2, "4H": 1, "1H": 0}
+    for tf, b in bucket.items():
+        assert K.KS_BUY_K[b] == R["tfs"][tf]["bot"]["adopted_k"], tf
+        assert R["tfs"][tf]["top"]["adopted_k"] == 0, tf                # no SELL filter was adopted
+    _, S = _spec()
+    src = K.generate(S)
+    assert "rawBuy  = profile == \"Optimized\" ? optBuy and strBuy >= kStrongBuy : highBot" in src
+    assert "strBuy = (not na(pBot) and pBot >= 1.1 * thBotH * kBuy ? 1 : 0) + evBot + (nz(htfTrend) > 0 ? 1 : 0)" in src

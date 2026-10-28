@@ -200,7 +200,9 @@ TEMPLATE = r'''//@version=6
 //   retrospect" (near the low/high and followed by a move the right way; reports/KR_RESULTS.md):
 //   BUY = High Conviction (threshold x1.1 on 1W/4H); SELL = early top states (1D High Conviction
 //   x0.9, 4H Early Warning x0.9, 1H Early Warning; 1W exhaustion + reversal near the 52-week high).
-//   Input "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed everywhere. A candle with both BUY and SELL draws neither; a same-direction repeat within
+//   Input "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed everywhere.
+//   4H and below also show a small red X when a mature uptrend breaks down (exit / protect;
+//   reports/KT_RESULTS.md); input "Breakdown / exit markers" turns it off. A candle with both BUY and SELL draws neither; a same-direction repeat within
 //   Q candles is suppressed. Timeframe sets the turn scale: >= 1W major, >= 1D intermediate,
 //   >= 1H swing, < 1H local (reuses the 1H model; UNVALIDATED).
 //
@@ -221,6 +223,7 @@ profile  = input.string("Optimized", "Signal profile", options = ["Optimized", "
 showBuy  = input.bool(true, "BUY triangles", group = grpS)
 showSell = input.bool(true, "SELL triangles", group = grpS)
 volMode  = input.string("Auto", "Volume features", options = ["Auto", "Off"], group = grpS, tooltip = "Auto uses volume features when the feed has volume on >90% of the last 50 candles; otherwise they are treated as missing (as for no-volume instruments in the research).")
+showBrk  = input.bool(true, "Breakdown / exit markers (4H and below)", group = grpS, tooltip = "Small red X above the candle: a mature uptrend has broken down (exit / protect). Shown only where it beat its baseline in research (reports/KT_RESULTS.md).")
 grpA = "Advanced display (off by default)"
 showStates = input.bool(false, "Mark every internal state (dots and labels)", group = grpA)
 showBg     = input.bool(false, "Shade candles above the High Conviction threshold", group = grpA)
@@ -520,6 +523,16 @@ cBuy  = #00C853
 cSell = #FF1744
 plotshape(showBuy and buySig, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)
 plotshape(showSell and sellSig, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)
+// breakdown / exit (= research/kenny_types.breakdown; 4H and below, reports/KT_RESULTS.md)
+hh2L   = ta.highest(high, 2 * L)
+nearHi = (hh2L - close) / atr <= 2.0
+matureUp = ta.highest(nearHi ? 1.0 : 0.0, M) > 0
+sma15  = ta.sma(close, int(math.round(1.5 * L)))
+belowS = close < sma15
+firstBelow = belowS and math.sum(belowS[1] ? 1.0 : 0.0, M) == 0
+brkSig = barstate.isconfirmed and bucket <= 1 and firstBelow and matureUp and nz(hst, 1.0) < 0 and (hh2L - close) / atr < 8.0
+plotshape(showBrk and brkSig, "Breakdown", shape.xcross, location.abovebar, cSell, size = size.tiny)
+alertcondition(brkSig, "Kenny Div: Breakdown / exit", "Kenny Div BREAKDOWN {{ticker}} {{interval}} {{close}}")
 alertcondition(buySig, "Kenny Div: BUY", "Kenny Div BUY {{ticker}} {{interval}} {{close}}")
 alertcondition(sellSig, "Kenny Div: SELL", "Kenny Div SELL {{ticker}} {{interval}} {{close}}")
 

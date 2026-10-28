@@ -56,6 +56,17 @@ where strong arrows were measurably more often right:
 
 Everywhere else, every SELL included, strength did not predict being right, so all arrows stay.
 
+**Extra signal types** (`reports/KT_CONFIG.md`, `reports/KT_RESULTS.md`). Four were tested, each
+against its own job and a baseline:
+* **Shown: breakdown / exit, 4H and below only.** A small red X above the candle means a mature
+  uptrend has broken down. It did its job 30–34% of the time, against 17–21% for the baseline.
+  It can be switched off with "Breakdown / exit markers".
+* **Not shown**, because they were no better than their baseline:
+  * caution / take profit (a pullback usually follows any candle near the high anyway);
+  * trend-continuation BUY (worse than simply being in an uptrend);
+  * bottom forming (early);
+  * breakdown on 1W and 1D.
+
 **Rollback.** Setting "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed
 everywhere.
 

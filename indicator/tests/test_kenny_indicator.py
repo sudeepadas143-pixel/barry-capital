@@ -109,7 +109,7 @@ def test_default_chart_is_only_buy_and_sell_triangles():
     _, S = _spec()
     src = K.generate(S)
     plots = [ln for ln in src.splitlines() if ln.startswith(("plotshape(", "plot(", "bgcolor(", "plotchar(", "plotarrow("))]
-    on_by_default = [ln for ln in plots if "showStates" not in ln and "showBg" not in ln]
+    on_by_default = [ln for ln in plots if "showStates" not in ln and "showBg" not in ln and "showBrk" not in ln]
     assert on_by_default == [
         'plotshape(showBuy and buySig, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)',
         'plotshape(showSell and sellSig, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)']
@@ -220,3 +220,19 @@ def test_pine_strength_cutoffs_equal_the_ks_adopted_choices():
     src = K.generate(S)
     assert "rawBuy  = profile == \"Optimized\" ? optBuy and strBuy >= kStrongBuy : highBot" in src
     assert "strBuy = (not na(pBot) and pBot >= 1.1 * thBotH * kBuy ? 1 : 0) + evBot + (nz(htfTrend) > 0 ? 1 : 0)" in src
+
+
+def test_breakdown_marker_follows_kt_result_and_definition():
+    res = ROOT / "reports" / "kt_results.json"
+    if not res.exists():
+        pytest.skip("no KT results")
+    R = json.loads(res.read_text())
+    shown = {tf for tf, cell in R["tfs"].items() for k, v in cell.items() if k == "BRK" and v["adopted"]}
+    assert shown == {"4H", "1H"}
+    assert all(not v["adopted"] for cell in R["tfs"].values() for k, v in cell.items() if k != "BRK")
+    _, S = _spec()
+    src = K.generate(S)
+    for tok in ("brkSig = barstate.isconfirmed and bucket <= 1 and firstBelow and matureUp and nz(hst, 1.0) < 0 and (hh2L - close) / atr < 8.0",
+                "sma15  = ta.sma(close, int(math.round(1.5 * L)))", "firstBelow = belowS and math.sum(belowS[1] ? 1.0 : 0.0, M) == 0",
+                'plotshape(showBrk and brkSig, "Breakdown", shape.xcross, location.abovebar, cSell, size = size.tiny)'):
+        assert tok in src, tok

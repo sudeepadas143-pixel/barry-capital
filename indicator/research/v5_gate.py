@@ -41,6 +41,9 @@ M_CODE = ("research/v5_context.py", "research/v5_inference.py", "scripts/v5_m_ex
 # HC-MTF 6.0 stage 1 (reports/V6_CONT_CONFIG.md §11.3)
 V6_CONFIG = "reports/V6_CONT_CONFIG.md"
 V6_CODE = ("research/v6_signals.py", "research/v5_context.py", "research/v5_inference.py", "scripts/v6_cont_explore.py")
+# cycle engine CY-1 (reports/CYCLE_CONFIG.md §8)
+CY_CONFIG = "reports/CYCLE_CONFIG.md"
+CY_CODE = ("research/cycle_features.py", "scripts/cycle_research.py", "research/v5_inference.py")
 
 
 class NotReady(RuntimeError):
@@ -168,6 +171,36 @@ def require_v6_ready(root: Path = ROOT) -> str:
     b = v6_blockers(root)
     if b:
         raise NotReady("HC-MTF 6.0 evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def cy_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    """Cycle-engine CY-1 exploration gate: valid review mode, CY config committed, unmodified and
+    FROZEN, baselines and CY code committed and unmodified, cache equal to the manifest."""
+    out = []
+    if review_mode(root) is None:
+        out += _review_problems(root) + _waiver_problems(root)
+    if not committed_and_clean(CY_CONFIG, root):
+        out.append(f"Y1: {CY_CONFIG} missing, uncommitted or modified")
+    elif "Status: FROZEN" not in (root / CY_CONFIG).read_text():
+        out.append(f"Y1: {CY_CONFIG} is not frozen (Status: FROZEN absent)")
+    for f in (BASELINES, *CY_CODE):
+        if not committed_and_clean(f, root):
+            out.append(f"Y2: {f} missing, uncommitted or modified")
+    if not committed_and_clean(MANIFEST, root):
+        out.append(f"Y3: {MANIFEST} missing, uncommitted or modified")
+    elif check_cache:
+        from .v5_manifest import verify
+        v = verify(root / MANIFEST)
+        if any(v.values()):
+            out.append(f"Y3: cache differs from the manifest: {v}")
+    return out
+
+
+def require_cy_ready(root: Path = ROOT) -> str:
+    b = cy_blockers(root)
+    if b:
+        raise NotReady("cycle-engine evaluation is blocked:\n  " + "\n  ".join(b))
     return review_mode(root)
 
 

@@ -23,6 +23,32 @@ Rules for the triangles:
 * A candle with both BUY and SELL draws neither.
 * A same-direction repeat within Q = max(2, L/4) candles is suppressed.
 
+## Signal profile "Optimized" (default, `reports/KR_CONFIG.md`, `reports/KR_RESULTS.md`)
+
+The arrows are tuned to be **right enough in retrospect**, not to hit the exact top or bottom. A
+signal counts as right when both hold:
+* its close is in the lowest 25% (BUY) or highest 25% (SELL) of the surrounding range (±L/2
+  candles);
+* price has moved the signal's way L/4 candles later.
+
+Per timeframe, chosen on early data and checked on later data (previously studied):
+
+| chart | BUY | SELL | check-period right-rate, BUY / SELL (previous SELL) |
+|---|---|---|---|
+| 1W | High Conviction, threshold ×1.1 | exhaustion + reversal near the 52-week high | 0.59 / 0.21 (0.01) |
+| 1D | High Conviction | High Conviction top, threshold ×0.9 | 0.54 / 0.30 (0.05) |
+| 4H | High Conviction, threshold ×1.1 | Early Warning top, threshold ×0.9 | 0.56 / 0.24 (0.02) |
+| 1H and below | High Conviction | Early Warning top | 0.40 / 0.28 (0.19) |
+
+**SELL.** The previous SELL (Confirmed) fired after the top, so it was almost never in the top
+quarter of the range. The new SELLs fire earlier: more often near the top, though most are still
+not right by this rule.
+
+**BUY.** Mostly unchanged; slightly stricter on 1W and 4H.
+
+**Rollback.** Setting "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed
+everywhere.
+
 ## Internal states and defaults
 
 | state | rule | timing |

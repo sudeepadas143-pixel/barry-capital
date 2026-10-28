@@ -119,8 +119,8 @@ def test_default_chart_is_only_buy_and_sell_triangles():
             assert "showStates" in prev, ln
     for flag in ("showStates", "showBg", "showTbl"):
         assert re.search(rf"^{flag}\s+= input\.bool\(false", src, re.M), flag
-    assert 'input.string("High Conviction", "BUY signal"' in src and 'input.string("Confirmed", "SELL signal"' in src
-    assert 'rawBuy  = buyMode == "High Conviction" ? highBot' in src and 'rawSell = sellMode == "Confirmed" ? confTop' in src
+    assert 'input.string("Optimized", "Signal profile", options = ["Optimized", "Previous"]' in src
+    assert 'rawBuy  = profile == "Optimized" ? optBuy : highBot' in src and 'rawSell = profile == "Optimized" ? optSell : confTop' in src
     assert "buySig := bar_index - lastBuy > Q" in src and "not (rawBuy and rawSell)" in src
 
 
@@ -177,3 +177,31 @@ def test_shipped_pine_respects_tradingview_size_rules():
     m, S = _spec()
     fl = K.decode(K.encode(K.flatten(S["tfs"]["1W"]["models"]["top"])))
     assert fl["roots"] == K.flatten(S["tfs"]["1W"]["models"]["top"])["roots"]
+
+
+def test_pine_signal_choices_equal_the_kr_adopted_choices():
+    """The per-timeframe BUY/SELL choices written into Pine are exactly those adopted in reports/kr_results.json."""
+    res = ROOT / "reports" / "kr_results.json"
+    if not res.exists():
+        pytest.skip("no KR results")
+    R = json.loads(res.read_text())
+    bucket = {"1W": 3, "1D": 2, "4H": 1, "1H": 0}
+    for tf, b in bucket.items():
+        buy = R["tfs"][tf]["cells"]["bot"]["adopted"]
+        sell = R["tfs"][tf]["cells"]["top"]["adopted"]
+        state, sc = buy.split("|")
+        assert state == "H" and K.KR_BUY_SCALE[b] == float(sc), (tf, buy)
+        if tf == "1W":
+            assert sell == "A"
+        else:
+            st, sc = sell.split("|")
+            assert K.KR_SELL[b] == (st, float(sc)), (tf, sell)
+
+
+def test_weekly_sell_pine_mirrors_candidate_a_definition():
+    _, S = _spec()
+    src = K.generate(S)
+    for tok in ("rally52 >= 6.0", "tsmW >= 0.5", "rsiMax8 >= 65", "rsiW <= rsiMax8 - 5", "dd52 <= 2.0",
+                "math.sum(math.sign(close - close[1]), 52) / math.sqrt(52)", "failedW  = high > hh52p and close < hh52p"):
+        assert tok in src, tok
+    assert "sellSig := wkA or bar_index - lastSell > Q" in src

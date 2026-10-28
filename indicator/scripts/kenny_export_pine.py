@@ -196,8 +196,11 @@ TEMPLATE = r'''//@version=6
 //     High Conviction - probability crosses the HIGH threshold (fewer, more precise; still early)
 //     Confirmed       - after a standard-threshold zone, within L/2 candles: close beyond EMA21
 //                       and a D/4 ATR retreat from the extreme (later, fewer false alerts)
-//   One state per side draws the triangles (defaults: BUY = High Conviction, SELL = Confirmed;
-//   reports/KENNY_DIVERGENCE.md). A candle with both BUY and SELL draws neither; a same-direction repeat within
+//   Which state draws the triangles is chosen per timeframe so that arrows are "right enough in
+//   retrospect" (near the low/high and followed by a move the right way; reports/KR_RESULTS.md):
+//   BUY = High Conviction (threshold x1.1 on 1W/4H); SELL = early top states (1D High Conviction
+//   x0.9, 4H Early Warning x0.9, 1H Early Warning; 1W exhaustion + reversal near the 52-week high).
+//   Input "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed everywhere. A candle with both BUY and SELL draws neither; a same-direction repeat within
 //   Q candles is suppressed. Timeframe sets the turn scale: >= 1W major, >= 1D intermediate,
 //   >= 1H swing, < 1H local (reuses the 1H model; UNVALIDATED).
 //
@@ -214,8 +217,7 @@ indicator("Kenny's Divergence Indicator", shorttitle = "Kenny Div", overlay = tr
 
 // ---------------------------------------------------------------- inputs
 grpS = "Signal"
-buyMode  = input.string("__BUYDEF__", "BUY signal", options = [__BUYOPTS__], group = grpS, tooltip = "Internal state that draws the green BUY triangle. Early Warning = earliest, most false alerts; High Conviction = fewer, more precise, before the turn; Confirmed = after the turn, later entry. Defaults: reports/KENNY_DIVERGENCE.md.")
-sellMode = input.string("__SELLDEF__", "SELL signal", options = [__SELLOPTS__], group = grpS, tooltip = "Internal state that draws the red SELL triangle (same states as BUY).")
+profile  = input.string("Optimized", "Signal profile", options = ["Optimized", "Previous"], group = grpS, tooltip = "Optimized = per-timeframe BUY/SELL choice that is most often right in retrospect (reports/KR_RESULTS.md). Previous = BUY High Conviction / SELL Confirmed on every timeframe (rollback).")
 showBuy  = input.bool(true, "BUY triangles", group = grpS)
 showSell = input.bool(true, "SELL triangles", group = grpS)
 volMode  = input.string("Auto", "Volume features", options = ["Auto", "Off"], group = grpS, tooltip = "Auto uses volume features when the feed has volume on >90% of the last 50 candles; otherwise they are treated as missing (as for no-volume instruments in the research).")
@@ -435,8 +437,28 @@ if barstate.isconfirmed
         bC.push(false)
 
 // ---------------------------------------------------------------- final BUY/SELL (the only default marks)
-rawBuy  = __SELBUY__
-rawSell = __SELSELL__
+// weekly SELL (Optimized profile): exhaustion + reversal near the 52-week high (= research/kenny_weekly_sell.cand_A, R = 6)
+atrW     = ta.atr(14)
+rsiW     = ta.rsi(close, 14)
+rsiMax8  = ta.highest(rsiW, 8)
+tsmW     = math.sum(math.sign(close - close[1]), 52) / math.sqrt(52)
+rally52  = (close - ta.lowest(low, 52)) / atrW
+dd52     = (ta.highest(high, 52) - close) / atrW
+hh52p    = ta.highest(high, 52)[1]
+bodyW    = math.abs(close - open)
+upW      = high - math.max(open, close)
+starW    = upW >= 2 * bodyW and upW >= 0.5 * rg
+engulfW  = close < open and close[1] > open[1] and open >= close[1] and close <= open[1]
+failedW  = high > hh52p and close < hh52p
+wkTop    = rally52 >= 6.0 and tsmW >= 0.5 and rsiMax8 >= 65 and rsiW <= rsiMax8 - 5 and dd52 <= 2.0 and (starW or engulfW or failedW)
+// per-timeframe choice (reports/KR_RESULTS.md): threshold scale x state, chosen on early data, checked on later data
+kBuy  = __KBUY__
+kSell = __KSELL__
+optBuy  = onset(pBot, prevBot, thBotH * kBuy)
+optSell = bucket == 3 ? barstate.isconfirmed and wkTop : __SELLSTATE__
+rawBuy  = profile == "Optimized" ? optBuy : highBot
+rawSell = profile == "Optimized" ? optSell : confTop
+wkA     = profile == "Optimized" and bucket == 3                   // the weekly-A SELL is not cooled down (as researched)
 // as-shipped de-duplication (= research/kb_signals.dedupe_final): a candle with both is dropped;
 // a repeat in the same direction within Q candles of the previous one is suppressed
 var int lastBuy = -1000000
@@ -448,7 +470,7 @@ if barstate.isconfirmed and not (rawBuy and rawSell)
         buySig := bar_index - lastBuy > Q
         lastBuy := bar_index
     if rawSell
-        sellSig := bar_index - lastSell > Q
+        sellSig := wkA or bar_index - lastSell > Q
         lastSell := bar_index
 cBuy  = #00C853
 cSell = #FF1744
@@ -508,40 +530,28 @@ def feature_order(S: dict) -> list[str]:
     return list(orders.pop()) if orders else []
 
 
-SIGNALS = {  # research candidate (reports/KB_CONFIG.md) -> (menu label, Pine BUY expr, Pine SELL expr)
-    "K_CONF": ("Confirmed", "confBot", "confTop"),
-    "K_H": ("High Conviction", "highBot", "highTop"),
-    "K_W": ("Early Warning", "warnBot", "warnTop"),
-}
+# reports/KR_RESULTS.md adopted choices per bucket (3 = 1W, 2 = 1D, 1 = 4H, 0 = 1H and below)
+KR_BUY_SCALE = {3: 1.1, 2: 1.0, 1: 1.1, 0: 1.0}                       # High Conviction threshold scale
+KR_SELL = {2: ("H", 0.9), 1: ("W", 0.9), 0: ("W", 1.0)}              # bucket 3 uses weekly Candidate A
 
 
-def _menu(default: str, side: int) -> tuple[str, str]:
-    if default not in SIGNALS:
-        raise ValueError(f"default signal {default!r} has no Pine implementation")
-    order = [default] + [k for k in SIGNALS if k != default]
-    var = "buyMode" if side == 1 else "sellMode"
-    expr = " : ".join(f'{var} == "{SIGNALS[k][0]}" ? {SIGNALS[k][side]}' for k in order[:-1]) + f" : {SIGNALS[order[-1]][side]}"
-    return ", ".join(f'"{SIGNALS[k][0]}"' for k in order), expr
+def kr_block() -> dict:
+    kb = " : ".join(f"bucket == {b} ? {_f(KR_BUY_SCALE[b])}" for b in (3, 2, 1)) + f" : {_f(KR_BUY_SCALE[0])}"
+    ks = " : ".join(f"bucket == {b} ? {_f(KR_SELL[b][1])}" for b in (2, 1)) + f" : {_f(KR_SELL[0][1])}"
+    th = {"H": "thTopH", "W": "thTopW"}
+    st = " : ".join(f"bucket == {b} ? onset(pTop, prevTop, {th[KR_SELL[b][0]]} * kSell)" for b in (2, 1)) \
+        + f" : onset(pTop, prevTop, {th[KR_SELL[0][0]]} * kSell)"
+    return {"__KBUY__": kb, "__KSELL__": ks, "__SELLSTATE__": st}
 
 
-def selection(buy: str, sell: str) -> dict:
-    bo, be = _menu(buy, 1)
-    so, se = _menu(sell, 2)
-    return {"__BUYDEF__": SIGNALS[buy][0], "__BUYOPTS__": bo, "__SELBUY__": be,
-            "__SELLDEF__": SIGNALS[sell][0], "__SELLOPTS__": so, "__SELSELL__": se}
-
-
-DEFAULT_BUY, DEFAULT_SELL = "K_H", "K_CONF"   # reports/KB_RESULTS.md and reports/KENNY_DIVERGENCE.md
-
-
-def generate(S: dict, R: dict | None = None, buy: str = DEFAULT_BUY, sell: str = DEFAULT_SELL) -> str:
+def generate(S: dict, R: dict | None = None) -> str:
     feats = feature_order(S)
     fv = ", ".join(FV_ORDER_PINE(feats)) if feats else "0.0"
     ft, lt = model_block(S, "top")
     fb, lb = model_block(S, "bot")
     blocks = "\n".join(x for x in (ft, fb) if x) + "\n\n" + lt + "\n\n" + lb
     src = TEMPLATE.replace("__FV__", fv).replace("__MODELS__", blocks).replace("__EVID__", evidence_block(S, R))
-    for k, v in selection(buy, sell).items():
+    for k, v in kr_block().items():
         src = src.replace(k, v)
     return src
 

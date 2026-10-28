@@ -224,3 +224,12 @@ frozen before any M code was written or any M outcome computed. All start **unte
 | M-B4 | reversal alerts land near labelled major turns more often when BTC is not with the old trend |
 
 They do not change any earlier hypothesis, label or event definition.
+
+### Amendment V6-1 (2026-10-28): HC-MTF 6.0 stage 1, continuation models A–D
+
+The HC-MTF 6.0 track adds an EMA trend-and-pullback baseline (A) and three incremental filters:
+RSI (B), MACD (C) and ATR extension (D). Definitions, ten predefined alternatives, contrasts and
+decision rules are in [`V6_CONT_CONFIG.md`](V6_CONT_CONFIG.md), frozen before any V6 code or
+outcome. Ledger ids: `V6-P` (primary config), `V6-S` (alternatives). Status: untested,
+exploration. No earlier hypothesis or definition changes.
+

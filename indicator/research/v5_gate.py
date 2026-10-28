@@ -38,6 +38,9 @@ DETECTORS = "research/v5_detect_c.py"
 # workstream M (reports/V5_M_B_CONFIG.md §10.5)
 M_CONFIG = "reports/V5_M_B_CONFIG.md"
 M_CODE = ("research/v5_context.py", "research/v5_inference.py", "scripts/v5_m_explore.py")
+# HC-MTF 6.0 stage 1 (reports/V6_CONT_CONFIG.md §11.3)
+V6_CONFIG = "reports/V6_CONT_CONFIG.md"
+V6_CODE = ("research/v6_signals.py", "research/v5_context.py", "research/v5_inference.py", "scripts/v6_cont_explore.py")
 
 
 class NotReady(RuntimeError):
@@ -133,6 +136,38 @@ def require_m_ready(root: Path = ROOT) -> str:
     b = m_blockers(root)
     if b:
         raise NotReady("workstream-M evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def v6_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    """HC-MTF 6.0 stage-1 exploration gate: valid review mode (independent or the self-audited
+    exploration waiver), the V6 configuration committed, unmodified and FROZEN, baselines and the
+    V6 code committed and unmodified, and the cache equal to the manifest."""
+    out = []
+    if review_mode(root) is None:
+        out += _review_problems(root) + _waiver_problems(root)
+    if not committed_and_clean(V6_CONFIG, root):
+        out.append(f"V1: {V6_CONFIG} missing, uncommitted or modified")
+    elif "Status: FROZEN" not in (root / V6_CONFIG).read_text():
+        out.append(f"V1: {V6_CONFIG} is not frozen (Status: FROZEN absent)")
+    for f in (BASELINES, *V6_CODE):
+        if not committed_and_clean(f, root):
+            out.append(f"V2: {f} missing, uncommitted or modified")
+    if not committed_and_clean(MANIFEST, root):
+        out.append(f"V3: {MANIFEST} missing, uncommitted or modified")
+    elif check_cache:
+        from .v5_manifest import verify
+        v = verify(root / MANIFEST)
+        if any(v.values()):
+            out.append(f"V3: cache differs from the manifest: {v}")
+    return out
+
+
+def require_v6_ready(root: Path = ROOT) -> str:
+    """Raise if any V6 blocker remains; otherwise return the review mode."""
+    b = v6_blockers(root)
+    if b:
+        raise NotReady("HC-MTF 6.0 evaluation is blocked:\n  " + "\n  ".join(b))
     return review_mode(root)
 
 

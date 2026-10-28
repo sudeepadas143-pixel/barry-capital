@@ -70,6 +70,8 @@ KS_CONFIG = "reports/KS_CONFIG.md"
 KS_CODE = KR_CODE + ("research/kenny_strength.py", "research/kenny_cluster.py", "scripts/ks_eval.py")
 KT_CONFIG = "reports/KT_CONFIG.md"
 KT_CODE = KR_CODE + ("research/kenny_types.py", "scripts/kt_eval.py")
+KF_CONFIG = "reports/KF_CONFIG.md"
+KF_CODE = KT_CODE + ("research/kenny_freq.py", "scripts/kf_eval.py")
 KC_CODE = KB_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "scripts/kc_eval.py", "scripts/kenny_export_pine.py")
 
 
@@ -345,6 +347,17 @@ def require_kt_ready(root: Path = ROOT) -> str:
     b = kt_blockers(root)
     if b:
         raise NotReady("KT evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def kf_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KF_CONFIG, KF_CODE)
+
+
+def require_kf_ready(root: Path = ROOT) -> str:
+    b = kf_blockers(root)
+    if b:
+        raise NotReady("KF evaluation is blocked:\n  " + "\n  ".join(b))
     return review_mode(root)
 
 

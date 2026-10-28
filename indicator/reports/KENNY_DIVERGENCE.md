@@ -164,6 +164,16 @@ reach similar win rates at 4H and 1H only with far more false alerts.
   * Neither confirmation-only nor warning + confirmation passed the KW-3 rule, so the weekly SELL
     is unchanged.
 
+  KW-6 (`reports/KW6_SPEC.md`, `reports/KW6_RESULTS.md`) built a full weekly cycle engine, a fast
+  vs slow momentum state machine with separate exhaustion and transition stages for both sides.
+  It did not merit further testing:
+  * **Warnings:** about as useful as simpler warnings (useful rate 0.17–0.18, against 0.19–0.21
+    for RSI-70 and Candidate A) but they caught fewer tops.
+  * **Confirmations, both sides:** 66–87% were late.
+  * **Weekly BUY:** worse than the current weekly BUY in 2018+.
+  * **Across all weekly SELL mechanisms tested** (RSI-70, Candidate A, the momentum regime and the
+    engine), the useful rate plateaus at about 0.16–0.21.
+
 ## How to test in TradingView
 
 1. Pine Editor → paste `pine/Kenny_Divergence_Indicator.pine` → Save → Add to chart. Report any

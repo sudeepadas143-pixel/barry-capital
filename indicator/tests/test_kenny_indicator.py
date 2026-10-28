@@ -234,5 +234,5 @@ def test_breakdown_marker_follows_kt_result_and_definition():
     src = K.generate(S)
     for tok in ("brkSig = barstate.isconfirmed and bucket <= 1 and firstBelow and matureUp and nz(hst, 1.0) < 0 and (hh2L - close) / atr < 8.0",
                 "sma15  = ta.sma(close, int(math.round(1.5 * L)))", "firstBelow = belowS and math.sum(belowS[1] ? 1.0 : 0.0, M) == 0",
-                'plotshape(showBrk and brkSig, "Breakdown", shape.xcross, location.abovebar, cSell, size = size.tiny)'):
+                'plotshape(showBrk and brkSig, "Breakdown", shape.xcross, location.abovebar, cSell, size = size.normal)'):
         assert tok in src, tok

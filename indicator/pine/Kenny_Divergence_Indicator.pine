@@ -457,7 +457,7 @@ sma15  = ta.sma(close, int(math.round(1.5 * L)))
 belowS = close < sma15
 firstBelow = belowS and math.sum(belowS[1] ? 1.0 : 0.0, M) == 0
 brkSig = barstate.isconfirmed and bucket <= 1 and firstBelow and matureUp and nz(hst, 1.0) < 0 and (hh2L - close) / atr < 8.0
-plotshape(showBrk and brkSig, "Breakdown", shape.xcross, location.abovebar, cSell, size = size.tiny)
+plotshape(showBrk and brkSig, "Breakdown", shape.xcross, location.abovebar, cSell, size = size.normal)
 alertcondition(brkSig, "Kenny Div: Breakdown / exit", "Kenny Div BREAKDOWN {{ticker}} {{interval}} {{close}}")
 alertcondition(buySig, "Kenny Div: BUY", "Kenny Div BUY {{ticker}} {{interval}} {{close}}")
 alertcondition(sellSig, "Kenny Div: SELL", "Kenny Div SELL {{ticker}} {{interval}} {{close}}")

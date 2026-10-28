@@ -2,7 +2,7 @@
 
 Pure, causal functions of one chart's OHLCV: every value at candle i uses candles <= i only
 (closed at i's close). Pine-identical primitives (hcmtf.ta). No labels, no outcomes, no downloads.
-The Pine indicator (pine/HC_CycleEngine.pine) computes the same quantities in the same way.
+Kenny's Divergence Indicator (pine/Kenny_Divergence_Indicator.pine) computes the same quantities in the same way.
 """
 
 from __future__ import annotations

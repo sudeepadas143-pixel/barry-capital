@@ -8573,11 +8573,2836 @@
      }
     }
    }
+  },
+  "1H": {
+   "instruments": 108,
+   "top": {
+    "models": {
+     "B_ext": {
+      "warning": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 7531,
+        "events_censored": 902,
+        "alerts_censored": 245,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6639411283728537,
+         0.6320998213955669,
+         0.6948034923931048
+        ],
+        "precision": [
+         0.32346301951932016,
+         0.301921736672971,
+         0.3437696520471073
+        ],
+        "matched": 2436,
+        "duplicates": 700,
+        "false_alarms": 4395,
+        "precision_excluding_duplicates": 0.35660957400087834,
+        "false_alarms_per_100_candles": 0.20334889488319585,
+        "false_alarms_per_instrument_year": 11.467022603623867,
+        "alerts_per_instrument_year": 19.64918025663057,
+        "lead_median": [
+         21.0,
+         16.0,
+         24.0
+        ],
+        "lead_iqr": [
+         -96.0,
+         50.0
+        ],
+        "remaining_median": 0.6551601743859983,
+        "remaining_share_gt_half": 0.7623152709359606,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.9800230026558651,
+        "ci95_excess": [
+         -0.03236827143337841,
+         0.01539180322200251
+        ],
+        "p": 0.7616666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 0.9734805347099644,
+         "late": 0.9845263324137739
+        }
+       },
+       "trade": {
+        "n": 7750,
+        "net_mean": -0.005728535332791449,
+        "net_ci95": [
+         -0.012337872594328106,
+         0.000880801928745208
+        ],
+        "net_median": 0.0004789733287638275,
+        "net2_mean": -0.007377683719888224,
+        "win_rate": 0.3149677419354839,
+        "mfe_med": 4.2341667762211825,
+        "mae_med": 4.499432032406192,
+        "by_half": {
+         "early": -0.011954053782144994,
+         "late": -0.0014287989866628864
+        },
+        "pair_median_of_mean_net": -0.0035311868457974715
+       }
+      },
+      "standard": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 6857,
+        "events_censored": 902,
+        "alerts_censored": 245,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6167893158898883,
+         0.5796418806339984,
+         0.6524073738625662
+        ],
+        "precision": [
+         0.3300277089106023,
+         0.30366286249947033,
+         0.35686149588268673
+        ],
+        "matched": 2263,
+        "duplicates": 538,
+        "false_alarms": 4056,
+        "precision_excluding_duplicates": 0.35812628580471595,
+        "false_alarms_per_100_candles": 0.1876639630594408,
+        "false_alarms_per_instrument_year": 10.582535535904075,
+        "alerts_per_instrument_year": 17.8906425467688,
+        "lead_median": [
+         15.0,
+         8.0,
+         22.0
+        ],
+        "lead_iqr": [
+         -104.5,
+         50.0
+        ],
+        "remaining_median": 0.6269744835965978,
+        "remaining_share_gt_half": 0.7118868758285462,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.9615646719240707,
+        "ci95_excess": [
+         -0.045200171521294935,
+         0.01254431730321422
+        ],
+        "p": 0.8706666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 0.9812684115564954,
+         "late": 0.9496876028234397
+        }
+       },
+       "trade": {
+        "n": 7076,
+        "net_mean": -0.005610390911619694,
+        "net_ci95": [
+         -0.011639096166601977,
+         0.00041831434336259046
+        ],
+        "net_median": -0.00026412249206160705,
+        "net2_mean": -0.007244746479737274,
+        "win_rate": 0.3103448275862069,
+        "mfe_med": 4.098442856861828,
+        "mae_med": 4.384351650470347,
+        "by_half": {
+         "early": -0.010869069090399164,
+         "late": -0.0024504250195748357
+        },
+        "pair_median_of_mean_net": -0.005412410131902367
+       }
+      },
+      "high": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 3059,
+        "events_censored": 902,
+        "alerts_censored": 137,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.3417825020441537,
+         0.3098324577082092,
+         0.36854617531253353
+        ],
+        "precision": [
+         0.40993788819875776,
+         0.3745441750320217,
+         0.44922859072027016
+        ],
+        "matched": 1254,
+        "duplicates": 82,
+        "false_alarms": 1723,
+        "precision_excluding_duplicates": 0.4212294255962378,
+        "false_alarms_per_100_candles": 0.0797201697118877,
+        "false_alarms_per_instrument_year": 4.495490317643669,
+        "alerts_per_instrument_year": 7.981256460633769,
+        "lead_median": [
+         21.0,
+         17.0,
+         25.524999999999977
+        ],
+        "lead_iqr": [
+         4.0,
+         48.0
+        ],
+        "remaining_median": 0.7997525747925036,
+        "remaining_share_gt_half": 0.8349282296650717,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.0006149620800366,
+        "ci95_excess": [
+         -0.042632808974781194,
+         0.043169640882696425
+        ],
+        "p": 0.49,
+        "G": 70,
+        "by_half": {
+         "early": 1.009152177451109,
+         "late": 0.9967352420064071
+        }
+       },
+       "trade": {
+        "n": 3177,
+        "net_mean": -0.019379019736222747,
+        "net_ci95": [
+         -0.029444802820999816,
+         -0.009313236651445678
+        ],
+        "net_median": -0.0027533363604080093,
+        "net2_mean": -0.020796520523128633,
+        "win_rate": 0.31885426502990244,
+        "mfe_med": 4.438804497399082,
+        "mae_med": 4.986984736923816,
+        "by_half": {
+         "early": -0.036994977457011545,
+         "late": -0.011096829525986085
+        },
+        "pair_median_of_mean_net": -0.006418164086613215
+       }
+      }
+     },
+     "LR": {
+      "warning": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 6331,
+        "events_censored": 902,
+        "alerts_censored": 206,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6216952848187517,
+         0.5735437375745527,
+         0.6647756825789871
+        ],
+        "precision": [
+         0.3602906333912494,
+         0.3277536522845618,
+         0.3931884985577642
+        ],
+        "matched": 2281,
+        "duplicates": 155,
+        "false_alarms": 3895,
+        "precision_excluding_duplicates": 0.3693329015544041,
+        "false_alarms_per_100_candles": 0.18021477714904385,
+        "false_alarms_per_instrument_year": 10.162469406397035,
+        "alerts_per_instrument_year": 16.518252583286166,
+        "lead_median": [
+         22.0,
+         19.0,
+         25.0
+        ],
+        "lead_iqr": [
+         4.0,
+         49.0
+        ],
+        "remaining_median": 0.7652453003209537,
+        "remaining_share_gt_half": 0.8228846996931171,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.9027572431922894,
+        "ci95_excess": [
+         -0.07059279725663062,
+         -0.01230084967044217
+        ],
+        "p": 0.9966666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 0.8832800141304227,
+         "late": 0.9160542732742205
+        }
+       },
+       "trade": {
+        "n": 6509,
+        "net_mean": -0.0061613052615752395,
+        "net_ci95": [
+         -0.012753834550611246,
+         0.0004312240274607672
+        ],
+        "net_median": 0.0004001325410700421,
+        "net2_mean": -0.007783981555936894,
+        "win_rate": 0.31571669995391,
+        "mfe_med": 4.165392871185571,
+        "mae_med": 4.347336898868054,
+        "by_half": {
+         "early": -0.009942160781567443,
+         "late": -0.00356661969876194
+        },
+        "pair_median_of_mean_net": -0.003970920603929114
+       }
+      },
+      "standard": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 6331,
+        "events_censored": 902,
+        "alerts_censored": 206,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6216952848187517,
+         0.5735437375745527,
+         0.6647756825789871
+        ],
+        "precision": [
+         0.3602906333912494,
+         0.3277536522845618,
+         0.3931884985577642
+        ],
+        "matched": 2281,
+        "duplicates": 155,
+        "false_alarms": 3895,
+        "precision_excluding_duplicates": 0.3693329015544041,
+        "false_alarms_per_100_candles": 0.18021477714904385,
+        "false_alarms_per_instrument_year": 10.162469406397035,
+        "alerts_per_instrument_year": 16.518252583286166,
+        "lead_median": [
+         22.0,
+         19.0,
+         25.0
+        ],
+        "lead_iqr": [
+         4.0,
+         49.0
+        ],
+        "remaining_median": 0.7652453003209537,
+        "remaining_share_gt_half": 0.8228846996931171,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.9027572431922894,
+        "ci95_excess": [
+         -0.07059279725663062,
+         -0.01230084967044217
+        ],
+        "p": 0.9966666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 0.8832800141304227,
+         "late": 0.9160542732742205
+        }
+       },
+       "trade": {
+        "n": 6509,
+        "net_mean": -0.0061613052615752395,
+        "net_ci95": [
+         -0.012753834550611246,
+         0.0004312240274607672
+        ],
+        "net_median": 0.0004001325410700421,
+        "net2_mean": -0.007783981555936894,
+        "win_rate": 0.31571669995391,
+        "mfe_med": 4.165392871185571,
+        "mae_med": 4.347336898868054,
+        "by_half": {
+         "early": -0.009942160781567443,
+         "late": -0.00356661969876194
+        },
+        "pair_median_of_mean_net": -0.003970920603929114
+       }
+      },
+      "high": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 3183,
+        "events_censored": 902,
+        "alerts_censored": 94,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.36331425456527666,
+         0.333567809008846,
+         0.39347582791905367
+        ],
+        "precision": [
+         0.4187873075714735,
+         0.38160298972684853,
+         0.4571278168615866
+        ],
+        "matched": 1333,
+        "duplicates": 42,
+        "false_alarms": 1808,
+        "precision_excluding_duplicates": 0.4243871378541866,
+        "false_alarms_per_100_candles": 0.08365296972669353,
+        "false_alarms_per_instrument_year": 4.717264361172231,
+        "alerts_per_instrument_year": 8.304785653546023,
+        "lead_median": [
+         19.0,
+         16.0,
+         22.0
+        ],
+        "lead_iqr": [
+         3.0,
+         45.0
+        ],
+        "remaining_median": 0.8082352601185548,
+        "remaining_share_gt_half": 0.8612153038259565,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.000197509793781,
+        "ci95_excess": [
+         -0.04073913276133934,
+         0.040909740576688315
+        ],
+        "p": 0.497,
+        "G": 70,
+        "by_half": {
+         "early": 1.0050864342710863,
+         "late": 0.9977095915889087
+        }
+       },
+       "trade": {
+        "n": 3261,
+        "net_mean": -0.016348418297029734,
+        "net_ci95": [
+         -0.02592789318838454,
+         -0.006768943405674927
+        ],
+        "net_median": -0.0021009094492779098,
+        "net2_mean": -0.017817139548179692,
+        "win_rate": 0.33486660533578655,
+        "mfe_med": 4.377190015972805,
+        "mae_med": 4.624318074626632,
+        "by_half": {
+         "early": -0.032768432543460825,
+         "late": -0.007582324143831577
+        },
+        "pair_median_of_mean_net": -0.003715582655343521
+       }
+      }
+     },
+     "GBZ": {
+      "warning": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 8044,
+        "events_censored": 902,
+        "alerts_censored": 212,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.8945216680294358,
+         0.8620480537891531,
+         0.9210358394051995
+        ],
+        "precision": [
+         0.4080059671805072,
+         0.3773393724429983,
+         0.43915109641102534
+        ],
+        "matched": 3282,
+        "duplicates": 554,
+        "false_alarms": 4208,
+        "precision_excluding_duplicates": 0.43818424566088116,
+        "false_alarms_per_100_candles": 0.194696734850623,
+        "false_alarms_per_instrument_year": 10.979119707861033,
+        "alerts_per_instrument_year": 20.9876518369853,
+        "lead_median": [
+         -8.0,
+         -9.0,
+         -7.0
+        ],
+        "lead_iqr": [
+         -18.0,
+         34.0
+        ],
+        "remaining_median": 0.6786357359001218,
+        "remaining_share_gt_half": 0.7925045703839122,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.1148619279162626,
+        "ci95_excess": [
+         0.016378960594095493,
+         0.08188438554696258
+        ],
+        "p": 0.002,
+        "G": 70,
+        "by_half": {
+         "early": 1.0736097965340015,
+         "late": 1.1402985666382641
+        }
+       },
+       "trade": {
+        "n": 8236,
+        "net_mean": -0.0053467366035779874,
+        "net_ci95": [
+         -0.012326869552982109,
+         0.001633396345826133
+        ],
+        "net_median": 0.0005843407652500864,
+        "net2_mean": -0.006949614214068517,
+        "win_rate": 0.3195726080621661,
+        "mfe_med": 3.958772289424568,
+        "mae_med": 3.8672340024113705,
+        "by_half": {
+         "early": -0.009657866758568223,
+         "late": -0.0026352267355263755
+        },
+        "pair_median_of_mean_net": -0.003328471752819866
+       }
+      },
+      "standard": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 6848,
+        "events_censored": 902,
+        "alerts_censored": 237,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6434995911692559,
+         0.5956609279499331,
+         0.6888785058069228
+        ],
+        "precision": [
+         0.34477219626168226,
+         0.3149275229483713,
+         0.37298799525282156
+        ],
+        "matched": 2361,
+        "duplicates": 211,
+        "false_alarms": 4276,
+        "precision_excluding_duplicates": 0.3557330119029682,
+        "false_alarms_per_100_candles": 0.19784297486246766,
+        "false_alarms_per_instrument_year": 11.156538942683882,
+        "alerts_per_instrument_year": 17.867160589218713,
+        "lead_median": [
+         18.0,
+         14.0,
+         21.0
+        ],
+        "lead_iqr": [
+         -3.0,
+         47.0
+        ],
+        "remaining_median": 0.7126079137765191,
+        "remaining_share_gt_half": 0.8081321473951716,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.883080978512526,
+        "ci95_excess": [
+         -0.0765520488094871,
+         -0.022901858470301677
+        ],
+        "p": 0.9996666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 0.8397851357340105,
+         "late": 0.912923691740856
+        }
+       },
+       "trade": {
+        "n": 7058,
+        "net_mean": -0.005745949376900154,
+        "net_ci95": [
+         -0.012567430038008235,
+         0.0010755312842079274
+        ],
+        "net_median": 8.943848632244098e-05,
+        "net2_mean": -0.007378848215097946,
+        "win_rate": 0.31283649759138565,
+        "mfe_med": 4.108503103478345,
+        "mae_med": 4.201934899206906,
+        "by_half": {
+         "early": -0.009721900412544095,
+         "late": -0.00299395449799724
+        },
+        "pair_median_of_mean_net": -0.004504068698739984
+       }
+      },
+      "high": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 3224,
+        "events_censored": 902,
+        "alerts_censored": 101,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.5170346143363315,
+         0.48831593687484465,
+         0.5473742300333504
+        ],
+        "precision": [
+         0.5883995037220844,
+         0.5549364495383613,
+         0.6163241878694192
+        ],
+        "matched": 1897,
+        "duplicates": 111,
+        "false_alarms": 1216,
+        "precision_excluding_duplicates": 0.6093800192740122,
+        "false_alarms_per_100_candles": 0.0562621743294576,
+        "false_alarms_per_instrument_year": 3.1726733756556595,
+        "alerts_per_instrument_year": 8.411759015718623,
+        "lead_median": [
+         -24.0,
+         -25.0,
+         -23.0
+        ],
+        "lead_iqr": [
+         -32.0,
+         -14.0
+        ],
+        "remaining_median": 0.5594125500667556,
+        "remaining_share_gt_half": 0.6146547179757512,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.4364511112907763,
+        "ci95_excess": [
+         0.1531244539912652,
+         0.22535597299437773
+        ],
+        "p": 0.0003333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.484345426938219,
+         "late": 1.410838059375591
+        }
+       },
+       "trade": {
+        "n": 3320,
+        "net_mean": -0.008191666874917646,
+        "net_ci95": [
+         -0.016679388658068894,
+         0.0002960549082336051
+        ],
+        "net_median": -0.0032867764969373545,
+        "net2_mean": -0.009704468079736924,
+        "win_rate": 0.2828313253012048,
+        "mfe_med": 3.3894497301284128,
+        "mae_med": 3.742628927350644,
+        "by_half": {
+         "early": -0.019021250873198885,
+         "late": -0.002235901258682678
+        },
+        "pair_median_of_mean_net": -0.0042837550324513595
+       }
+      }
+     },
+     "GBB": {
+      "warning": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 10653,
+        "events_censored": 902,
+        "alerts_censored": 322,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.8468247478877078,
+         0.8182073014225631,
+         0.8748878465003287
+        ],
+        "precision": [
+         0.291654932882756,
+         0.27334656524171697,
+         0.3104381377647918
+        ],
+        "matched": 3107,
+        "duplicates": 1772,
+        "false_alarms": 5774,
+        "precision_excluding_duplicates": 0.34984799009120593,
+        "false_alarms_per_100_candles": 0.26715279159398697,
+        "false_alarms_per_instrument_year": 15.064980321575476,
+        "alerts_per_instrument_year": 27.794810420114917,
+        "lead_median": [
+         0.0,
+         -11.0,
+         7.0
+        ],
+        "lead_iqr": [
+         -53.0,
+         45.5
+        ],
+        "remaining_median": 0.6148782093482548,
+        "remaining_share_gt_half": 0.6688123591889282,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.0797133203632532,
+        "ci95_excess": [
+         0.007058713358164447,
+         0.06056691710728665
+        ],
+        "p": 0.006666666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 1.0992084051024298,
+         "late": 1.065004696222326
+        }
+       },
+       "trade": {
+        "n": 10934,
+        "net_mean": -0.004480971809317747,
+        "net_ci95": [
+         -0.011357039200092858,
+         0.0023950955814573648
+        ],
+        "net_median": 0.00017506859379875535,
+        "net2_mean": -0.006164216733407743,
+        "win_rate": 0.3307115419791476,
+        "mfe_med": 4.135181264400934,
+        "mae_med": 3.9752226561672863,
+        "by_half": {
+         "early": -0.008198774452903618,
+         "late": -0.001671726587622965
+        },
+        "pair_median_of_mean_net": -0.004181182338209509
+       }
+      },
+      "standard": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 6146,
+        "events_censored": 902,
+        "alerts_censored": 270,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6015263014445353,
+         0.5605459687402184,
+         0.6384721667910254
+        ],
+        "precision": [
+         0.35909534656687275,
+         0.33309128098109775,
+         0.3854097455821384
+        ],
+        "matched": 2207,
+        "duplicates": 688,
+        "false_alarms": 3251,
+        "precision_excluding_duplicates": 0.40436057163796263,
+        "false_alarms_per_100_candles": 0.15041803350745614,
+        "false_alarms_per_instrument_year": 8.482204888368873,
+        "alerts_per_instrument_year": 16.03556790031224,
+        "lead_median": [
+         -16.0,
+         -26.0,
+         -5.0
+        ],
+        "lead_iqr": [
+         -63.0,
+         38.5
+        ],
+        "remaining_median": 0.6097920027166992,
+        "remaining_share_gt_half": 0.6692342546443135,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.1135502592925606,
+        "ci95_excess": [
+         0.012129771095773095,
+         0.08393503593241272
+        ],
+        "p": 0.005333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.1228164870205573,
+         "late": 1.1071003124216563
+        }
+       },
+       "trade": {
+        "n": 6379,
+        "net_mean": -0.00692937757318692,
+        "net_ci95": [
+         -0.01426533322358126,
+         0.00040657807720741786
+        ],
+        "net_median": -0.0007639060568603844,
+        "net2_mean": -0.008626163903332712,
+        "win_rate": 0.32518030730636566,
+        "mfe_med": 4.116555137683956,
+        "mae_med": 4.071717378547649,
+        "by_half": {
+         "early": -0.005266910291623124,
+         "late": -0.008057667867700876
+        },
+        "pair_median_of_mean_net": -0.005105871660804603
+       }
+      },
+      "high": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 2510,
+        "events_censored": 902,
+        "alerts_censored": 58,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.21068411011174706,
+         0.1743807702403346,
+         0.24560927908727778
+        ],
+        "precision": [
+         0.3079681274900398,
+         0.28122548135326947,
+         0.3350422058109584
+        ],
+        "matched": 773,
+        "duplicates": 123,
+        "false_alarms": 1614,
+        "precision_excluding_duplicates": 0.32383745286971094,
+        "false_alarms_per_100_candles": 0.07467693204584257,
+        "false_alarms_per_instrument_year": 4.211097720648219,
+        "alerts_per_instrument_year": 6.5488570500787056,
+        "lead_median": [
+         -65.0,
+         -82.0,
+         -50.0
+        ],
+        "lead_iqr": [
+         -114.0,
+         16.0
+        ],
+        "remaining_median": 0.5221518987341772,
+        "remaining_share_gt_half": 0.536869340232859,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.8484351008027796,
+        "ci95_excess": [
+         -0.0966976146716623,
+         -0.030841762359475167
+        ],
+        "p": 1.0,
+        "G": 70,
+        "by_half": {
+         "early": 0.693202834473929,
+         "late": 0.933423732810071
+        }
+       },
+       "trade": {
+        "n": 2562,
+        "net_mean": 0.0018654786875002675,
+        "net_ci95": [
+         -0.007287539057761486,
+         0.01101849643276202
+        ],
+        "net_median": -0.0004063865482332504,
+        "net2_mean": 0.0002996316929647468,
+        "win_rate": 0.37861046057767367,
+        "mfe_med": 5.315685034465383,
+        "mae_med": 4.557853526067321,
+        "by_half": {
+         "early": 0.003500922997353484,
+         "late": 0.0009691959146683233
+        },
+        "pair_median_of_mean_net": -0.0013820438852236478
+       }
+      }
+     }
+    },
+    "confirm": {
+     "B_ext": {
+      "cy1_rule": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 6868,
+        "events_censored": 902,
+        "alerts_censored": 201,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.41837012810029983,
+         0.38815543896007715,
+         0.44826359977304436
+        ],
+        "precision": [
+         0.22350029120559115,
+         0.2052291893693437,
+         0.2435842165630612
+        ],
+        "matched": 1535,
+        "duplicates": 183,
+        "false_alarms": 5150,
+        "precision_excluding_duplicates": 0.22961854899027673,
+        "false_alarms_per_100_candles": 0.2382814126617653,
+        "false_alarms_per_instrument_year": 13.436897931436388,
+        "alerts_per_instrument_year": 17.91934271710779,
+        "lead_median": [
+         -89.0,
+         -107.0,
+         -58.42500000000007
+        ],
+        "lead_iqr": [
+         -134.0,
+         -8.0
+        ],
+        "remaining_median": 0.6380371837854313,
+        "remaining_share_gt_half": 0.7198697068403909,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.8701645881940614,
+        "ci95_excess": [
+         -0.059150916670474125,
+         -0.015496472550023406
+        ],
+        "p": 0.9996666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 0.8703330004747,
+         "late": 0.8700636348035303
+        }
+       },
+       "trade": {
+        "n": 7044,
+        "net_mean": -0.003268166627873548,
+        "net_ci95": [
+         -0.009271451592452924,
+         0.0027351183367058268
+        ],
+        "net_median": -8.594639140453895e-05,
+        "net2_mean": -0.004905162652859353,
+        "win_rate": 0.2921635434412266,
+        "mfe_med": 3.8301272175810404,
+        "mae_med": 4.200621927544269,
+        "by_half": {
+         "early": -0.008808948612175599,
+         "late": 7.143097768188521e-05
+        },
+        "pair_median_of_mean_net": -0.0036159840209517152
+       }
+      },
+      "ema_cross_after_zone": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 4944,
+        "events_censored": 902,
+        "alerts_censored": 153,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.40310711365494684,
+         0.36396323428988514,
+         0.441807360594599
+        ],
+        "precision": [
+         0.2991504854368932,
+         0.2721590930565362,
+         0.3340436282391939
+        ],
+        "matched": 1479,
+        "duplicates": 207,
+        "false_alarms": 3258,
+        "precision_excluding_duplicates": 0.3122229259024699,
+        "false_alarms_per_100_candles": 0.15074191115573427,
+        "false_alarms_per_instrument_year": 8.500468633130048,
+        "alerts_per_instrument_year": 12.899422014178931,
+        "lead_median": [
+         -35.0,
+         -41.0,
+         -33.0
+        ],
+        "lead_iqr": [
+         -113.0,
+         -22.0
+        ],
+        "remaining_median": 0.5836538461538461,
+        "remaining_share_gt_half": 0.6294793779580797,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.1883313408979,
+        "ci95_excess": [
+         0.020747933510187846,
+         0.08734421546384606
+        ],
+        "p": 0.0016666666666666668,
+        "G": 70,
+        "by_half": {
+         "early": 1.213481032299612,
+         "late": 1.1736718171174827
+        }
+       },
+       "trade": {
+        "n": 5087,
+        "net_mean": -0.000960554772481099,
+        "net_ci95": [
+         -0.008689869454946332,
+         0.006768759909984134
+        ],
+        "net_median": 0.0007702992549782576,
+        "net2_mean": -0.002605139006803884,
+        "win_rate": 0.3310399056418321,
+        "mfe_med": 3.9784693795936246,
+        "mae_med": 3.5399140194080556,
+        "by_half": {
+         "early": -0.0038566414543969086,
+         "late": 0.00072290251542147
+        },
+        "pair_median_of_mean_net": -0.0015762765611354278
+       }
+      }
+     },
+     "GBZ": {
+      "cy1_rule": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 6872,
+        "events_censored": 902,
+        "alerts_censored": 190,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.3894794221858817,
+         0.3475381342358199,
+         0.42880926928154717
+        ],
+        "precision": [
+         0.2079452852153667,
+         0.18708395835524488,
+         0.2294686632589619
+        ],
+        "matched": 1429,
+        "duplicates": 50,
+        "false_alarms": 5393,
+        "precision_excluding_duplicates": 0.20946936382292583,
+        "false_alarms_per_100_candles": 0.24952459388056317,
+        "false_alarms_per_instrument_year": 14.070910785288628,
+        "alerts_per_instrument_year": 17.929779142685604,
+        "lead_median": [
+         -11.0,
+         -13.0,
+         -9.237500000000011
+        ],
+        "lead_iqr": [
+         -24.0,
+         -6.0
+        ],
+        "remaining_median": 0.7503782148260214,
+        "remaining_share_gt_half": 0.8957312806158153,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.7479770757269485,
+        "ci95_excess": [
+         -0.0936400082169155,
+         -0.05139297415949225
+        ],
+        "p": 1.0,
+        "G": 70,
+        "by_half": {
+         "early": 0.6624735486177254,
+         "late": 0.8064499671378818
+        }
+       },
+       "trade": {
+        "n": 7038,
+        "net_mean": -0.005695409468574839,
+        "net_ci95": [
+         -0.01253183610135079,
+         0.0011410171642011113
+        ],
+        "net_median": 0.00016094051746901638,
+        "net2_mean": -0.007329623733991151,
+        "win_rate": 0.30818414322250637,
+        "mfe_med": 3.849294873191128,
+        "mae_med": 4.049845567681324,
+        "by_half": {
+         "early": -0.010604091521470974,
+         "late": -0.0022934578221005153
+        },
+        "pair_median_of_mean_net": -0.004692380798229551
+       }
+      },
+      "ema_cross_after_zone": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 4968,
+        "events_censored": 902,
+        "alerts_censored": 125,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.46197874080130824,
+         0.4055201683761141,
+         0.51704723482902
+        ],
+        "precision": [
+         0.34118357487922707,
+         0.306258342281291,
+         0.37633328525332815
+        ],
+        "matched": 1695,
+        "duplicates": 35,
+        "false_alarms": 3238,
+        "precision_excluding_duplicates": 0.34360429758767486,
+        "false_alarms_per_100_candles": 0.1498165464463682,
+        "false_alarms_per_instrument_year": 8.448286505240976,
+        "alerts_per_instrument_year": 12.96204056764582,
+        "lead_median": [
+         -28.0,
+         -29.0,
+         -26.0
+        ],
+        "lead_iqr": [
+         -40.0,
+         -19.0
+        ],
+        "remaining_median": 0.6265822784810127,
+        "remaining_share_gt_half": 0.7474926253687315,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.2105726718068455,
+        "ci95_excess": [
+         0.02618195580188816,
+         0.09496308863748008
+        ],
+        "p": 0.001,
+        "G": 70,
+        "by_half": {
+         "early": 1.109108922469162,
+         "late": 1.2776833470642763
+        }
+       },
+       "trade": {
+        "n": 5089,
+        "net_mean": -0.002040029033310367,
+        "net_ci95": [
+         -0.008831399980003093,
+         0.004751341913382358
+        ],
+        "net_median": 0.0006378595653812064,
+        "net2_mean": -0.003669013116627327,
+        "win_rate": 0.3234427195912753,
+        "mfe_med": 3.833695001708572,
+        "mae_med": 3.5159159723866074,
+        "by_half": {
+         "early": -0.007173864418366133,
+         "late": 0.0013780466371326526
+        },
+        "pair_median_of_mean_net": -0.004155335987284715
+       }
+      }
+     },
+     "GBB": {
+      "cy1_rule": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 6174,
+        "events_censored": 902,
+        "alerts_censored": 225,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.4957754156445898,
+         0.4570895804902887,
+         0.5274848441068442
+        ],
+        "precision": [
+         0.29462261094914155,
+         0.2703652311547503,
+         0.31961054268461947
+        ],
+        "matched": 1819,
+        "duplicates": 330,
+        "false_alarms": 4025,
+        "precision_excluding_duplicates": 0.31125941136208074,
+        "false_alarms_per_100_candles": 0.18622964775992337,
+        "false_alarms_per_instrument_year": 10.501653237676011,
+        "alerts_per_instrument_year": 16.108622879356943,
+        "lead_median": [
+         -56.0,
+         -63.0,
+         -51.0
+        ],
+        "lead_iqr": [
+         -94.0,
+         -21.0
+        ],
+        "remaining_median": 0.6019736842105261,
+        "remaining_share_gt_half": 0.6542056074766355,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.2157401151678018,
+        "ci95_excess": [
+         0.0340033257456794,
+         0.0895316530759444
+        ],
+        "p": 0.0003333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.2230041551631399,
+         "late": 1.210734112884012
+        }
+       },
+       "trade": {
+        "n": 6364,
+        "net_mean": -0.006974122662444011,
+        "net_ci95": [
+         -0.015245295936515385,
+         0.0012970506116273617
+        ],
+        "net_median": -0.001218269101188196,
+        "net2_mean": -0.008670917131331503,
+        "win_rate": 0.32762413576367067,
+        "mfe_med": 4.126064575203533,
+        "mae_med": 4.210005769344168,
+        "by_half": {
+         "early": -0.006917052071267527,
+         "late": -0.007012831934729327
+        },
+        "pair_median_of_mean_net": -0.005075793746559833
+       }
+      },
+      "ema_cross_after_zone": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3669,
+        "alerts": 3877,
+        "events_censored": 902,
+        "alerts_censored": 117,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.3810302534750613,
+         0.345040918453587,
+         0.4217835742670296
+        ],
+        "precision": [
+         0.36058808356977046,
+         0.32859806054861995,
+         0.39345246485502544
+        ],
+        "matched": 1398,
+        "duplicates": 167,
+        "false_alarms": 2312,
+        "precision_excluding_duplicates": 0.37681940700808625,
+        "false_alarms_per_100_candles": 0.10697216040271872,
+        "false_alarms_per_instrument_year": 6.032253983976879,
+        "alerts_per_instrument_year": 10.115505491296869,
+        "lead_median": [
+         -45.0,
+         -50.2625,
+         -40.0
+        ],
+        "lead_iqr": [
+         -91.0,
+         -26.0
+        ],
+        "remaining_median": 0.6025053792524147,
+        "remaining_share_gt_half": 0.6888412017167382,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.4097962231909305,
+        "ci95_excess": [
+         0.07970170779368284,
+         0.15496968194491673
+        ],
+        "p": 0.0003333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.472194664103478,
+         "late": 1.365219729764351
+        }
+       },
+       "trade": {
+        "n": 3984,
+        "net_mean": -0.00873957131172205,
+        "net_ci95": [
+         -0.017363029827763114,
+         -0.00011611279568098792
+        ],
+        "net_median": -0.000727976564077042,
+        "net2_mean": -0.01044667472537667,
+        "win_rate": 0.3105699221692192,
+        "mfe_med": 3.943396261652829,
+        "mae_med": 4.009544926045333,
+        "by_half": {
+         "early": -0.009347193536127878,
+         "late": -0.008311792791032576
+        },
+        "pair_median_of_mean_net": -0.0031316213673731512
+       }
+      }
+     }
+    },
+    "vs_B_ext": {
+     "LR": {
+      "standard": {
+       "near": {
+        "delta": -0.023714339281189045,
+        "ci95": [
+         -0.04372806048207531,
+         -0.0037006180803027776
+        ],
+        "p": 0.992,
+        "by_half": {
+         "early": -0.04080109757826095,
+         "late": -0.011429782484244755
+        }
+       },
+       "net": {
+        "delta": -0.0005509143499555459,
+        "ci95": [
+         -0.004125057724978903,
+         0.003023229025067811
+        ],
+        "p": 0.6223333333333333,
+        "by_half": {
+         "early": 0.0009269083088317212,
+         "late": -0.0011161946791871042
+        }
+       }
+      },
+      "robustness": {},
+      "promoted": false,
+      "note": "reference"
+     },
+     "GBZ": {
+      "standard": {
+       "near": {
+        "delta": -0.03290356467706784,
+        "ci95": [
+         -0.05143069687220553,
+         -0.01437643248193016
+        ],
+        "p": 0.9996666666666667,
+        "by_half": {
+         "early": -0.0591636267890292,
+         "late": -0.013922169933285433
+        }
+       },
+       "net": {
+        "delta": -0.00013555846528046003,
+        "ci95": [
+         -0.00377733723661405,
+         0.00350622030605313
+        ],
+        "p": 0.5236666666666666,
+        "by_half": {
+         "early": 0.0011471686778550694,
+         "late": -0.0005435294784224042
+        }
+       }
+      },
+      "robustness": {},
+      "promoted": false,
+      "note": "robust variants agreeing: 0/4"
+     },
+     "GBB": {
+      "standard": {
+       "near": {
+        "delta": 0.06255039671716778,
+        "ci95": [
+         0.027065312321543022,
+         0.09803548111279253
+        ],
+        "p": 0.0003333333333333333,
+        "by_half": {
+         "early": 0.059005217300938384,
+         "late": 0.0651856284838836
+        }
+       },
+       "net": {
+        "delta": -0.0013189866615672266,
+        "ci95": [
+         -0.008406213781420764,
+         0.00576824045828631
+        ],
+        "p": 0.6343333333333333,
+        "by_half": {
+         "early": 0.00560215879877604,
+         "late": -0.00560724284812604
+        }
+       }
+      },
+      "robustness": {},
+      "promoted": false,
+      "note": "robust variants agreeing: 0/4"
+     }
+    }
+   },
+   "bot": {
+    "models": {
+     "B_ext": {
+      "warning": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 7454,
+        "events_censored": 876,
+        "alerts_censored": 205,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6389668725435149,
+         0.5981332797022252,
+         0.6763749617395397
+        ],
+        "precision": [
+         0.30533941507915213,
+         0.2832301187171755,
+         0.3292961113198751
+        ],
+        "matched": 2276,
+        "duplicates": 667,
+        "false_alarms": 4511,
+        "precision_excluding_duplicates": 0.3353469868866952,
+        "false_alarms_per_100_candles": 0.2087160101975191,
+        "false_alarms_per_instrument_year": 11.769678945380493,
+        "alerts_per_instrument_year": 19.448279064257637,
+        "lead_median": [
+         21.0,
+         15.0,
+         26.524999999999977
+        ],
+        "lead_iqr": [
+         -92.0,
+         51.0
+        ],
+        "remaining_median": 0.6766279431346125,
+        "remaining_share_gt_half": 0.7781195079086116,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.9534407978647605,
+        "ci95_excess": [
+         -0.04600899459758725,
+         0.007448493654665274
+        ],
+        "p": 0.9236666666666666,
+        "G": 70,
+        "by_half": {
+         "early": 0.9236328664769607,
+         "late": 0.9726990199335169
+        }
+       },
+       "trade": {
+        "n": 7643,
+        "net_mean": 0.00016183925530765,
+        "net_ci95": [
+         -0.007002788480474947,
+         0.0073264669910902466
+        ],
+        "net_median": -0.0018126389217080867,
+        "net2_mean": -0.0014669060017903498,
+        "win_rate": 0.29962056783985347,
+        "mfe_med": 3.7113130817100903,
+        "mae_med": 3.896501617717963,
+        "by_half": {
+         "early": 0.005166292260598426,
+         "late": -0.0031163050368111455
+        },
+        "pair_median_of_mean_net": 0.0017051242535766208
+       }
+      },
+      "standard": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 6909,
+        "events_censored": 876,
+        "alerts_censored": 212,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.5825379000561483,
+         0.5398790406071657,
+         0.6216910613024623
+        ],
+        "precision": [
+         0.30033289911709365,
+         0.27951972435716127,
+         0.32250997829372446
+        ],
+        "matched": 2075,
+        "duplicates": 495,
+        "false_alarms": 4339,
+        "precision_excluding_duplicates": 0.3235110695353913,
+        "false_alarms_per_100_candles": 0.20075787369697082,
+        "false_alarms_per_instrument_year": 11.320912645534463,
+        "alerts_per_instrument_year": 18.026316079280388,
+        "lead_median": [
+         15.0,
+         7.475000000000001,
+         21.0
+        ],
+        "lead_iqr": [
+         -111.5,
+         48.0
+        ],
+        "remaining_median": 0.6474358974358971,
+        "remaining_share_gt_half": 0.7233734939759037,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.8978959899244122,
+        "ci95_excess": [
+         -0.06957674219017088,
+         -0.01502215338383273
+        ],
+        "p": 0.999,
+        "G": 70,
+        "by_half": {
+         "early": 0.8564968603139772,
+         "late": 0.9225065068925324
+        }
+       },
+       "trade": {
+        "n": 7110,
+        "net_mean": 0.0023645809601631753,
+        "net_ci95": [
+         -0.004506330108477923,
+         0.009235492028804273
+        ],
+        "net_median": -0.0005260090835138221,
+        "net2_mean": 0.0007504600037637362,
+        "win_rate": 0.29915611814345994,
+        "mfe_med": 3.6837376954473693,
+        "mae_med": 3.806683762932809,
+        "by_half": {
+         "early": 0.0068699607254183994,
+         "late": -0.000341486850215245
+        },
+        "pair_median_of_mean_net": 0.0010402766799067309
+       }
+      },
+      "high": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 2842,
+        "events_censored": 876,
+        "alerts_censored": 129,
+        "event_clusters": 70,
+        "alert_clusters": 69,
+        "recall": [
+         0.3498034811903425,
+         0.3073256750814409,
+         0.3928568208879786
+        ],
+        "precision": [
+         0.43842364532019706,
+         0.3910150212236534,
+         0.4854125845430098
+        ],
+        "matched": 1246,
+        "duplicates": 107,
+        "false_alarms": 1489,
+        "precision_excluding_duplicates": 0.45557586837294334,
+        "false_alarms_per_100_candles": 0.06889340261230457,
+        "false_alarms_per_instrument_year": 3.884959421341511,
+        "alerts_per_instrument_year": 7.4150803730373225,
+        "lead_median": [
+         15.5,
+         13.0,
+         21.524999999999977
+        ],
+        "lead_iqr": [
+         4.0,
+         43.0
+        ],
+        "remaining_median": 0.7856128246753248,
+        "remaining_share_gt_half": 0.8025682182985554,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.136091141195144,
+        "ci95_excess": [
+         0.00295163509594646,
+         0.11110495963288672
+        ],
+        "p": 0.024666666666666667,
+        "G": 69,
+        "by_half": {
+         "early": 1.1007292203063204,
+         "late": 1.154826773640869
+        }
+       },
+       "trade": {
+        "n": 2948,
+        "net_mean": 0.008675744788661724,
+        "net_ci95": [
+         0.0012532151808409024,
+         0.016098274396482544
+        ],
+        "net_median": 0.004135085161428759,
+        "net2_mean": 0.007100371654333365,
+        "win_rate": 0.3179504580929759,
+        "mfe_med": 4.335245314046843,
+        "mae_med": 4.095501533197284,
+        "by_half": {
+         "early": 0.0054924785725516566,
+         "late": 0.010400568951784124
+        },
+        "pair_median_of_mean_net": 0.006725385768420458
+       }
+      }
+     },
+     "LR": {
+      "warning": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 6528,
+        "events_censored": 876,
+        "alerts_censored": 203,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.5732734418865806,
+         0.5254643911972551,
+         0.6169806131548169
+        ],
+        "precision": [
+         0.3128063725490196,
+         0.2849096298113833,
+         0.34000708443784583
+        ],
+        "matched": 2042,
+        "duplicates": 181,
+        "false_alarms": 4305,
+        "precision_excluding_duplicates": 0.3217268000630219,
+        "false_alarms_per_100_candles": 0.1991847536910485,
+        "false_alarms_per_instrument_year": 11.232203028123038,
+        "alerts_per_instrument_year": 17.03224654299354,
+        "lead_median": [
+         25.5,
+         22.0,
+         31.0
+        ],
+        "lead_iqr": [
+         7.0,
+         53.0
+        ],
+        "remaining_median": 0.7697635040012653,
+        "remaining_share_gt_half": 0.8188050930460333,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.8236986155553683,
+        "ci95_excess": [
+         -0.10313255106465485,
+         -0.04264031724254625
+        ],
+        "p": 1.0,
+        "G": 70,
+        "by_half": {
+         "early": 0.7726953289190635,
+         "late": 0.8575556069434541
+        }
+       },
+       "trade": {
+        "n": 6696,
+        "net_mean": -0.0009649476075360507,
+        "net_ci95": [
+         -0.007926669412296238,
+         0.005996774197224137
+        ],
+        "net_median": -0.0014281609989226212,
+        "net2_mean": -0.0026235497580736865,
+        "win_rate": 0.2962962962962963,
+        "mfe_med": 3.573363652403199,
+        "mae_med": 3.887054321015191,
+        "by_half": {
+         "early": 0.0031438152791666216,
+         "late": -0.0037308164772954216
+        },
+        "pair_median_of_mean_net": -0.00019124055941365935
+       }
+      },
+      "standard": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 6580,
+        "events_censored": 876,
+        "alerts_censored": 204,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.5786075238629983,
+         0.5300717939538234,
+         0.6236960744690019
+        ],
+        "precision": [
+         0.31322188449848026,
+         0.28358233150445716,
+         0.3402120909291432
+        ],
+        "matched": 2061,
+        "duplicates": 188,
+        "false_alarms": 4331,
+        "precision_excluding_duplicates": 0.3224342928660826,
+        "false_alarms_per_100_candles": 0.2003877278132244,
+        "false_alarms_per_instrument_year": 11.300039794378833,
+        "alerts_per_instrument_year": 17.16792007550513,
+        "lead_median": [
+         26.0,
+         22.0,
+         31.0
+        ],
+        "lead_iqr": [
+         7.0,
+         53.0
+        ],
+        "remaining_median": 0.7722602739726029,
+        "remaining_share_gt_half": 0.8199902959728287,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.8270626403688117,
+        "ci95_excess": [
+         -0.10229946274099032,
+         -0.04063731185578685
+        ],
+        "p": 1.0,
+        "G": 70,
+        "by_half": {
+         "early": 0.7819835792231589,
+         "late": 0.8575556069434541
+        }
+       },
+       "trade": {
+        "n": 6749,
+        "net_mean": -0.001093066610633253,
+        "net_ci95": [
+         -0.008149440288761784,
+         0.0059633070674952795
+        ],
+        "net_median": -0.0014368735217928901,
+        "net2_mean": -0.0027543497636929666,
+        "win_rate": 0.2938213068602756,
+        "mfe_med": 3.5771094457077446,
+        "mae_med": 3.9041496828774878,
+        "by_half": {
+         "early": 0.002749771018191647,
+         "late": -0.0037308164772954216
+        },
+        "pair_median_of_mean_net": -0.00019124055941365935
+       }
+      },
+      "high": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 2756,
+        "events_censored": 876,
+        "alerts_censored": 100,
+        "event_clusters": 70,
+        "alert_clusters": 69,
+        "recall": [
+         0.37113980909601346,
+         0.33484458086769986,
+         0.412939417920058
+        ],
+        "precision": [
+         0.4796806966618287,
+         0.43821122662849804,
+         0.521636662007774
+        ],
+        "matched": 1322,
+        "duplicates": 65,
+        "false_alarms": 1369,
+        "precision_excluding_duplicates": 0.49126718691936083,
+        "false_alarms_per_100_candles": 0.0633412143561081,
+        "false_alarms_per_instrument_year": 3.5718666540070707,
+        "alerts_per_instrument_year": 7.190697223114308,
+        "lead_median": [
+         15.0,
+         11.0,
+         21.0
+        ],
+        "lead_iqr": [
+         3.0,
+         41.0
+        ],
+        "remaining_median": 0.8102212367905263,
+        "remaining_share_gt_half": 0.8547655068078669,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.2160101271925097,
+        "ci95_excess": [
+         0.03906395528631767,
+         0.1397346654459329
+        ],
+        "p": 0.0006666666666666666,
+        "G": 69,
+        "by_half": {
+         "early": 1.2519104901404705,
+         "late": 1.1935199704393455
+        }
+       },
+       "trade": {
+        "n": 2832,
+        "net_mean": 0.00896321271896314,
+        "net_ci95": [
+         -0.001386544882978489,
+         0.01931297032090477
+        ],
+        "net_median": 0.003384157147314182,
+        "net2_mean": 0.007326772040997037,
+        "win_rate": 0.3060070671378092,
+        "mfe_med": 3.9369446043191916,
+        "mae_med": 3.7312518915059454,
+        "by_half": {
+         "early": 0.010900699929540921,
+         "late": 0.007727210178033535
+        },
+        "pair_median_of_mean_net": 0.00557088575801672
+       }
+      }
+     },
+     "GBZ": {
+      "warning": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 7166,
+        "events_censored": 876,
+        "alerts_censored": 221,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6218416619876473,
+         0.580683732010015,
+         0.6560530326989138
+        ],
+        "precision": [
+         0.3090985207926319,
+         0.28694755735695293,
+         0.3312638924501587
+        ],
+        "matched": 2215,
+        "duplicates": 265,
+        "false_alarms": 4686,
+        "precision_excluding_duplicates": 0.32096797565570206,
+        "false_alarms_per_100_candles": 0.2168129514044723,
+        "false_alarms_per_instrument_year": 12.226272564409886,
+        "alerts_per_instrument_year": 18.69685642265498,
+        "lead_median": [
+         26.0,
+         21.0,
+         32.0
+        ],
+        "lead_iqr": [
+         5.0,
+         53.0
+        ],
+        "remaining_median": 0.7521700408807701,
+        "remaining_share_gt_half": 0.8135440180586907,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.8393894413923458,
+        "ci95_excess": [
+         -0.09122853979471271,
+         -0.04121032919889964
+        ],
+        "p": 1.0,
+        "G": 70,
+        "by_half": {
+         "early": 0.8137154927947813,
+         "late": 0.857026092615059
+        }
+       },
+       "trade": {
+        "n": 7350,
+        "net_mean": 0.0007272308017946242,
+        "net_ci95": [
+         -0.006604725189751827,
+         0.008059186793341075
+        ],
+        "net_median": -0.0016281787977669975,
+        "net2_mean": -0.0009450004907223833,
+        "win_rate": 0.28965986394557824,
+        "mfe_med": 3.579816326331972,
+        "mae_med": 3.9516721959814136,
+        "by_half": {
+         "early": 0.005178244970970127,
+         "late": -0.0023580264281176278
+        },
+        "pair_median_of_mean_net": -0.0004245541567804666
+       }
+      },
+      "standard": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 6769,
+        "events_censored": 876,
+        "alerts_censored": 184,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6723750701852892,
+         0.6197507736196208,
+         0.7244078984920087
+        ],
+        "precision": [
+         0.35381888018909735,
+         0.3252312371725445,
+         0.3867366866117844
+        ],
+        "matched": 2395,
+        "duplicates": 256,
+        "false_alarms": 4118,
+        "precision_excluding_duplicates": 0.36772608628896053,
+        "false_alarms_per_100_candles": 0.19053259365847564,
+        "false_alarms_per_instrument_year": 10.744300132360202,
+        "alerts_per_instrument_year": 17.661041184056874,
+        "lead_median": [
+         13.0,
+         6.0,
+         17.0
+        ],
+        "lead_iqr": [
+         -14.0,
+         45.5
+        ],
+        "remaining_median": 0.7183094959220296,
+        "remaining_share_gt_half": 0.8112734864300626,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.9464803443192433,
+        "ci95_excess": [
+         -0.05698457013288254,
+         0.012693423805002449
+        ],
+        "p": 0.893,
+        "G": 70,
+        "by_half": {
+         "early": 1.054747523802506,
+         "late": 0.8671805164038118
+        }
+       },
+       "trade": {
+        "n": 6936,
+        "net_mean": -0.0016556653716492558,
+        "net_ci95": [
+         -0.008111593537053617,
+         0.004800262793755105
+        ],
+        "net_median": -0.002,
+        "net2_mean": -0.0032984854408534096,
+        "win_rate": 0.2889273356401384,
+        "mfe_med": 3.6905348612928464,
+        "mae_med": 3.840386992911861,
+        "by_half": {
+         "early": -0.0021494478361755607,
+         "late": -0.0012882773121739386
+        },
+        "pair_median_of_mean_net": -6.098378077780394e-05
+       }
+      },
+      "high": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 3300,
+        "events_censored": 876,
+        "alerts_censored": 117,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.5519371139809096,
+         0.5059150002517346,
+         0.5959048285252725
+        ],
+        "precision": [
+         0.5957575757575757,
+         0.5514518806141665,
+         0.6403075549916267
+        ],
+        "matched": 1966,
+        "duplicates": 111,
+        "false_alarms": 1223,
+        "precision_excluding_duplicates": 0.6164941988084038,
+        "false_alarms_per_100_candles": 0.056586051977735724,
+        "false_alarms_per_instrument_year": 3.190937120416835,
+        "alerts_per_instrument_year": 8.610051101697103,
+        "lead_median": [
+         -21.0,
+         -23.0,
+         -19.23750000000001
+        ],
+        "lead_iqr": [
+         -30.75,
+         -11.0
+        ],
+        "remaining_median": 0.5993635993635993,
+        "remaining_share_gt_half": 0.6881993896236012,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.4996154018555237,
+        "ci95_excess": [
+         0.16119558736986156,
+         0.258185149273212
+        ],
+        "p": 0.0003333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.5985743892360493,
+         "late": 1.444066740776535
+        }
+       },
+       "trade": {
+        "n": 3404,
+        "net_mean": 0.004456801435162307,
+        "net_ci95": [
+         -0.0038835278365423453,
+         0.01279713070686696
+        ],
+        "net_median": 0.00010980867699602633,
+        "net2_mean": 0.0029233114234114253,
+        "win_rate": 0.3147223038495445,
+        "mfe_med": 3.87028540191106,
+        "mae_med": 3.593762354063361,
+        "by_half": {
+         "early": 0.0025344154942739663,
+         "late": 0.005563953338155407
+        },
+        "pair_median_of_mean_net": 0.0021360200329272115
+       }
+      }
+     },
+     "GBB": {
+      "warning": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 10027,
+        "events_censored": 876,
+        "alerts_censored": 282,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.8492419988770353,
+         0.8289308035207483,
+         0.8679015007335157
+        ],
+        "precision": [
+         0.3016854492869253,
+         0.28213221789590504,
+         0.31999814568902607
+        ],
+        "matched": 3025,
+        "duplicates": 1783,
+        "false_alarms": 5219,
+        "precision_excluding_duplicates": 0.36693352741387675,
+        "false_alarms_per_100_candles": 0.2414739209090783,
+        "false_alarms_per_instrument_year": 13.61692627265369,
+        "alerts_per_instrument_year": 26.16150981718692,
+        "lead_median": [
+         0.0,
+         -8.0,
+         5.0
+        ],
+        "lead_iqr": [
+         -39.0,
+         41.0
+        ],
+        "remaining_median": 0.6460055096418725,
+        "remaining_share_gt_half": 0.6925619834710743,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.166480991957762,
+        "ci95_excess": [
+         0.03743620357818864,
+         0.09943447750291715
+        ],
+        "p": 0.0003333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.159952468874195,
+         "late": 1.1711037548291185
+        }
+       },
+       "trade": {
+        "n": 10274,
+        "net_mean": -0.00044815467850739245,
+        "net_ci95": [
+         -0.005992590163293786,
+         0.005096280806279001
+        ],
+        "net_median": -0.003655309181001359,
+        "net2_mean": -0.0021667452955990815,
+        "win_rate": 0.3101031730582052,
+        "mfe_med": 4.08044298304565,
+        "mae_med": 4.28176374244264,
+        "by_half": {
+         "early": -0.0015934938035631642,
+         "late": 0.00036999930019505353
+        },
+        "pair_median_of_mean_net": 0.0003597627392056935
+       }
+      },
+      "standard": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 6795,
+        "events_censored": 876,
+        "alerts_censored": 224,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.6650758001122965,
+         0.6310883537564386,
+         0.6982945554975342
+        ],
+        "precision": [
+         0.34863870493009563,
+         0.3213638341993735,
+         0.37822910683033467
+        ],
+        "matched": 2369,
+        "duplicates": 860,
+        "false_alarms": 3566,
+        "precision_excluding_duplicates": 0.3991575400168492,
+        "false_alarms_per_100_candles": 0.16499252767997186,
+        "false_alarms_per_instrument_year": 9.304073402621778,
+        "alerts_per_instrument_year": 17.72887795031267,
+        "lead_median": [
+         -11.0,
+         -19.0,
+         0.7624999999999886
+        ],
+        "lead_iqr": [
+         -47.0,
+         35.0
+        ],
+        "remaining_median": 0.6381017412086035,
+        "remaining_share_gt_half": 0.6939636977627691,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.1592303206149956,
+        "ci95_excess": [
+         0.024215996172851993,
+         0.10633031881892441
+        ],
+        "p": 0.0013333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.0424073046131543,
+         "late": 1.2430507955152736
+        }
+       },
+       "trade": {
+        "n": 6986,
+        "net_mean": 0.0007661877167163012,
+        "net_ci95": [
+         -0.006108423507877184,
+         0.007640798941309787
+        ],
+        "net_median": -0.002853355265876727,
+        "net2_mean": -0.0009797470098797498,
+        "win_rate": 0.30021474588403724,
+        "mfe_med": 4.047704782877289,
+        "mae_med": 4.159626494923222,
+        "by_half": {
+         "early": -0.0007907249095008448,
+         "late": 0.0018829701757383341
+        },
+        "pair_median_of_mean_net": 0.0006216846230861519
+       }
+      },
+      "high": {
+       "det": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 2625,
+        "events_censored": 876,
+        "alerts_censored": 136,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.26501965188096577,
+         0.23464412682956223,
+         0.2989837831439394
+        ],
+        "precision": [
+         0.3596190476190476,
+         0.32646429677067595,
+         0.39806735822373174
+        ],
+        "matched": 944,
+        "duplicates": 68,
+        "false_alarms": 1613,
+        "precision_excluding_duplicates": 0.369182635901447,
+        "false_alarms_per_100_candles": 0.07463066381037427,
+        "false_alarms_per_instrument_year": 4.208488614253765,
+        "alerts_per_instrument_year": 6.848904285440877,
+        "lead_median": [
+         -42.0,
+         -51.0,
+         -36.0
+        ],
+        "lead_iqr": [
+         -113.0,
+         -15.0
+        ],
+        "remaining_median": 0.527498681917806,
+        "remaining_share_gt_half": 0.5561440677966102,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.9146723157271606,
+        "ci95_excess": [
+         -0.07636116896674469,
+         0.00443190351705678
+        ],
+        "p": 0.9606666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 0.8724415091635008,
+         "late": 0.9348414648504625
+        }
+       },
+       "trade": {
+        "n": 2748,
+        "net_mean": 0.010556376431768365,
+        "net_ci95": [
+         0.002188175264002404,
+         0.018924577599534326
+        ],
+        "net_median": -0.00021780518969195982,
+        "net2_mean": 0.009119695209060941,
+        "win_rate": 0.3697234352256186,
+        "mfe_med": 4.74960669204159,
+        "mae_med": 3.9408182719217604,
+        "by_half": {
+         "early": 0.02690263514244444,
+         "late": 0.002503113720968148
+        },
+        "pair_median_of_mean_net": 0.0031078880464733825
+       }
+      }
+     }
+    },
+    "confirm": {
+     "B_ext": {
+      "cy1_rule": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 6918,
+        "events_censored": 876,
+        "alerts_censored": 186,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.3871420550252667,
+         0.35753996394980414,
+         0.41643327503358013
+        ],
+        "precision": [
+         0.19933506793871061,
+         0.18441032035103586,
+         0.216057007672083
+        ],
+        "matched": 1379,
+        "duplicates": 178,
+        "false_alarms": 5361,
+        "precision_excluding_duplicates": 0.20459940652818992,
+        "false_alarms_per_100_candles": 0.24804401034557744,
+        "false_alarms_per_instrument_year": 13.987419380666111,
+        "alerts_per_instrument_year": 18.04979803683047,
+        "lead_median": [
+         -84.0,
+         -102.0,
+         -25.0
+        ],
+        "lead_iqr": [
+         -136.0,
+         -10.0
+        ],
+        "remaining_median": 0.6853633934599536,
+        "remaining_share_gt_half": 0.7701232777374909,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.8036907903983104,
+        "ci95_excess": [
+         -0.07542307299009156,
+         -0.03452553448712052
+        ],
+        "p": 1.0,
+        "G": 70,
+        "by_half": {
+         "early": 0.7609102389268182,
+         "late": 0.8289312594054821
+        }
+       },
+       "trade": {
+        "n": 7094,
+        "net_mean": -0.0008555244828941995,
+        "net_ci95": [
+         -0.006865075251450296,
+         0.005154026285661898
+        ],
+        "net_median": -0.0020045780521496127,
+        "net2_mean": -0.0024699028307938343,
+        "win_rate": 0.30222723428249226,
+        "mfe_med": 3.6717645546152893,
+        "mae_med": 3.8355700019671217,
+        "by_half": {
+         "early": 0.0006581676039534637,
+         "late": -0.0017636031818149896
+        },
+        "pair_median_of_mean_net": 0.0005540754395037232
+       }
+      },
+      "ema_cross_after_zone": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 4874,
+        "events_censored": 876,
+        "alerts_censored": 127,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.3512071869736103,
+         0.30909064575003986,
+         0.3971707933450516
+        ],
+        "precision": [
+         0.2566680344686089,
+         0.22896792470038776,
+         0.2840002327938941
+        ],
+        "matched": 1251,
+        "duplicates": 171,
+        "false_alarms": 3452,
+        "precision_excluding_duplicates": 0.266000425260472,
+        "false_alarms_per_100_candles": 0.15971794883658522,
+        "false_alarms_per_instrument_year": 9.00663527365406,
+        "alerts_per_instrument_year": 12.716784566567174,
+        "lead_median": [
+         -36.0,
+         -39.0,
+         -33.0
+        ],
+        "lead_iqr": [
+         -95.5,
+         -23.0
+        ],
+        "remaining_median": 0.6193041526374853,
+        "remaining_share_gt_half": 0.7002398081534772,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.0394151871195703,
+        "ci95_excess": [
+         -0.02187742794424792,
+         0.04400422750673841
+        ],
+        "p": 0.25866666666666666,
+        "G": 70,
+        "by_half": {
+         "early": 0.9543635172617969,
+         "late": 1.0885362569650412
+        }
+       },
+       "trade": {
+        "n": 4996,
+        "net_mean": 0.0023456688731243584,
+        "net_ci95": [
+         -0.0037213486550068896,
+         0.008412686401255606
+        ],
+        "net_median": -0.0024839116594672795,
+        "net2_mean": 0.0007466496577520599,
+        "win_rate": 0.33827061649319456,
+        "mfe_med": 4.210024414713752,
+        "mae_med": 4.062598481874824,
+        "by_half": {
+         "early": 0.009553129440628612,
+         "late": -0.0019035912069218974
+        },
+        "pair_median_of_mean_net": 0.0023418365868419578
+       }
+      }
+     },
+     "GBZ": {
+      "cy1_rule": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 6768,
+        "events_censored": 876,
+        "alerts_censored": 161,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.4416058394160584,
+         0.39488897858363836,
+         0.4928909419563507
+        ],
+        "precision": [
+         0.23241725768321514,
+         0.20883471076363383,
+         0.2600369749942766
+        ],
+        "matched": 1573,
+        "duplicates": 40,
+        "false_alarms": 5155,
+        "precision_excluding_duplicates": 0.23379904875148633,
+        "false_alarms_per_100_candles": 0.23851275383910683,
+        "false_alarms_per_instrument_year": 13.449943463408655,
+        "alerts_per_instrument_year": 17.65843207766242,
+        "lead_median": [
+         -16.0,
+         -20.525,
+         -13.0
+        ],
+        "lead_iqr": [
+         -38.0,
+         -7.0
+        ],
+        "remaining_median": 0.7394678492239469,
+        "remaining_share_gt_half": 0.8881118881118881,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 0.8518410288841208,
+        "ci95_excess": [
+         -0.06918224603931931,
+         -0.013721358290475383
+        ],
+        "p": 0.9986666666666667,
+        "G": 70,
+        "by_half": {
+         "early": 1.0292038514530222,
+         "late": 0.7230035334499125
+        }
+       },
+       "trade": {
+        "n": 6912,
+        "net_mean": -0.002115806068945827,
+        "net_ci95": [
+         -0.008318213051268356,
+         0.004086600913376702
+        ],
+        "net_median": -0.0016385406419330058,
+        "net2_mean": -0.0037588182217236058,
+        "win_rate": 0.29094328703703703,
+        "mfe_med": 3.70352481961004,
+        "mae_med": 3.8812964196090416,
+        "by_half": {
+         "early": -0.0028853728562771284,
+         "late": -0.001544499240437966
+        },
+        "pair_median_of_mean_net": 0.0005535106240293507
+       }
+      },
+      "ema_cross_after_zone": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 4842,
+        "events_censored": 876,
+        "alerts_censored": 109,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.48006737787759685,
+         0.42128177294544034,
+         0.5417854579718906
+        ],
+        "precision": [
+         0.35315985130111527,
+         0.3113127434605204,
+         0.4019469134687415
+        ],
+        "matched": 1710,
+        "duplicates": 32,
+        "false_alarms": 3100,
+        "precision_excluding_duplicates": 0.35550935550935553,
+        "false_alarms_per_100_candles": 0.14343152995174224,
+        "false_alarms_per_instrument_year": 8.088229822806369,
+        "alerts_per_instrument_year": 12.633293161944657,
+        "lead_median": [
+         -30.0,
+         -31.0,
+         -28.0
+        ],
+        "lead_iqr": [
+         -43.0,
+         -21.0
+        ],
+        "remaining_median": 0.6606139318321002,
+        "remaining_share_gt_half": 0.7847953216374269,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.2843669685135641,
+        "ci95_excess": [
+         0.033820452000377456,
+         0.12548967419690496
+        ],
+        "p": 0.0003333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.6078521381035042,
+         "late": 1.0557557613178
+        }
+       },
+       "trade": {
+        "n": 4946,
+        "net_mean": 0.002195075929688785,
+        "net_ci95": [
+         -0.0034981323695667866,
+         0.007888284228944357
+        ],
+        "net_median": -0.001711535550696473,
+        "net2_mean": 0.0005637779110878943,
+        "win_rate": 0.3336029114435908,
+        "mfe_med": 4.162955354610556,
+        "mae_med": 3.9310390759023264,
+        "by_half": {
+         "early": 0.004498073521484855,
+         "late": 0.0005333585583719551
+        },
+        "pair_median_of_mean_net": 0.0020962756565854612
+       }
+      }
+     },
+     "GBB": {
+      "cy1_rule": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 6807,
+        "events_censored": 876,
+        "alerts_censored": 187,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.5429533969679955,
+         0.5049654906499133,
+         0.5811007508128879
+        ],
+        "precision": [
+         0.2841192889672396,
+         0.25900877176039394,
+         0.31051252122911316
+        ],
+        "matched": 1934,
+        "duplicates": 459,
+        "false_alarms": 4414,
+        "precision_excluding_duplicates": 0.3046628859483302,
+        "false_alarms_per_100_candles": 0.2042279913570936,
+        "false_alarms_per_instrument_year": 11.516595625118487,
+        "alerts_per_instrument_year": 17.760187227046114,
+        "lead_median": [
+         -43.0,
+         -48.0,
+         -39.0
+        ],
+        "lead_iqr": [
+         -78.0,
+         -16.0
+        ],
+        "remaining_median": 0.6478034229840323,
+        "remaining_share_gt_half": 0.7244053774560496,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.2683034099844168,
+        "ci95_excess": [
+         0.04031259535098611,
+         0.10842473285306442
+        ],
+        "p": 0.0003333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.1863683971231611,
+         "late": 1.326541822189478
+        }
+       },
+       "trade": {
+        "n": 6963,
+        "net_mean": -0.000759456331208468,
+        "net_ci95": [
+         -0.007060780167692106,
+         0.00554186750527517
+        ],
+        "net_median": -0.003287458337328508,
+        "net2_mean": -0.0025052268324292077,
+        "win_rate": 0.30676432572167167,
+        "mfe_med": 3.8962430210590537,
+        "mae_med": 4.071609856449078,
+        "by_half": {
+         "early": -0.0028066703012338276,
+         "late": 0.0007095484637603949
+        },
+        "pair_median_of_mean_net": 0.0006730669997750932
+       }
+      },
+      "ema_cross_after_zone": {
+       "det": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 3562,
+        "alerts": 4700,
+        "events_censored": 876,
+        "alerts_censored": 129,
+        "event_clusters": 70,
+        "alert_clusters": 70,
+        "recall": [
+         0.45676586187535095,
+         0.42241266788927484,
+         0.48989908803358634
+        ],
+        "precision": [
+         0.34617021276595744,
+         0.31581260761245133,
+         0.37436131932227584
+        ],
+        "matched": 1627,
+        "duplicates": 171,
+        "false_alarms": 2902,
+        "precision_excluding_duplicates": 0.35924045043055863,
+        "false_alarms_per_100_candles": 0.13427041932901804,
+        "false_alarms_per_instrument_year": 7.571626756704543,
+        "alerts_per_instrument_year": 12.262800053932237,
+        "lead_median": [
+         -35.0,
+         -39.0,
+         -32.0
+        ],
+        "lead_iqr": [
+         -70.0,
+         -24.0
+        ],
+        "remaining_median": 0.6203007518796994,
+        "remaining_share_gt_half": 0.7092808850645359,
+        "evaluable": true
+       },
+       "lift": {
+        "lift": 1.3781491766164582,
+        "ci95_excess": [
+         0.06990564855271174,
+         0.14003123901829206
+        ],
+        "p": 0.0003333333333333333,
+        "G": 70,
+        "by_half": {
+         "early": 1.2812029794967184,
+         "late": 1.4398367312949476
+        }
+       },
+       "trade": {
+        "n": 4814,
+        "net_mean": -0.0019016864069946885,
+        "net_ci95": [
+         -0.008482107131689435,
+         0.004678734317700058
+        ],
+        "net_median": -0.00502759025610394,
+        "net2_mean": -0.0036446236733012954,
+        "win_rate": 0.3122143747403407,
+        "mfe_med": 3.874246549156142,
+        "mae_med": 4.027811462406621,
+        "by_half": {
+         "early": -0.0015359313659884498,
+         "late": -0.00213686814667242
+        },
+        "pair_median_of_mean_net": 0.0005538645928694206
+       }
+      }
+     }
+    },
+    "vs_B_ext": {
+     "LR": {
+      "standard": {
+       "near": {
+        "delta": -0.030185265595599975,
+        "ci95": [
+         -0.05918513928979194,
+         -0.0011853919014080082
+        ],
+        "p": 0.9783333333333334,
+        "by_half": {
+         "early": -0.030012531328320824,
+         "late": -0.02787611898153669
+        }
+       },
+       "net": {
+        "delta": -0.0034576475707964282,
+        "ci95": [
+         -0.00787712664282529,
+         0.0009618315012324325
+        ],
+        "p": 0.9413333333333334,
+        "by_half": {
+         "early": -0.004120189707226753,
+         "late": -0.003389329627080177
+        }
+       }
+      },
+      "robustness": {},
+      "promoted": false,
+      "note": "reference"
+     },
+     "GBZ": {
+      "standard": {
+       "near": {
+        "delta": 0.019659772641922146,
+        "ci95": [
+         -0.01859270743176046,
+         0.05791225271560475
+        ],
+        "p": 0.15433333333333332,
+        "by_half": {
+         "early": 0.0793506794415772,
+         "late": -0.02233834277444985
+        }
+       },
+       "net": {
+        "delta": -0.004020246331812432,
+        "ci95": [
+         -0.01019961891689449,
+         0.0021591262532696266
+        ],
+        "p": 0.9016666666666666,
+        "by_half": {
+         "early": -0.00901940856159396,
+         "late": -0.0009467904619586936
+        }
+       }
+      },
+      "robustness": {},
+      "promoted": false,
+      "note": "robust variants agreeing: 0/4"
+     },
+     "GBB": {
+      "standard": {
+       "near": {
+        "delta": 0.10322377600704458,
+        "ci95": [
+         0.06488842097838682,
+         0.14155913103570233
+        ],
+        "p": 0.0003333333333333333,
+        "by_half": {
+         "early": 0.07380322795978245,
+         "late": 0.1286464269329386
+        }
+       },
+       "net": {
+        "delta": -0.0015983932434468742,
+        "ci95": [
+         -0.008923266003208362,
+         0.005726479516314614
+        ],
+        "p": 0.6433333333333333,
+        "by_half": {
+         "early": -0.007660685634919244,
+         "late": 0.002224457025953579
+        }
+       }
+      },
+      "robustness": {},
+      "promoted": false,
+      "note": "robust variants agreeing: 0/4"
+     }
+    }
+   }
   }
  },
  "meta": {
   "mode": "self_audited_exploration_only",
   "config": "reports/CYCLE2_CONFIG.md",
-  "git_head": "a1bbd0445d77b64ef07cc8f2f923cae7517a735f"
+  "git_head": "55963f8f1e9c9d40e3f97546baa424dc31f11055"
  }
 }

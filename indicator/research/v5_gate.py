@@ -74,6 +74,8 @@ KF_CONFIG = "reports/KF_CONFIG.md"
 KF_CODE = KT_CODE + ("research/kenny_freq.py", "scripts/kf_eval.py")
 KWB_CONFIG = "reports/KWB_CONFIG.md"
 KWB_CODE = KF_CODE + ("research/kenny_wbuy.py", "scripts/kwb_eval.py")
+KWB2_CONFIG = "reports/KWB2_CONFIG.md"
+KWB2_CODE = KWB_CODE
 KC_CODE = KB_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "scripts/kc_eval.py", "scripts/kenny_export_pine.py")
 
 
@@ -371,6 +373,17 @@ def require_kwb_ready(root: Path = ROOT) -> str:
     b = kwb_blockers(root)
     if b:
         raise NotReady("KWB evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def kwb2_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KWB2_CONFIG, KWB2_CODE)
+
+
+def require_kwb2_ready(root: Path = ROOT) -> str:
+    b = kwb2_blockers(root)
+    if b:
+        raise NotReady("KWB-2 evaluation is blocked:\n  " + "\n  ".join(b))
     return review_mode(root)
 
 

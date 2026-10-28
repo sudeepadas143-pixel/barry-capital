@@ -22,3 +22,12 @@ def test_variants_causal_and_scale_free():
     w2[["open", "high", "low", "close"]] *= 250.0
     assert np.array_equal(WB.v1(w2, 3.0), full)
     assert set(WB.v2(w, 3.0, np.array([5, 7]))) >= {5, 7}
+
+
+def test_drawdown_sigma_variant_causal_and_scale_free():
+    w = rs(daily("1995-01-01", "2026-10-01", 17), "W-MON")
+    full = WB.d1(w, 1.0)
+    assert np.array_equal(WB.d1(w.iloc[:1000], 1.0), full[full < 1000])
+    w2 = w.copy()
+    w2[["open", "high", "low", "close"]] *= 40.0
+    assert np.array_equal(WB.d1(w2, 1.0), full)

@@ -26,7 +26,9 @@ _s = importlib.util.spec_from_file_location("kr_eval", ROOT / "scripts" / "kr_ev
 KE = importlib.util.module_from_spec(_s)
 _s.loader.exec_module(KE)
 
-OUT, MD = ROOT / "reports" / "kwb_results.json", ROOT / "reports" / "KWB_RESULTS.md"
+V2MODE = len(sys.argv) > 2 and sys.argv[2] == "v2"          # KWB-2 (reports/KWB2_CONFIG.md)
+OUT, MD = (ROOT / "reports" / "kwb2_results.json", ROOT / "reports" / "KWB2_RESULTS.md") if V2MODE else \
+    (ROOT / "reports" / "kwb_results.json", ROOT / "reports" / "KWB_RESULTS.md")
 SPLIT = pd.Timestamp("2018-01-01", tz="UTC")
 REPS = ("BTCUSDT", "ETHUSDT", "SOLUSDT")
 
@@ -42,7 +44,10 @@ def one(sym):
     st = KSIM.states(df, "1W", spec)
     c26 = KSIM.CF.q_of(26)
     shipped = cooldown(KSIM.CF.zone_onsets(st["bot"]["p"], st["bot"]["theta"]["high"] * 1.1, c26), c26)
-    sets = {"SHIPPED": shipped, **{f"V1|{k}": WB.v1(df, k) for k in WB.KS}, **{f"V2|{k}": WB.v2(df, k, shipped) for k in WB.KS}}
+    if V2MODE:
+        sets = {"SHIPPED": shipped, **{f"D1|{k}": WB.d1(df, k) for k in WB.KS2}, **{f"D2|{k}": WB.d2(df, k, shipped) for k in WB.KS2}}
+    else:
+        sets = {"SHIPPED": shipped, **{f"V1|{k}": WB.v1(df, k) for k in WB.KS}, **{f"V2|{k}": WB.v2(df, k, shipped) for k in WB.KS}}
     c = df["close"].to_numpy(float)
     pre = np.asarray(df.index < SPLIT)
     grp = KE.GRP.get(DG.EXPLORATION[sym].cls, "other")
@@ -74,16 +79,17 @@ def summ(T, Cv, yrs, opt, per, grp=None):
 
 
 def run():
-    mode = GT.require_kwb_ready()
+    mode = GT.require_kwb2_ready() if V2MODE else GT.require_kwb_ready()
+    cfg, tid, hyp, code = (GT.KWB2_CONFIG, "kwb2-1W", "KWB-2", GT.KWB2_CODE) if V2MODE else (GT.KWB_CONFIG, "kwb-1W", "KWB-1", GT.KWB_CODE)
     m = json.loads((ROOT / GT.MANIFEST).read_text())
     if any(MF.verify(m).values()):
         raise SystemExit("cache differs from the manifest")
     data_files = sorted({str(Path(p)) for s in DG.EVAL_SYMBOLS for p in MF.files_for(s, "1H", m) + MF.files_for(s, "1D", m)})
     LG.verify_against_git(LG.LEDGER)
-    LG.record("kwb-1W", "KWB-1", ["exploration"], {"config": GT.KWB_CONFIG, "mode": mode}, list(GT.KWB_CODE),
-              ["right_rate", "excess", "coverage", "rate"], True, GT.KWB_CONFIG, data_files, notes=f"exploration; review mode {mode}")
+    LG.record(tid, hyp, ["exploration"], {"config": cfg, "mode": mode}, list(code),
+              ["right_rate", "excess", "coverage", "rate"], True, cfg, data_files, notes=f"exploration; review mode {mode}")
     subprocess.run(["git", "add", str(LG.LEDGER)], cwd=ROOT, check=True)
-    subprocess.run(["git", "commit", "-q", "-m", "KWB ledger: record trial kwb-1W (before its computation)\n\n"
+    subprocess.run(["git", "commit", "-q", "-m", f"KWB ledger: record trial {tid} (before its computation)\n\n"
                     "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n"
                     "Claude-Session: https://claude.ai/code/session_01PE4opNBuW3L5a8HGngHZ25"], cwd=ROOT, check=True)
     with ProcessPoolExecutor(4) as ex:
@@ -113,7 +119,7 @@ def run():
 def render():
     out = json.loads(OUT.read_text())
     f = lambda v: f"{v['n']}, {v['rate']:.2f}/yr, right {v['right']:.2f}, excess {v['excess']:+.2f}, coverage {v['coverage']:.2f} of {v['swings']}" if v["n"] else f"0 (coverage of {v['swings']} swings: 0)"  # noqa: E731
-    L = ["# KWB: weekly BUY for cycle bottoms (EXPLORATORY)", "", f"Chosen on <2018: {out['chosen']}; **adopted: {out['adopted']}**. 2018+ previously studied.", "",
+    L = [f"# {'KWB-2: weekly BUY from cycle-sized drawdowns' if V2MODE else 'KWB: weekly BUY for cycle bottoms'} (EXPLORATORY)", "", f"Chosen on <2018: {out['chosen']}; **adopted: {out['adopted']}**. 2018+ previously studied.", "",
          "| option | <2018 all | 2018+ all | 2018+ equities | 2018+ crypto |", "|---|---|---|---|---|"]
     for o, S in out["options"].items():
         L.append(f"| {o} | {f(S['tune']['all'])} | {f(S['check']['all'])} | {f(S['check']['equities'])} | {f(S['check']['crypto'])} |")

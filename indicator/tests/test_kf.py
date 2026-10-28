@@ -19,7 +19,7 @@ def test_outcome_and_base_rate():
     assert list(KF.outcome(c, np.array([0, 2]), 2, 1)) == [1.0, 0.0]
     assert list(KF.outcome(c, np.array([2]), 2, -1)) == [1.0]
     assert np.isnan(KF.outcome(c, np.array([5]), 2, 1)[0])
-    assert KF.base_rate(c, 2, 1, np.ones(6, bool)) == 0.5
+    assert KF.base_rate(c, 2, 1, np.ones(6, bool)) == 0.25          # only 1 of the 4 scorable candles rose
 
 
 def test_options_are_causal():

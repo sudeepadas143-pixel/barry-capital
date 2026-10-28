@@ -83,3 +83,90 @@ def test_kc_gate(tmp_path):
     assert GT.kc_blockers(tmp_path, check_cache=False) == []
     (tmp_path / "research" / "kenny_cluster.py").write_text("changed")
     assert any(b.startswith("Y2") for b in GT.kc_blockers(tmp_path, check_cache=False))
+
+
+def _pine_twin(df, tf, st, htf, hl, theta):
+    """Bar-by-bar transliteration of the Pine cluster block (pivots by highest/lowest windows,
+    pivot arrays pruned at 60 candles, traces updated on closed candles)."""
+    from hcmtf import ta
+    from research.cycle_features import SCALE, q_of
+    L = SCALE[tf]["L"]
+    Q, M = q_of(L), L // 2
+    o, h, l, c = (df[k].to_numpy(float) for k in ("open", "high", "low", "close"))
+    n = len(c)
+    r, hst = ta.rsi(c, 14), ta.macd(c, 12, 26, 9)[2]
+    F = st["F"]
+    relv, vr = F["relvol"].to_numpy(float), F["vratio"].to_numpy(float)
+    trend = KC.htf_trend(df, htf)
+    pa = KC.price_action(o, h, l, c, L)
+    lam = 0.5 ** (1.0 / max(1.0, L * hl))
+    W = [KC.WEIGHTS[f] for f in KC.FAMS]
+    piv = {"top": [], "bot": []}
+    tr = {"top": [0.0] * 5, "bot": [0.0] * 5}
+    last_std = {"top": -10**6, "bot": -10**6}
+    on = {d: {k: set(st[d][k].tolist()) for k in ("K_W", "K_S", "K_H", "K_CONF")} for d in ("top", "bot")}
+    buy, sell = [], []
+    for i in range(n):
+        e = {}
+        for d in ("top", "bot"):
+            px = h if d == "top" else l
+            isp = i >= 10 and ((px[i - 5] > px[i - 10:i - 5].max() and px[i - 5] >= px[i - 4:i + 1].max()) if d == "top"
+                               else (px[i - 5] < px[i - 10:i - 5].min() and px[i - 5] <= px[i - 4:i + 1].min()))
+            ediv = 0.0
+            if isp:
+                p = i - 5
+                arr = piv[d]
+                while arr and p - arr[0][0] > 60:
+                    arr.pop(0)
+                for (q, pq, rq, hq) in reversed(arr):
+                    if p - q >= 5:
+                        pxd = px[p] > pq if d == "top" else px[p] < pq
+                        k = 0.0
+                        for x, xq in ((r[p], rq), (hst[p], hq)):
+                            if pxd and np.isfinite(x) and np.isfinite(xq) and ((x < xq) if d == "top" else (x > xq)):
+                                k += 0.5
+                        ediv = k
+                        break
+                arr.append((p, px[p], r[p], hst[p]))
+            rg = h[i] - l[i]
+            wu = (h[i] - max(o[i], c[i])) / rg if rg > 0 else 0.0
+            wd = (min(o[i], c[i]) - l[i]) / rg if rg > 0 else 0.0
+            burst = (relv[i] >= 1.0 if np.isfinite(relv[i]) else False) or (vr[i] >= 0.5 if np.isfinite(vr[i]) else False)
+            ext = 1.0 if i in on[d]["K_H"] else 0.7 if i in on[d]["K_S"] else 0.4 if i in on[d]["K_W"] else 0.0
+            if i in on[d]["K_S"]:
+                last_std[d] = i
+            p_, thw = st[d]["p"], st[d]["theta"]["warning"]
+            warm = any(np.isfinite(p_[j]) and p_[j] >= thw for j in range(max(0, i - Q + 1), i + 1)) and i >= Q - 1
+            e[d] = ([ext, 1.0 if i in on[d]["K_CONF"] else 0.0, ediv, pa[d][i], 1.0 if burst and (wu if d == "top" else wd) >= 0.4 else 0.0],
+                    warm or i - last_std[d] <= M)
+        new, score = {}, {}
+        for d, od in (("top", "bot"), ("bot", "top")):
+            opp = max(e[od][0])
+            add = 0.0
+            for k in range(5):
+                t = tr[d][k] * lam * (1.0 - 0.5 * opp)
+                inc = max(0.0, W[k] * e[d][0][k] * (1.0 - t / W[k]))
+                tr[d][k] = min(t + inc, W[k])
+                add += inc
+            new[d] = add
+        for d in ("top", "bot"):
+            score[d] = sum(tr[d]) * (1.2 if (d == "bot" and trend[i] > 0) or (d == "top" and trend[i] < 0) else 1.0)
+        qT = e["top"][1] and new["top"] >= 0.15 and score["top"] >= theta
+        qB = e["bot"][1] and new["bot"] >= 0.15 and score["bot"] >= theta
+        if qB and not (qT and score["top"] >= score["bot"]):
+            buy.append(i)
+        if qT and not (qB and score["bot"] >= score["top"]):
+            sell.append(i)
+    return np.array(buy, int), np.array(sell, int)
+
+
+def test_pine_cluster_algorithm_matches_the_research_reference():
+    d = daily("2010-01-01", "2020-12-31", 21)
+    w = rs(d, "W-MON")
+    st = KSIM.states(d, "1D", SPEC)
+    ref = KC.run_clusters(KC.evidence(d, "1D", st, w), "1D", 1 / 8, 1.5, True)
+    tw = _pine_twin(d, "1D", st, w, 1 / 8, 1.5)
+    assert len(ref[0]) + len(ref[1]) > 20
+    # the Pine warm-up of ta.highest (na for the first Q-1 candles) is the only intended difference
+    Q = 15
+    assert np.array_equal(tw[0], ref[0][ref[0] >= Q - 1]) and np.array_equal(tw[1], ref[1][ref[1] >= Q - 1])

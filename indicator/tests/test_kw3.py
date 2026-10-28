@@ -57,3 +57,18 @@ def test_weekly_buy_and_other_timeframes_are_unchanged_by_sell_module():
     import research.kenny_weekly_sell  # noqa: F401  (import has no side effects on the shipped path)
     b1, _, _ = KSIM.shipped_signals(w, "1W", SPEC)
     assert np.array_equal(b0, b1)
+
+
+def test_kw4_variants_are_causal_and_subsets_of_their_trigger():
+    w = _w(12)
+    f = WS.features(w)
+    low = w["low"].to_numpy(float)
+    full = {"A1": WS.cand_A1(f, 2.0), "A2": WS.cand_A2(f, 4, low), "A3": WS.cand_A3(f, 1.5)}
+    a = set(WS.cand_A(f, 6.0))
+    assert set(full["A1"]) <= a and set(full["A3"]) <= a                # A1/A3 only remove A signals
+    for cut in (900, 1300):
+        pw = w.iloc[:cut]
+        pf, pl = WS.features(pw), pw["low"].to_numpy(float)
+        part = {"A1": WS.cand_A1(pf, 2.0), "A2": WS.cand_A2(pf, 4, pl), "A3": WS.cand_A3(pf, 1.5)}
+        for k in full:
+            assert np.array_equal(part[k], full[k][full[k] < cut]), k

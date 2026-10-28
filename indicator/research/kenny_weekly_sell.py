@@ -182,3 +182,53 @@ def decline_within(h, l, c, atr, s, horizon):
     if end - s - 1 < horizon or not np.isfinite(atr[s]):
         return np.nan
     return float((l[s + 1:end] <= c[s] - MOVE * atr[s]).any())
+
+
+# ----------------------------------------------------------------------------- KW-4 (reports/KW4_CONFIG.md): Candidate A variants
+
+def _a_base(f, R=6.0):
+    """Candidate A's arm (extended advance, RSI reached >= 65 in 8 weeks, near the 52-week high,
+    RSI >= 5 points off its 8-week max) without the reversal trigger."""
+    with np.errstate(invalid="ignore"):
+        ext = (np.nan_to_num(f["rally52"]) >= R) & (np.nan_to_num(f["tsm"]) >= 0.5) & (np.nan_to_num(f["rsi_max8"]) >= 65)
+        weak = np.nan_to_num(f["rsi"], nan=99) <= np.nan_to_num(f["rsi_max8"]) - 5
+        near = np.nan_to_num(f["dd52"], nan=99) <= 2.0
+    return ext & weak & near
+
+
+def cand_A1(f, x40):
+    """Stronger exhaustion. Hypothesis: A fires on modest advances. Require a long-term extension
+    of >= x40 ATR above SMA40 within the last 8 weeks and falling 13-week momentum (roc13 lower than
+    4 weeks ago), plus A's reversal trigger."""
+    n = len(f["atr"])
+    with np.errstate(invalid="ignore"):
+        ext8 = np.convolve((np.nan_to_num(f["ext40"]) >= x40).astype(float), np.ones(8), "full")[:n] > 0
+        decel = np.nan_to_num(f["roc13_acc"], nan=1.0) < 0
+        rev = f["star"] | f["engulf"] | f["failed_high"]
+    return np.flatnonzero(_a_base(f) & ext8 & decel & rev)
+
+
+def cand_A2(f, w, low):
+    """Failed-breakout confirmation. Hypothesis: a single reversal candle is weak evidence. Require a
+    failed new 52-week high (high above the prior 52-week high, close back below it) while A's arm
+    holds, then a weekly close below that failed-high week's low within w weeks."""
+    arm = np.flatnonzero(_a_base(f) & f["failed_high"])
+    out = []
+    c = f["close"]
+    for a in arm:
+        for k in range(a + 1, min(len(c), a + w + 1)):
+            if c[k] < low[a]:
+                out.append(k)
+                break
+    return np.unique(np.array(out, int))
+
+
+def cand_A3(f, cap):
+    """Regime-aware warning. Hypothesis: A fires inside persistent strong trends whose trend is still
+    accelerating. Suppress A's signal while TSMOM > cap and the SMA40 slope is still rising (slope
+    now >= its value 8 weeks ago); otherwise as A."""
+    with np.errstate(invalid="ignore"):
+        rev = f["star"] | f["engulf"] | f["failed_high"]
+        accel = np.nan_to_num(f["slope40"]) >= np.nan_to_num(_lag(f["slope40"], 8), nan=-np.inf)
+        persistent = (np.nan_to_num(f["tsm"]) > cap) & accel
+    return np.flatnonzero(_a_base(f) & rev & ~persistent)

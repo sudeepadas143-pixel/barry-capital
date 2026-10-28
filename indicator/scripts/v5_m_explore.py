@@ -47,7 +47,7 @@ SLIPPAGE_SENS = 0.0010                                                         #
 GAP_FACTOR = 1.25                                                              # §1.1 evaluation-only exclusion
 UNIVERSE = (*X.TARGETS, X.BTC)
 CODE_FILES = ["research/v5_context.py", "research/v5_eval.py", "research/v5_baselines.py", "research/v5_state.py",
-              "research/v5_data.py", "research/v5_inference.py", "research/v5_costs.py", "research/v5_labels.py",
+              "research/v5_data.py", "research/v5_inference.py", "research/v5_costs.py",
               "research/v5_gate.py", "scripts/v5_m_explore.py"]
 
 

@@ -1,8 +1,8 @@
 """V5 workstream M: crypto BTC-regime context, point-in-time eligibility and BTC episodes
 (reports/V5_M_B_CONFIG.md, FROZEN; section numbers below refer to it).
 
-Context and eligibility only: nothing here reads outcomes or labels (no import of v5_labels or
-v5_eval), and nothing downloads data.
+Context and eligibility only: nothing here reads outcomes or labels (no import of the label module or
+the evaluator), and nothing downloads data.
 
 * btc_context (§2, E7): the BTC state row with the SAME open time as each target candle; both
   candles close at the same instant and the signal executes at the next open. A missing or

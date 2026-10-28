@@ -162,3 +162,44 @@ def test_restated_scales_equal_the_frozen_label_table():
         for P in (TOP_PARAMS, BOTTOM_PARAMS):
             assert P[tf] == {"L": L, "F": F, "D": D}
         assert CF.SCALE[tf] == {"L": L, "D": D}
+
+
+# ----------------------------------------------------------------------------- Pine generator
+
+def _gen():
+    s = importlib.util.spec_from_file_location("cycle_export_pine", ROOT / "scripts" / "cycle_export_pine.py")
+    m = importlib.util.module_from_spec(s)
+    s.loader.exec_module(m)
+    return m
+
+
+def test_pine_generator_writes_every_shipped_coefficient_and_refuses_unportable_features():
+    X = _gen()
+    logit = {"kind": "logit", "features": ["ext_c", "rsi_gap_hi", "htf_rng"], "mu": [0.1, 0.2, 0.5], "sd": [1.5, 0.1, 0.3],
+             "coef": [0.7, -1.25, 0.33], "intercept": -2.5, "theta": 0.61, "C": 0.1}
+    base = {"kind": "base", "feature": "rsi", "sign": -1.0, "theta": -0.3}
+    S = {"tfs": {tf: {"models": {"top|vol": logit, "top|novol": base, "bot|vol": base, "bot|novol": logit}} for tf in ("1W", "1D", "4H", "1H")}}
+    src = X.generate(S)
+    for tok in ("0.7 * z(fExtC, 0.1, 1.5)", "-1.25 * z(fRsiGapHi, 0.2, 0.1)", "0.33 * z(fHtfRng, 0.5, 0.3)", "sig(-2.5",
+                "th := 0.61", "-1 * fRsi", "th := -0.3", "lookahead = barmerge.lookahead_on", "barstate.isconfirmed"):
+        assert tok in src, tok
+    assert "__SCORES__" not in src and "__HTF__" not in src and src.startswith("//@version=6")
+    S["tfs"]["1D"]["models"]["top|vol"] = dict(logit, features=["breadth", "ext_c", "rsi_gap_hi"])
+    with pytest.raises(ValueError):
+        X.generate(S)
+    # every research feature has a Pine definition with the same name map
+    assert set(CF.PRICE + CF.MOM + CF.VOL + CF.INTER + ["htf_rng"]) == set(X.PINE_FEAT)
+
+
+def test_pine_score_matches_python_score():
+    """The generated expression is the research score: evaluate both on the same feature values."""
+    import math
+    X = _gen()
+    spec = {"kind": "logit", "features": ["ext_c", "rsi", "relvol"], "mu": [0.5, 0.55, 0.0], "sd": [2.0, 0.1, 0.4],
+            "coef": [0.9, 1.1, -0.4], "intercept": -1.2, "theta": 0.6}
+    vals = {"ext_c": 3.1, "rsi": 0.78, "relvol": 2.9}
+    py = float(M.score(spec, pd.DataFrame([vals]))[0])
+    e = X.expr(spec)
+    env = {"sig": lambda x: 1 / (1 + math.exp(-x)), "z": lambda x, mu, sd: max(-5.0, min(5.0, (x - mu) / sd)),
+           **{X.PINE_FEAT[k]: v for k, v in vals.items()}}
+    assert eval(e, env) == pytest.approx(py, rel=1e-9)

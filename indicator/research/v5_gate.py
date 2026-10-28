@@ -53,6 +53,10 @@ KW_CONFIG = "reports/KW_CONFIG.md"
 KW_CODE = CY2_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "research/kenny_weekly.py", "scripts/kw_eval.py", "scripts/kenny_export_pine.py")
 KW2_CONFIG = "reports/KW2_CONFIG.md"
 KW2_CODE = KW_CODE + ("scripts/kw2_eval.py",)
+KW3D_CONFIG = "reports/KW3_DIAG_CONFIG.md"
+KW3D_CODE = CY2_CODE + ("research/kenny_sim.py", "research/kenny_weekly_sell.py", "scripts/kw3_eval.py", "scripts/kenny_export_pine.py")
+KW3_CONFIG = "reports/KW3_CONFIG.md"
+KW3_CODE = KW3D_CODE + ("reports/kw3_grid.json",)
 KC_CODE = KB_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "scripts/kc_eval.py", "scripts/kenny_export_pine.py")
 
 
@@ -240,6 +244,28 @@ def require_kw2_ready(root: Path = ROOT) -> str:
     b = kw2_blockers(root)
     if b:
         raise NotReady("KW-2 weekly evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def kw3d_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KW3D_CONFIG, KW3D_CODE)
+
+
+def require_kw3d_ready(root: Path = ROOT) -> str:
+    b = kw3d_blockers(root)
+    if b:
+        raise NotReady("KW-3 diagnosis is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def kw3_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KW3_CONFIG, KW3_CODE)
+
+
+def require_kw3_ready(root: Path = ROOT) -> str:
+    b = kw3_blockers(root)
+    if b:
+        raise NotReady("KW-3 evaluation is blocked:\n  " + "\n  ".join(b))
     return review_mode(root)
 
 

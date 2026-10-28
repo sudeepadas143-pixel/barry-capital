@@ -44,7 +44,7 @@ HYPOTHESES = ("A1", "A2", "B1", "B2", "B3", "C1", "C2", "C3", "C4", "C5",
               "V6-P", "V6-S",
               "CY-1W", "CY-1D", "CY-4H", "CY-1H",
               "CY2-1W", "CY2-1D", "CY2-4H", "CY2-1H",
-              "KB-1W", "KB-1D", "KB-4H", "KB-1H", "KC-1", "KW-1", "KW-2")  # cycle engine CY-1: reports/CYCLE_CONFIG.md                                 # HC-MTF 6.0 stage 1: reports/V6_CONT_CONFIG.md
+              "KB-1W", "KB-1D", "KB-4H", "KB-1H", "KC-1", "KW-1", "KW-2", "KW-3D", "KW-3")  # cycle engine CY-1: reports/CYCLE_CONFIG.md                                 # HC-MTF 6.0 stage 1: reports/V6_CONT_CONFIG.md
 PARTITIONS = ("exploration", "reserve_xs", "forward")
 GENESIS = "0" * 64
 

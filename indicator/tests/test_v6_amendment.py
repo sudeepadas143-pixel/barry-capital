@@ -116,8 +116,8 @@ def test_item3_seeding_is_named_deterministic_and_order_independent(monkeypatch,
     assert np.array_equal(a, M.rng_for("ETHUSDT", "P", 1, "1H").random(5))
     for other in (("XRPUSDT", "P", 1, "1H"), ("ETHUSDT", "E1", 1, "1H"), ("ETHUSDT", "P", -1, "1H"), ("ETHUSDT", "P", 1, "4H")):
         assert not np.array_equal(a, M.rng_for(*other).random(5)), other
-    src = inspect.getsource(M.worker)
-    assert "rng_for(sym, cfg_id, side, tf)" in src and "sorted(cnt.items())" in src
+    assert "rng_for(sym, cfg_id, side, tf)" in inspect.getsource(M.worker)
+    assert "sorted(cnt.items())" in inspect.getsource(M.random_entry_draws)
     # same pair, different universe order and processing order -> identical random-entry replicates
     _patch(monkeypatch, synth, SYMS)
     liq, first = M.prepare()
@@ -159,3 +159,76 @@ def test_item4_shared_trades_are_config_free_and_identical_across_configs(monkey
         assert t["net"] - t["slip"] == pytest.approx(row.net) and t["gross"] == pytest.approx(row.gross)
         ref = EV.trade(o, h, l, c, df.index, row.i, row.side, M.TFS["1H"]["hold"], t["stop"], "crypto", None)
         assert ref["net"] == pytest.approx(t["net"])
+
+
+# ----------------------------------------------------------------------------- pre-run audit (2026-10-28)
+
+def test_audit1_trading_median_pair_accounting_and_min20_sensitivity_is_reporting_only():
+    rows = [("AAA", "ok", 0.01)] * 25 + [("BBB", "ok", -0.02)] * 3 + [("CCC", "no_exit_in_data", np.nan)] * 2
+    d = pd.DataFrame(rows, columns=["sym", "trade_status", "net"]).assign(slip=0.001, mae_trade=0.0, cost_src="x")
+    s = M.trading_summary(d)
+    assert s["pairs_with_units"] == 3 and s["pairs_without_completed_trade"] == ["CCC"]
+    assert s["pairs"] == 2 and s["pair_median_of_mean_net"] == pytest.approx((0.01 - 0.02) / 2)   # CCC excluded, BBB (3 trades) included
+    assert s["pairs_min20"] == 1 and s["pair_median_of_mean_net_min20"] == pytest.approx(0.01)
+    # the stage decision reads only the frozen quantity, never the min-20 sensitivity
+    assert "pair_median_of_mean_net_min20" not in inspect.getsource(M.apply_decisions)
+    assert 'tmed[(model, side, tf)] = tr["targets"].get("pair_median_of_mean_net")' in inspect.getsource(M.evaluate)
+
+
+def test_audit1_excluding_pairs_without_trades_depends_only_on_status_not_returns():
+    base = pd.DataFrame({"sym": ["AAA", "AAA", "BBB"], "trade_status": ["ok", "ok", "trade_gap"], "net": [0.01, 0.02, np.nan],
+                         "slip": 0.001, "mae_trade": 0.0, "cost_src": "x"})
+    flipped = base.assign(net=[-0.01, -0.02, np.nan])
+    assert M.trading_summary(base)["pairs_without_completed_trade"] == M.trading_summary(flipped)["pairs_without_completed_trade"] == ["BBB"]
+
+
+def test_audit2_random_entry_draws_use_no_outcomes_and_keep_the_matching_structure():
+    assert list(inspect.signature(M.random_entry_draws).parameters) == ["pool", "cl", "signal_i", "rng", "reps"]
+    n = 300
+    cl = np.repeat(np.arange(6), 50)
+    pool = np.zeros(n, bool); pool[::3] = True
+    pool[250:] = False; pool[250:252] = True                              # block 5: only 2 candidates
+    sig = np.array([3, 6, 9, 60, 63, 120, 255, 258, 270])                  # block 0: 3, 1: 2, 2: 1, 5: 3 (shortfall)
+    draws, short = M.random_entry_draws(pool, cl, sig, np.random.default_rng(1), 25)
+    assert short == 1
+    for ix in draws:
+        assert pool[ix].all() and len(ix) == len(set(ix))                 # pool only, no replacement
+        got = pd.Series(cl[ix]).value_counts().to_dict()
+        assert got == {0: 3, 1: 2, 2: 1, 5: 2}                            # same count per block (shortfall kept, never padded)
+    a, _ = M.random_entry_draws(pool, cl, sig, M.rng_for("ETHUSDT", "P", 1, "1H"), 5)
+    b, _ = M.random_entry_draws(pool, cl, sig, M.rng_for("ETHUSDT", "P", 1, "1H"), 5)
+    assert all(np.array_equal(x, y) for x, y in zip(a, b))
+
+
+def test_audit2_worker_pool_is_built_from_causal_masks_only():
+    src = inspect.getsource(M.worker)
+    assert "pool = ok & (tr == (S6.UP if side > 0 else S6.DOWN))" in src
+    assert "ok = elig & full & ~np.isnan(rhx[(cfg.ema, side)])" in src     # same unit rule as model A's signals
+    # outcome values enter only after the draw, to average the drawn candles
+    assert src.index("random_entry_draws(") < src.index("sums = np.array([rh[side][ix].sum() for ix in draws])")
+
+
+def test_audit4_gap_cases_missing_irregular_and_sessions():
+    h = lambda s: pd.Timestamp(s, tz="UTC")
+    # missing 1H candles -> gap (2 h > 1.5 h); exactly 1.5 h -> not a gap; sub-nominal / irregular spacing -> not a gap
+    t = pd.DatetimeIndex([h("2021-01-01 00:00"), h("2021-01-01 02:00"), h("2021-01-01 03:30"), h("2021-01-01 03:50"),
+                          h("2021-01-01 05:00")])
+    assert list(S6.gaps(t, "1H")) == [False, True, False, False, False]
+    # an 11-hour exchange outage (the kind present in the cache) -> gap; a 2-day weekend-style hole -> gap
+    t2 = pd.DatetimeIndex([h("2021-01-01 00:00"), h("2021-01-01 11:00"), h("2021-01-03 11:00")])
+    assert list(S6.gaps(t2, "1H")) == [False, True, True]
+    # 4H from 1H buckets: a whole missing bucket -> gap; a PARTIAL bucket is a normal candle (no gap) - disclosed limitation
+    m = minute_bars(n15=4 * 24 * 3, seed=9, start="2021-01-01")
+    h1 = _resample(m, "1h", label="left", closed="left")
+    part = h1.drop(index=h1.index[5:7])                                    # 05:00, 06:00 missing -> bucket 04:00 partial
+    whole = h1.drop(index=h1.index[8:12])                                  # 08:00-11:00 missing -> bucket 08:00 absent
+    f4p = _resample(part, "4h", label="left", closed="left").dropna()
+    f4w = _resample(whole, "4h", label="left", closed="left").dropna()
+    assert not S6.gaps(f4p.index, "4H").any()
+    gw = S6.gaps(f4w.index, "4H")
+    assert gw.sum() == 1 and f4w.index[gw][0] == h("2021-01-01 12:00")
+    # non-increasing timestamps are refused upstream (loader index is strictly increasing; classify raises)
+    from research import v5_state as ST
+    bad = h1.iloc[[0, 2, 1, 3]]
+    with pytest.raises(ValueError):
+        ST.classify(bad, _resample(m, "4h", label="left", closed="left"), None)

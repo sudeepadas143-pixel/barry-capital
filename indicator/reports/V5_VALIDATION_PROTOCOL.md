@@ -295,3 +295,46 @@ amendment's commit.
     across configurations, even where the B/C/D flags differ;
   * recomputing from (i, j, side) reproduces every stored trade;
   * the trade equals `v5_eval.trade` with the same stop.
+
+### Pre-run audit note to V6-A1 (2026-10-28, before any V6 outcome)
+
+Append-only. It records findings of the pre-run audit. It changes no threshold, decision rule,
+family or configuration, and `V6_CONT_CONFIG.md` is untouched.
+
+1. **Trading-median test: eligibility and pair accounting.**
+   * The test is computed only on the model's units that pass the frozen §1 eligibility (E1–E6)
+     and the §5 full-window rules.
+   * A pair enters it with **≥ 1 completed trade**. A pair whose units all ended
+     `no_exit_in_data` / `trade_gap` (data end or a timestamp gap) is excluded, and listed in the
+     results as `pairs_without_completed_trade`.
+   * That exclusion depends only on trade status, never on returns, so it cannot favour the
+     result (tested by flipping returns).
+   * The frozen §8 per-pair minimum (≥ 20) is defined for the signal-quality contrasts, not for
+     the trading test, so it is **not** applied to the decisive median. The trading test is only
+     consulted at a TF where the feature's own cell has passed, which already requires ≥ 8 pairs
+     with ≥ 20 kept units each.
+   * A median over pairs with ≥ 20 completed trades, and the count of such pairs, are reported
+     as a **reporting-only sensitivity** that never decides.
+2. **Random entry.** The draw is now `random_entry_draws(pool, cl, signal_i, rng, reps)`. Its
+   inputs are masks, block ids and signal positions only.
+   * **Pool:** E1–E6-eligible, in-window candles with a full window and a defined benchmark, in
+     the same trend state (causal).
+   * **Count:** model A's count per calendar block. Blocks are drawn in calendar order, without
+     replacement. A shortfall keeps all candidates and is never padded.
+   * Outcome values are read only after the draw, to average the drawn candles.
+   * The defined-benchmark condition is the same unit rule model A's signals pass, so signals and
+     controls are drawn from comparable candles.
+3. **The 1.5× gap rule is frozen text** (`V6_CONT_CONFIG.md` §2), not a new operational choice;
+   so are the 1.25× window rules (§5). V6-A1 item 2 only applies it at the touch candle.
+4. **Gap cases** (timestamps of the 36 cached pairs since 2019 profiled; no prices read):
+
+   | case | in the data | handling |
+   |---|---|---|
+   | missing candles | 587 gaps at 1H, 85 at 4H: exchange-wide outages of 11–12 h | gap |
+   | irregular spacing (below nominal, or 1–1.5× nominal) | none | not a gap |
+   | misaligned open times or duplicates | none | the loader index is strictly increasing; `v5_state.classify` refuses otherwise |
+   | market sessions | none: crypto trades 24/7 | – |
+   | **partial 4H candles** (built from fewer than 4 hourly candles) | 814 of 532,265 (0.15%) | treated as normal candles, not gaps. **Disclosed limitation**: the frozen rules have no partial-candle test; E4 (≥ 95% hourly completeness over 30 days) bounds their frequency per pair |
+   | empty 4H buckets | dropped by the loader (no NaN rows) | appear as a gap |
+
+   Regression tests are in `tests/test_v6_amendment.py`.

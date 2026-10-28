@@ -134,6 +134,28 @@ def rng_for(sym: str, cfg_id: str, side: int, tf: str) -> np.random.Generator:
     return np.random.default_rng(np.random.SeedSequence(SEED, spawn_key=key))
 
 
+def random_entry_draws(pool: np.ndarray, cl: np.ndarray, signal_i: np.ndarray, rng: np.random.Generator,
+                       reps: int) -> tuple[list[np.ndarray], int]:
+    """Matched random entry (§7 C0; amendment V6-A1 item 3): for each calendar block holding model-A
+    signals, draw - per replicate, uniformly without replacement - as many candles as A has in that
+    block from the block's pool (eligible, in-window, same trend state, full window). Blocks in
+    calendar order; a block with fewer candidates than signals keeps all candidates (shortfall).
+    Inputs are masks, block ids and signal positions only: no outcome value is passed in, so the
+    draw cannot depend on outcomes. Returns one index array per replicate and the shortfall count."""
+    out = [[] for _ in range(reps)]
+    short = 0
+    cnt = pd.Series(cl[signal_i]).value_counts() if len(signal_i) else pd.Series(dtype=int)
+    for b, k in sorted(cnt.items()):                                      # blocks in calendar order
+        cand = np.flatnonzero(pool & (cl == b))
+        m = min(int(k), len(cand))
+        short += int(m < k)
+        if m == 0:
+            continue
+        for rr in range(reps):
+            out[rr].append(cand[rng.choice(len(cand), m, replace=False)])
+    return [np.concatenate(x) if x else np.array([], int) for x in out], short
+
+
 def shared_trade(o, h, l, c, idx, atr, funding, i: int, j: int, side: int, hold: int, tgap: bool, slip: float):
     """The one trade of a signal at candle i with pullback start j (amendment V6-A1, item 4).
     Depends only on (i, j, side) and pair data: stop = pullback extreme over j..i -/+ 0.5 ATR[i];
@@ -219,19 +241,9 @@ def worker(args):
                 ok = elig & full & ~np.isnan(rhx[(cfg.ema, side)])
                 a_i = np.array([int(v) for v in sg["i"] if ok[int(v)]], int)
                 pool = ok & (tr == (S6.UP if side > 0 else S6.DOWN))
-                cnt = pd.Series(cl[a_i]).value_counts() if len(a_i) else pd.Series(dtype=int)
-                rng = rng_for(sym, cfg_id, side, tf)
-                sums, counts, short = np.zeros(REPS_RAND), np.zeros(REPS_RAND), 0
-                for b, k in sorted(cnt.items()):                                  # blocks in calendar order
-                    cand = np.flatnonzero(pool & (cl == b))
-                    m = min(int(k), len(cand))
-                    short += int(m < k)
-                    if m == 0:
-                        continue
-                    v = rh[side][cand]
-                    for rr in range(REPS_RAND):
-                        sums[rr] += v[rng.choice(len(cand), m, replace=False)].sum()
-                    counts += m
+                draws, short = random_entry_draws(pool, cl, a_i, rng_for(sym, cfg_id, side, tf), REPS_RAND)
+                sums = np.array([rh[side][ix].sum() for ix in draws])
+                counts = np.array([float(len(ix)) for ix in draws])
                 rand[(cfg_id, side)] = {"sums": sums, "counts": counts, "shortfall_blocks": short}
     U = pd.DataFrame(rows)
     if len(U):
@@ -451,7 +463,11 @@ def pair_median_of_mean_net(ok: pd.DataFrame) -> float | None:
 def trading_summary(d: pd.DataFrame) -> dict:
     ok = d[d["trade_status"] == "ok"]
     out = {"units": int(len(d)), "trades": int(len(ok)), "status": d["trade_status"].value_counts().to_dict(),
-           "cost_sources": ok["cost_src"].value_counts().to_dict()}
+           "cost_sources": ok["cost_src"].value_counts().to_dict(),
+           # pair accounting for the trading-median test (pre-run audit, item 1): pairs with model units,
+           # and those without any completed trade (all no_exit_in_data / trade_gap), which the test excludes
+           "pairs_with_units": int(d["sym"].nunique()),
+           "pairs_without_completed_trade": sorted(set(d["sym"]) - set(ok["sym"]))}
     if len(ok):
         net = ok["net"].to_numpy(float)
         slip = ok["slip"].to_numpy(float)
@@ -463,7 +479,10 @@ def trading_summary(d: pd.DataFrame) -> dict:
         out.update({"net_mean": float(net.mean()), "net_median": float(np.median(net)),
                     "net_pct": [float(v) for v in np.percentile(net, [5, 25, 50, 75, 95])],
                     "net_mean_slip0": float((net + slip).mean()), "net_mean_slip2": float((net - slip).mean()),
-                    "pair_median_of_mean_net": pair_median_of_mean_net(ok), "pairs": int(len(pm)), "pairs_positive": int((pm > 0).sum()),
+                    "pair_median_of_mean_net": pair_median_of_mean_net(ok), "pairs": int(len(pm)),
+                    # reporting-only sensitivity (never decides): pairs with >= 20 completed trades
+                    "pair_median_of_mean_net_min20": _num(pm[ok.groupby("sym").size() >= 20].median()) if (ok.groupby("sym").size() >= 20).any() else None,
+                    "pairs_min20": int((ok.groupby("sym").size() >= 20).sum()), "pairs_positive": int((pm > 0).sum()),
                     "worst_trade": float(net.min()), "mae_pct": [float(v) for v in np.percentile(ok["mae_trade"], [5, 50, 95])],
                     "top1pct_trades_share_of_total": _num(srt[:top].sum() / tot) if tot != 0 else None,
                     "top5_pairs_share_of_total": _num(pair_tot.iloc[:5].sum() / tot) if tot != 0 else None,
@@ -658,7 +677,8 @@ def render():
                      f"{_f(d['p_holm_family'], 4)} | {_f(d['p_holm_all'], 4)} | **{d['verdict']}** | {d['verdict_all_cell_holm']} |")
     L += ["", "## Net trading results, config P (separate from signal quality; never decisive)", "",
           "Fees 20 bp + slippage 10/20 bp round trip by liquidity rank; shorts pay funding (observed or 10%/yr estimated). Stop = pullback extreme ∓ 0.5 ATR; time exit 2H.", "",
-          "| model · side · TF | trades | net mean | net median | pair median of mean net | pairs > 0 | slip ×0 / ×2 mean | MAE p50/p95 | top 1% trades share | top 5 pairs share | book median log ret / max DD | cost sources |",
+          "Pair median = median across pairs (with >= 1 completed trade) of each pair's mean net per trade; the >= 20-trade version in brackets is a reporting-only sensitivity.", "",
+          "| model · side · TF | trades | net mean | net median | pair median of mean net (≥20-trade pairs: median, n) | pairs > 0 | slip ×0 / ×2 mean | MAE p50/p95 | top 1% trades share | top 5 pairs share | book median log ret / max DD | cost sources |",
           "|---|---:|---:|---:|---:|---|---|---|---:|---:|---|---|"]
     for k, tr in R["trading"].items():
         x = tr["targets"]
@@ -666,7 +686,7 @@ def render():
             L.append(f"| {k} | 0 | | | | | | | | | | |")
             continue
         b = tr["books"]
-        L.append(f"| {k} | {x['trades']} | {_f(x['net_mean'], 4, True)} | {_f(x['net_median'], 4, True)} | {_f(x['pair_median_of_mean_net'], 4, True)} | "
+        L.append(f"| {k} | {x['trades']} | {_f(x['net_mean'], 4, True)} | {_f(x['net_median'], 4, True)} | {_f(x['pair_median_of_mean_net'], 4, True)} ({_f(x.get('pair_median_of_mean_net_min20'), 4, True)}, {x.get('pairs_min20')}) | "
                  f"{x['pairs_positive']}/{x['pairs']} | {_f(x['net_mean_slip0'], 4, True)} / {_f(x['net_mean_slip2'], 4, True)} | "
                  f"{_f(x['mae_pct'][1], 3)} / {_f(x['mae_pct'][2], 3)} | {_f(x['top1pct_trades_share_of_total'], 2)} | {_f(x['top5_pairs_share_of_total'], 2)} | "
                  f"{_f(b.get('median_total_log_return'), 2, True)} / {_f(b.get('median_max_drawdown'), 2, True)} | {x['cost_sources']} |")

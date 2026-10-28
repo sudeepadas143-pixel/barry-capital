@@ -101,8 +101,10 @@ def model_a(ind: dict, trend: np.ndarray, gap: np.ndarray, side: int, W: int) ->
         if j < 0 and defined and trend[k] == want:                       # (b) arm, then start
             if (l[k] > ef[k]) if side > 0 else (h[k] < ef[k]):
                 armed = True
-            elif armed and not gap[k] and ((l[k] <= ef[k]) if side > 0 else (h[k] >= ef[k])):
-                j, armed = k, False
+            elif armed and ((l[k] <= ef[k]) if side > 0 else (h[k] >= ef[k])):
+                j, armed = k, False                                      # starting disarms (§3.2 step 1)
+                if gap[k]:                                               # §3.2 step 4: a gap before the start
+                    j = -1                                               # candle ends the pullback at once
         if j >= 0 and k >= 1 and not np.isnan(h[k - 1]) and not np.isnan(l[k - 1]):   # (c) trigger
             if side > 0:
                 trig = c[k] > ef[k] and c[k] > h[k - 1]

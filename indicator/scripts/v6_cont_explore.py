@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import zlib
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -125,8 +126,32 @@ class _F:
 
 # ----------------------------------------------------------------------------- per-pair worker
 
-def _rng(*keys):
-    return np.random.default_rng(np.random.SeedSequence(SEED, spawn_key=tuple(int(k) for k in keys)))
+def rng_for(sym: str, cfg_id: str, side: int, tf: str) -> np.random.Generator:
+    """Matched-random-entry stream for one (pair, config, side, TF): SeedSequence(20261027) with a
+    spawn key derived from the NAMES (crc32), so draws do not depend on list positions, worker
+    scheduling or the order in which pairs are processed (amendment V6-A1, item 3)."""
+    key = (zlib.crc32(sym.encode()), zlib.crc32(cfg_id.encode()), side + 1, zlib.crc32(tf.encode()))
+    return np.random.default_rng(np.random.SeedSequence(SEED, spawn_key=key))
+
+
+def shared_trade(o, h, l, c, idx, atr, funding, i: int, j: int, side: int, hold: int, tgap: bool, slip: float):
+    """The one trade of a signal at candle i with pullback start j (amendment V6-A1, item 4).
+    Depends only on (i, j, side) and pair data: stop = pullback extreme over j..i -/+ 0.5 ATR[i];
+    entry, stops and time exit by v5_eval.trade; no configuration-specific input. Returns the
+    trade dict (with MAE and the slippage to charge), or a status string."""
+    if tgap:
+        return "trade_gap"
+    if i + hold >= len(c):
+        return "no_exit_in_data"
+    stop = float(np.min(l[j:i + 1]) - 0.5 * atr[i]) if side > 0 else float(np.max(h[j:i + 1]) + 0.5 * atr[i])
+    t = EV.trade(o, h, l, c, idx, i, side, hold, stop, "crypto", funding)
+    if t is None:
+        return "no_exit_in_data"
+    e_, x_ = t["entry_i"], t["exit_i"]
+    t["mae"] = float((o[e_] - np.min(l[e_:x_ + 1])) / o[e_]) if side > 0 else float((np.max(h[e_:x_ + 1]) - o[e_]) / o[e_])
+    t["slip"] = float(slip)
+    t["stop"] = stop
+    return t
 
 
 def worker(args):
@@ -172,7 +197,7 @@ def worker(args):
             ct = EV.candle_table(sym, idx, tf, H, {"trend": tr}, {"r_h": r})
             rhx[(ema, side)] = rh[side] - EV.causal_benchmark(ct, "r_h", ["trend"], H, 200)
     rows, trades, rand = [], {}, {}
-    for ci, cfg_id in enumerate(CFG_IDS):
+    for cfg_id in CFG_IDS:
         cfg = S6.CONFIGS[cfg_id]
         for side in (1, -1):
             sg, ind, tr = S6.signals(df, tf, cfg, side)
@@ -188,22 +213,16 @@ def worker(args):
                              "perp_ok": bool(sym in X.PERP_PAIRS and pstart is not None and idx[i] >= pstart)})
                 key = (i, j, side)
                 if key not in trades and elig[i] and full[i] and not np.isnan(x):
-                    stop = float(np.min(l[j:i + 1]) - 0.5 * f.atr[i]) if side > 0 else float(np.max(h[j:i + 1]) + 0.5 * f.atr[i])
-                    t = None if (tgap[i] or i + hold >= n) else EV.trade(o, h, l, c, idx, i, side, hold, stop, "crypto", funding)
-                    if t is not None:
-                        e_, x_ = t["entry_i"], t["exit_i"]
-                        t["mae"] = float((o[e_] - np.min(l[e_:x_ + 1])) / o[e_]) if side > 0 else float((np.max(h[e_:x_ + 1]) - o[e_]) / o[e_])
-                        t["slip"] = float(slip[i])
-                    trades[key] = t if t is not None else ("trade_gap" if tgap[i] else "no_exit_in_data")
+                    trades[key] = shared_trade(o, h, l, c, idx, f.atr, funding, i, j, side, hold, bool(tgap[i]), slip[i])
             # matched random entry (C0) for configs that define A
             if "A" in S6.AFFECTS[cfg_id]:
                 ok = elig & full & ~np.isnan(rhx[(cfg.ema, side)])
                 a_i = np.array([int(v) for v in sg["i"] if ok[int(v)]], int)
                 pool = ok & (tr == (S6.UP if side > 0 else S6.DOWN))
                 cnt = pd.Series(cl[a_i]).value_counts() if len(a_i) else pd.Series(dtype=int)
-                rng = _rng(UNIVERSE.index(sym), ci, side + 1, list(TFS).index(tf))
+                rng = rng_for(sym, cfg_id, side, tf)
                 sums, counts, short = np.zeros(REPS_RAND), np.zeros(REPS_RAND), 0
-                for b, k in cnt.items():
+                for b, k in sorted(cnt.items()):                                  # blocks in calendar order
                     cand = np.flatnonzero(pool & (cl == b))
                     m = min(int(k), len(cand))
                     short += int(m < k)
@@ -419,6 +438,16 @@ def apply_decisions(cellres: dict, trading_medians: dict) -> dict:
     return out
 
 
+def pair_median_of_mean_net(ok: pd.DataFrame) -> float | None:
+    """Stage-success trading test (§9; amendment V6-A1, item 1): for each eligible pair with at
+    least one completed trade of the model, the mean net return per trade at PRIMARY costs (fees +
+    slippage + funding); then the median of those per-pair means across pairs. Distinct from the
+    pooled per-trade mean and median."""
+    if not len(ok):
+        return None
+    return float(ok.groupby("sym")["net"].mean().median())
+
+
 def trading_summary(d: pd.DataFrame) -> dict:
     ok = d[d["trade_status"] == "ok"]
     out = {"units": int(len(d)), "trades": int(len(ok)), "status": d["trade_status"].value_counts().to_dict(),
@@ -434,7 +463,7 @@ def trading_summary(d: pd.DataFrame) -> dict:
         out.update({"net_mean": float(net.mean()), "net_median": float(np.median(net)),
                     "net_pct": [float(v) for v in np.percentile(net, [5, 25, 50, 75, 95])],
                     "net_mean_slip0": float((net + slip).mean()), "net_mean_slip2": float((net - slip).mean()),
-                    "pair_median_of_mean_net": float(pm.median()), "pairs": int(len(pm)), "pairs_positive": int((pm > 0).sum()),
+                    "pair_median_of_mean_net": pair_median_of_mean_net(ok), "pairs": int(len(pm)), "pairs_positive": int((pm > 0).sum()),
                     "worst_trade": float(net.min()), "mae_pct": [float(v) for v in np.percentile(ok["mae_trade"], [5, 50, 95])],
                     "top1pct_trades_share_of_total": _num(srt[:top].sum() / tot) if tot != 0 else None,
                     "top5_pairs_share_of_total": _num(pair_tot.iloc[:5].sum() / tot) if tot != 0 else None,

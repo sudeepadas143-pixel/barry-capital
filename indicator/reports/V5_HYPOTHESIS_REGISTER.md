@@ -233,3 +233,117 @@ decision rules are in [`V6_CONT_CONFIG.md`](V6_CONT_CONFIG.md), frozen before an
 outcome. Ledger ids: `V6-P` (primary config), `V6-S` (alternatives). Status: untested,
 exploration. No earlier hypothesis or definition changes.
 
+### Amendment V6-A1 (2026-10-28): four implementation clarifications of `V6_CONT_CONFIG.md`, recorded before any V6 outcome
+
+**Scope.** These clarifications do **not** edit the frozen configuration file. They record how
+four points that the frozen text left implicit are implemented. They were written, tested and
+committed before any V6 trial was recorded or any V6 outcome computed.
+
+None of the four changes a threshold, a parameter, a family size, a decision rule or a selection.
+None reads an outcome, and none can select or favour a configuration. Regression tests:
+`tests/test_v6_amendment.py`.
+
+The pre-amendment review found two places where the code did not yet match the frozen text: item 2
+(gap at the touch candle) and item 3 (an order-fragile seed). Both were corrected in this
+amendment's commit.
+
+**1. Trading-median test** (§9, stage success: "the model's `P` net trading median per pair ≥ 0").
+
+* **Implemented:**
+  * Per eligible pair, the mean net return per completed trade of the model, at primary costs:
+    fees 20 bp, slippage 10/20 bp by liquidity rank, and short funding (observed or the
+    estimated 10%/yr).
+  * Then the median of those per-pair means across pairs (`pair_median_of_mean_net`).
+  * Eligible pairs are the target pairs with at least one completed trade in the model's unit set
+    (signals passing E1–E6 with a full outcome window). Pairs whose trades all ended
+    `no_exit_in_data` / `trade_gap` are not counted. BTCUSDT is excluded.
+  * The ×0 and ×2 slippage sensitivities never enter this test.
+* **Consistent with the protocol because:**
+  * "median per pair" names a cross-pair median of a per-pair quantity;
+  * the per-trade mean is a pair's expectancy, the quantity the trading test is about;
+  * it is computed only for the TF at which the feature's own cell passes, as §9 states.
+* **Kept separate** from:
+  * the pooled per-trade mean and median, which are reported in their own columns and never
+    decide;
+  * the signal-quality criteria of §9.
+* **Thresholds and outcomes:** the threshold stays ≥ 0, and no configuration is selected by it.
+* **Tests:** a case where the pooled mean is positive while the median of per-pair means is
+  negative; the median differs from the pooled per-trade median; slippage sensitivities do not
+  change it; pairs without a completed trade are not counted.
+
+**2. Gap at the touch candle** (§2 gap definition; §3.2 steps 1 and 4).
+
+* **Implemented:**
+  * **Gap.** A gap before candle k means open time[k] − open time[k−1] > 1.5 × the nominal
+    duration: 1.5 h for 1H, 6 h for 4H. For 4H candles, built from 1H data in UTC buckets, a gap
+    therefore means at least one whole bucket is missing.
+  * **Behaviour.** When a pullback would start at candle j (trend `up`, low[j] ≤ EMA_f[j], pair
+    armed) and there is a gap before j, the pullback **starts and is immediately ended** by the
+    gap rule. So:
+    * it never triggers, not even at j itself;
+    * starting it **disarms** the pair, so a new pullback needs the pair to re-arm first.
+
+    Shorts mirror this.
+* **Consistent with the protocol because:**
+  * §3.2 step 1 starts the pullback and disarms the pair on exactly these conditions.
+  * Step 4 ends a pullback at the first candle i with a gap before i. Pullback candles run from
+    j, so i = j qualifies, and the end check precedes the trigger.
+  * The pre-amendment code did not start such a pullback and left the pair armed. That let the
+    next touching candle start one, which the frozen text does not allow. It is corrected here.
+* **Why a gap disqualifies the touch.** A trigger at j would compare close[j] with high[j−1],
+  which lies on the far side of missing data, and the pullback itself would begin across that
+  missing data. The frozen gap rule exists to stop either.
+* **Thresholds and outcomes:** the 1.5× threshold is the frozen §2 value. Prices are read only
+  as frozen; outcomes are not read.
+* **Tests:** the gap threshold at 1H and 4H; a touch after a gap starts nothing tradable and
+  disarms; the next touch without re-arming is ignored; after re-arming a new pullback triggers;
+  a gapped touch candle never triggers itself.
+
+**3. Matched-random-entry seeding** (§7 C0: "200 seeded replicates, `default_rng(20261027)`").
+
+* **Implemented:**
+  * One stream per (pair, configuration, side, TF):
+    `np.random.default_rng(np.random.SeedSequence(20261027, spawn_key=(crc32(pair),
+    crc32(config id), side + 1, crc32(TF))))`.
+  * Within a stream, calendar blocks are drawn in ascending block order. In each block, the 200
+    replicates are drawn in sequence, uniformly without replacement.
+  * The pre-amendment code keyed the stream by list positions, and drew blocks in
+    `value_counts` order (count-descending, ties unspecified). Both are replaced here.
+* **Consistent with the protocol because:**
+  * every stream derives from seed 20261027, so it is seeded and reproducible as frozen;
+  * the draw rule (same pair, same calendar block, same trend state, same count, no replacement)
+    is unchanged;
+  * keying by names makes the result independent of execution order, worker scheduling and
+    list order.
+* **Thresholds and outcomes:** it does not depend on outcomes, and it selects nothing.
+* **Tests:**
+  * identical draws for identical keys, and different draws when any key differs;
+  * the worker uses the named stream and sorted blocks;
+  * one pair's replicate sums are identical when the universe order is reversed and another pair
+    is processed first.
+
+**4. Shared trades** (§5: entry, exit and costs identical for every model).
+
+* **Implemented:**
+  * Within a pair and TF, every unit with the same (signal candle i, pullback start j, side) uses
+    one trade from `shared_trade`, whose inputs are only pair data and (i, j, side):
+    * entry at open[i+1];
+    * stop = min low[j..i] − 0.5 × ATR14[i] (short: max high[j..i] + 0.5 × ATR14[i]);
+    * fills and the time exit by `v5_eval.trade`;
+    * slippage by the liquidity rank at i;
+    * funding for shorts.
+  * The trade is computed once, by the first configuration under which the unit is eligible
+    (E1–E6, full outcome window, defined `rh_x`). It is reused by every configuration and model
+    (A, B, C, D) with the same key.
+* **Consistent with the protocol because:**
+  * §5 requires identical entry, exit and costs across compared models;
+  * the trade depends on nothing configuration-specific. EMA periods, RSI, MACD and extension
+    settings and the B/C/D flags are not inputs. j is part of the key, so different pullback
+    starts give different stops, as the frozen stop rule requires.
+* **Thresholds and outcomes:** it does not depend on outcomes, and it selects nothing.
+* **Tests:**
+  * the helper's signature has no configuration argument;
+  * on a synthetic run, every unit sharing a key has identical net, gross, MAE and cost source
+    across configurations, even where the B/C/D flags differ;
+  * recomputing from (i, j, side) reproduces every stored trade;
+  * the trade equals `v5_eval.trade` with the same stop.

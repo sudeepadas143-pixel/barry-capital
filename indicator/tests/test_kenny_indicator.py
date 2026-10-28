@@ -277,7 +277,8 @@ def test_pine_buy_choices_follow_the_kbal_rule():
 def test_daily_buy_zone_reads_the_previous_completed_day_and_only_shows_on_4h_and_below():
     _, S = _spec()
     src = K.generate(S)
-    assert 'dNew   = request.security(syminfo.tickerid, "D", buySig[1], lookahead = barmerge.lookahead_on)' in src
+    assert 'dNew   = request.security(syminfo.tickerid, "D", dFlag()[1], lookahead = barmerge.lookahead_on)' in src
+    assert "dFlag() => buySig ? 1.0 : 0.0" in src
     assert 'dSince = request.security(syminfo.tickerid, "D", ta.barssince(buySig)[1], lookahead = barmerge.lookahead_on)' in src
-    assert "dOn = showDz and bucket <= 1" in src and 'dMark = dOn and nz(dNew) and timeframe.change("D")' in src
+    assert "dOn = showDz and bucket <= 1" in src and 'dMark = dOn and nz(dNew) > 0 and timeframe.change("D")' in src
     assert "dSince < 15" in src and re.search(r"^showDz\s+= input\.bool\(true", src, re.M)

@@ -473,10 +473,11 @@ plotshape(sellN and bucket <= 1, "SELL", shape.triangledown, location.abovebar, 
 plotshape(sellN and bucket == 2, "SELL 1D", shape.triangledown, location.abovebar, cSell, size = size.normal)
 plotshape(sellN and bucket == 3, "SELL 1W", shape.triangledown, location.abovebar, cSell, size = size.large)
 // daily BUY zone on 4H and below (the 1D chart's BUY, previous completed day, no repaint; reports/KBAL_CONFIG.md)
-dNew   = request.security(syminfo.tickerid, "D", buySig[1], lookahead = barmerge.lookahead_on)
+dFlag() => buySig ? 1.0 : 0.0
+dNew   = request.security(syminfo.tickerid, "D", dFlag()[1], lookahead = barmerge.lookahead_on)
 dSince = request.security(syminfo.tickerid, "D", ta.barssince(buySig)[1], lookahead = barmerge.lookahead_on)
 dOn = showDz and bucket <= 1
-dMark = dOn and nz(dNew) and timeframe.change("D")
+dMark = dOn and nz(dNew) > 0 and timeframe.change("D")
 plotshape(dMark, "Daily BUY (on 4H and below)", shape.labelup, location.belowbar, cBuy, text = "1D", textcolor = color.white, size = size.small)
 bgcolor(dOn and not na(dSince) and dSince < 15 ? color.new(cBuy, 92) : na, title = "Daily BUY zone")
 alertcondition(dMark, "Kenny Div: Daily BUY (on 4H and below)", "Kenny Div DAILY BUY {{ticker}} {{interval}} {{close}}")

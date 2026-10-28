@@ -56,6 +56,13 @@ reports/
   v1/                                        v1 results and README
 ```
 
+## HC-MTF Cycle Engine (CY-1, separate indicator)
+
+A separate cycle-top/bottom indicator, `pine/HC_CycleEngine.pine`, is generated from the CY-1
+research (`reports/CYCLE_CONFIG.md`, `reports/CYCLE_SUMMARY.md`). Its evidence is
+**exploratory and did not pass the corrected test** on any timeframe; read the summary before use.
+The production indicator described below is unchanged.
+
 ## Using the indicator
 
 1. TradingView → Pine Editor → paste `pine/HighConvictionMTF.pine` → *Add to chart*. Works on any

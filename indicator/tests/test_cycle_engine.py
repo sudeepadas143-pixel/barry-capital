@@ -203,3 +203,11 @@ def test_pine_score_matches_python_score():
     env = {"sig": lambda x: 1 / (1 + math.exp(-x)), "z": lambda x, mu, sd: max(-5.0, min(5.0, (x - mu) / sd)),
            **{X.PINE_FEAT[k]: v for k, v in vals.items()}}
     assert eval(e, env) == pytest.approx(py, rel=1e-9)
+
+
+def test_committed_pine_is_generated_from_the_committed_spec():
+    import json
+    spec_path, pine_path = ROOT / "reports" / "cycle_model_spec.json", ROOT / "pine" / "HC_CycleEngine.pine"
+    if not spec_path.exists() or not pine_path.exists():
+        pytest.skip("no shipped spec yet")
+    assert _gen().generate(json.loads(spec_path.read_text())) == pine_path.read_text()

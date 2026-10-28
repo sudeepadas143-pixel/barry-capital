@@ -84,9 +84,12 @@ TEMPLATE = r'''//@version=6
 //   candle (request.security(..., f()[1], lookahead_on)), so it never changes after the fact.
 //   Context symbols are display-only and never change a signal.
 //
-// EVIDENCE (see reports/CYCLE_RESULTS.md): exploratory only - all research data had been examined
-//   before; no independent confirmation exists. Read the per-timeframe verdicts before relying on
-//   any marker. Not financial advice.
+// EVIDENCE (reports/CYCLE_SUMMARY.md): EXPLORATORY ONLY - all research data had been examined
+//   before; no independent confirmation exists. In the CY-1 test periods NO timeframe/direction
+//   passed the multiple-testing-corrected lift test. Strongest raw results: weekly bottoms (zones
+//   near a labelled major bottom ~1.8x the random rate), daily bottoms (~1.3x), 4H tops (~1.2x);
+//   weekly/daily tops and 1H showed little or no lift. Treat markers as research context, not as
+//   validated signals. Not financial advice.
 indicator("HC-MTF Cycle Engine", shorttitle = "HC-Cycle", overlay = true, max_labels_count = 500)
 
 // ---------------------------------------------------------------- inputs
@@ -136,8 +139,8 @@ fExtC     = (close - emaL) / atr
 fExtF     = (close - emaF) / atr
 fRng      = rngOf(L)
 fSlope    = (emaL - emaL[Q]) / atr
-fSinceHH  = -ta.highestbars(high, L) / L
-fSinceLL  = -ta.lowestbars(low, L) / L
+fSinceHH  = -ta.highestbars(high, L) / float(L)
+fSinceLL  = -ta.lowestbars(low, L) / float(L)
 fAtrRank  = ta.percentrank(atr / close, 100) / 100.0
 fRsi      = r / 100.0
 fRsiSlope = (r - r[3]) / 100.0
@@ -201,9 +204,15 @@ if barstate.isconfirmed
             array.set(tC, j, true)
             confTop := true
         if age >= M
-            array.remove(tS, j), array.remove(tX, j), array.remove(tD, j), array.remove(tC, j)
+            array.remove(tS, j)
+            array.remove(tX, j)
+            array.remove(tD, j)
+            array.remove(tC, j)
     if onTop
-        array.push(tS, bar_index), array.push(tX, high), array.push(tD, false), array.push(tC, false)
+        array.push(tS, bar_index)
+        array.push(tX, high)
+        array.push(tD, false)
+        array.push(tC, false)
     // bottoms (mirror)
     for j = array.size(bS) - 1 to 0
         if array.size(bS) == 0
@@ -219,9 +228,15 @@ if barstate.isconfirmed
             array.set(bC, j, true)
             confBot := true
         if age >= M
-            array.remove(bS, j), array.remove(bX, j), array.remove(bD, j), array.remove(bC, j)
+            array.remove(bS, j)
+            array.remove(bX, j)
+            array.remove(bD, j)
+            array.remove(bC, j)
     if onBot
-        array.push(bS, bar_index), array.push(bX, low), array.push(bD, false), array.push(bC, false)
+        array.push(bS, bar_index)
+        array.push(bX, low)
+        array.push(bD, false)
+        array.push(bC, false)
 
 // ---------------------------------------------------------------- plots (sparse)
 cTop = color.new(#e0533d, 0)

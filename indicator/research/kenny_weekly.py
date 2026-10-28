@@ -163,3 +163,41 @@ def run(ev: dict, hl: float, theta: dict, delta: float = 0.15, kappa: float = 0.
     buy = qual["bot"] & ~(both & (score["top"] >= score["bot"]))
     sell = qual["top"] & ~(both & (score["bot"] >= score["top"]))
     return np.flatnonzero(buy), np.flatnonzero(sell), score
+
+
+# ----------------------------------------------------------------------------- KW-2 (reports/KW2_CONFIG.md)
+
+def drawdown_atr(df):
+    o, h, l, c = (df[k].to_numpy(float) for k in ("open", "high", "low", "close"))
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return (highest(h, 52) - c) / ta.atr(h, l, c, 14)
+
+
+def ext_percentile(ext, n=156):
+    """ta.percentrank(ext_c, n) / 100: share of the previous n values <= the current value."""
+    from .cycle_features import percentrank
+    return percentrank(ext, n) / 100.0
+
+
+def kw2_sell(df, st, variant, g):
+    """X1: Confirmed SELL, no cooldown, dropped while the drawdown from the 52-week high >= g ATR.
+    X2: GBZ High Conviction onsets with the same guard."""
+    dd = drawdown_atr(df)
+    idx = st["top"]["K_CONF"] if variant == "X1" else st["top"]["K_H"]
+    with np.errstate(invalid="ignore"):
+        keep = ~(np.nan_to_num(dd[idx], nan=np.inf) >= g)
+    return np.asarray(idx, int)[keep]
+
+
+def kw2_buy(df, st, variant, q):
+    """Y1: current BUY (B_ext High Conviction onsets) OR the extension's own-history percentile <= q
+    (onset, cooldown-free). Y2: the percentile rule alone."""
+    from .cycle_features import zone_onsets
+    ext = st["F"]["ext_c"].to_numpy(float)
+    pr = ext_percentile(ext)
+    with np.errstate(invalid="ignore"):
+        score = np.where((ext < 0) & np.isfinite(pr), -pr, np.nan)
+    pct_on = zone_onsets(score, -q, q_of(L))
+    if variant == "Y2":
+        return pct_on
+    return np.union1d(st["bot"]["K_H"], pct_on)

@@ -66,3 +66,22 @@ def test_kw_gate(tmp_path):
     assert GT.kw_blockers(tmp_path, check_cache=False) == []
     (tmp_path / "research" / "kenny_weekly.py").write_text("changed")
     assert any(b.startswith("Y2") for b in GT.kw_blockers(tmp_path, check_cache=False))
+
+
+def test_kw2_sell_guard_and_percentile_buy_are_causal_and_asset_agnostic():
+    w = _w(6)
+    st = KSIM.states(w, "1W", SPEC)
+    full_s = KWK.kw2_sell(w, st, "X1", 4.0)
+    full_b = KWK.kw2_buy(w, st, "Y1", 0.05)
+    assert set(full_b) >= set(st["bot"]["K_H"])                          # Y1 keeps every current BUY
+    dd = KWK.drawdown_atr(w)
+    assert not (dd[full_s] >= 4.0).any()                                 # guard removes SELLs deep in a drawdown
+    cut = 900
+    pw = w.iloc[:cut]
+    pst = KSIM.states(pw, "1W", SPEC)
+    assert np.array_equal(KWK.kw2_sell(pw, pst, "X1", 4.0), full_s[full_s < cut])
+    assert np.array_equal(KWK.kw2_buy(pw, pst, "Y1", 0.05), full_b[full_b < cut])
+    w2 = w.copy()
+    w2[["open", "high", "low", "close"]] *= 37.0                          # price scale does not change signals
+    st2 = KSIM.states(w2, "1W", SPEC)
+    assert np.array_equal(KWK.kw2_buy(w2, st2, "Y2", 0.05), KWK.kw2_buy(w, st, "Y2", 0.05))

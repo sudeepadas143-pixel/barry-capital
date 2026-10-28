@@ -72,3 +72,19 @@ def test_kw4_variants_are_causal_and_subsets_of_their_trigger():
         part = {"A1": WS.cand_A1(pf, 2.0), "A2": WS.cand_A2(pf, 4, pl), "A3": WS.cand_A3(pf, 1.5)}
         for k in full:
             assert np.array_equal(part[k], full[k][full[k] < cut]), k
+
+
+def test_kw5_two_state_confirmation_follows_its_warning_and_is_causal():
+    w = _w(14)
+    f = WS.features(w)
+    low = w["low"].to_numpy(float)
+    ew, per, cf = WS.two_state(f, low)
+    assert np.array_equal(ew, WS.cand_A(f, WS.EW_R))
+    ok = per >= 0
+    assert ((per[ok] > ew[ok]) & (per[ok] <= ew[ok] + WS.CF_WINDOW)).all()
+    cond = WS.confirm_cond(f, low)
+    assert cond[per[ok]].all()
+    cut = 1100
+    pw = w.iloc[:cut]
+    pew, _, pcf = WS.two_state(WS.features(pw), pw["low"].to_numpy(float))
+    assert np.array_equal(pcf, cf[cf < cut]) and np.array_equal(pew, ew[ew < cut])

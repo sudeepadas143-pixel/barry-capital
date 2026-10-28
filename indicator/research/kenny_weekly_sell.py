@@ -232,3 +232,30 @@ def cand_A3(f, cap):
         accel = np.nan_to_num(f["slope40"]) >= np.nan_to_num(_lag(f["slope40"], 8), nan=-np.inf)
         persistent = (np.nan_to_num(f["tsm"]) > cap) & accel
     return np.flatnonzero(_a_base(f) & rev & ~persistent)
+
+
+# ----------------------------------------------------------------------------- KW-5 (reports/KW5_CONFIG.md): two-state SELL
+
+EW_R = 6.0          # Candidate A as frozen by KW-3 (pre-2018 walk-forward choice)
+CF_WINDOW = 13      # confirmation must arrive within 13 weeks of an early warning
+
+
+def confirm_cond(f, low):
+    """Weekly structure + momentum deterioration: close below the lowest low of the previous 4 weeks
+    with the MACD histogram < 0."""
+    with np.errstate(invalid="ignore"):
+        return (f["close"] < _lag(lowest(low, 4), 1)) & (np.nan_to_num(f["hist"], nan=1.0) < 0)
+
+
+def two_state(f, low):
+    """Early warnings (A), and per warning the first confirmation in (w, w + CF_WINDOW] (or -1).
+    Returns (ew_idx, conf_for_each_ew, cf_idx = unique confirmations)."""
+    ew = cand_A(f, EW_R)
+    cond = np.flatnonzero(confirm_cond(f, low))
+    per = np.full(len(ew), -1)
+    for j, w in enumerate(ew):
+        k = cond[(cond > w) & (cond <= w + CF_WINDOW)]
+        if len(k):
+            per[j] = int(k[0])
+    cf = np.unique(per[per >= 0])
+    return ew, per, cf

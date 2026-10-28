@@ -49,6 +49,8 @@ CY2_CODE = CY_CODE + ("research/cycle2_features.py", "scripts/cycle2_research.py
 KB_CONFIG = "reports/KB_CONFIG.md"
 KB_CODE = CY2_CODE + ("research/kb_signals.py", "scripts/kb_bench.py")
 KC_CONFIG = "reports/KC_CONFIG.md"
+KW_CONFIG = "reports/KW_CONFIG.md"
+KW_CODE = CY2_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "research/kenny_weekly.py", "scripts/kw_eval.py", "scripts/kenny_export_pine.py")
 KC_CODE = KB_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "scripts/kc_eval.py", "scripts/kenny_export_pine.py")
 
 
@@ -215,6 +217,17 @@ def kb_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
 
 def kc_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
     return cy_blockers(root, check_cache, KC_CONFIG, KC_CODE)
+
+
+def kw_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KW_CONFIG, KW_CODE)
+
+
+def require_kw_ready(root: Path = ROOT) -> str:
+    b = kw_blockers(root)
+    if b:
+        raise NotReady("KW weekly evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
 
 
 def require_kc_ready(root: Path = ROOT) -> str:

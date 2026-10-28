@@ -40,7 +40,7 @@ MD = ROOT / "reports" / "CYCLE_RESULTS.md"
 TFS = ("1W", "1D", "4H", "1H")
 SPLIT = {"1W": ("2010-01-01", "2016-01-01"), "1D": ("2016-01-01", "2020-01-01"),
          "4H": ("2021-01-01", "2022-01-01"), "1H": ("2021-01-01", "2022-01-01")}          # (validation start, test start)
-LABEL = {"1H": (168, 336, 8.0), "4H": (126, 252, 8.0), "1D": (63, 126, 8.0), "1W": (26, 52, 5.0)}   # = v5_labels (frozen)
+LABEL = {"1H": (168, 336, 8.0), "4H": (126, 252, 8.0), "1D": (63, 126, 8.0), "1W": (26, 52, 5.0)}   # = frozen label table (tested equal)
 MODELS = {"L_price": CF.PRICE, "L_mom": CF.PRICE + CF.MOM, "L_vol": CF.PRICE + CF.MOM + CF.VOL,
           "L_int": CF.PRICE + CF.MOM + CF.VOL + CF.INTER}
 BASE = {"B_ext": "ext_c", "B_rsi": "rsi", "B_rng": "rng"}

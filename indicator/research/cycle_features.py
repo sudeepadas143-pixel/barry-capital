@@ -13,7 +13,7 @@ from numpy.lib.stride_tricks import sliding_window_view as win
 
 from hcmtf import ta
 
-# per-TF scale: label radius L (= v5_labels values; restated here so this module never imports
+# per-TF scale: label radius L (= the frozen label table; restated here so this module never imports
 # the label module) and move size D used by the confirmation rule (D/4 ATR)
 SCALE = {"1H": {"L": 168, "D": 8.0}, "4H": {"L": 126, "D": 8.0}, "1D": {"L": 63, "D": 8.0},
          "1W": {"L": 26, "D": 5.0}, "1M": {"L": 12, "D": 5.0}}

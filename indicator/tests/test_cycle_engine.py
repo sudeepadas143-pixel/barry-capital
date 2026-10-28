@@ -154,3 +154,11 @@ def test_pipeline_dry_run_on_synthetic_daily(monkeypatch):
     R = {"tfs": {"1D": {"evaluation": ev}}}
     M.decide(R)
     assert set(R["primary"]) == {"1D|top", "1D|bot"}
+
+
+def test_restated_scales_equal_the_frozen_label_table():
+    from research.v5_labels import BOTTOM_PARAMS, TOP_PARAMS
+    for tf, (L, F, D) in M.LABEL.items():
+        for P in (TOP_PARAMS, BOTTOM_PARAMS):
+            assert P[tf] == {"L": L, "F": F, "D": D}
+        assert CF.SCALE[tf] == {"L": L, "D": D}

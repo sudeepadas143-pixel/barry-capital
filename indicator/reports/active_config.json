@@ -1,0 +1,8 @@
+{
+ "evidence": [],
+ "filters": [],
+ "crypto_only": [],
+ "counter_major": 2.0,
+ "source": "reports/screening.json (scripts/screen_components.py rule)",
+ "note": "fewer than three evidence families survived screening"
+}

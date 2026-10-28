@@ -1,0 +1,210 @@
+{
+ "1H": {
+  "crypto": {
+   "instruments": 36,
+   "instrument_years": 223.4,
+   "tops": 3261,
+   "bottoms": 3091,
+   "tops_per_instrument_year": 14.6,
+   "bottoms_per_instrument_year": 13.83,
+   "top_months": 82,
+   "bottom_months": 82
+  },
+  "equities": {
+   "instruments": 41,
+   "instrument_years": 119.3,
+   "tops": 391,
+   "bottoms": 373,
+   "tops_per_instrument_year": 3.28,
+   "bottoms_per_instrument_year": 3.13,
+   "top_months": 34,
+   "bottom_months": 34
+  },
+  "commodities": {
+   "instruments": 11,
+   "instrument_years": 32.0,
+   "tops": 101,
+   "bottoms": 96,
+   "tops_per_instrument_year": 3.15,
+   "bottoms_per_instrument_year": 3.0,
+   "top_months": 27,
+   "bottom_months": 30
+  },
+  "rates_fx": {
+   "instruments": 20,
+   "instrument_years": 56.8,
+   "tops": 419,
+   "bottoms": 432,
+   "tops_per_instrument_year": 7.37,
+   "bottoms_per_instrument_year": 7.6,
+   "top_months": 34,
+   "bottom_months": 34
+  },
+  "all": {
+   "instruments": 108,
+   "instrument_years": 431.6,
+   "tops": 4172,
+   "bottoms": 3992,
+   "tops_per_instrument_year": 9.67,
+   "bottoms_per_instrument_year": 9.25,
+   "top_months": 82,
+   "bottom_months": 82
+  }
+ },
+ "4H": {
+  "crypto": {
+   "instruments": 36,
+   "instrument_years": 223.4,
+   "tops": 838,
+   "bottoms": 885,
+   "tops_per_instrument_year": 3.75,
+   "bottoms_per_instrument_year": 3.96,
+   "top_months": 80,
+   "bottom_months": 77
+  },
+  "equities": {
+   "instruments": 41,
+   "instrument_years": 119.3,
+   "tops": 129,
+   "bottoms": 114,
+   "tops_per_instrument_year": 1.08,
+   "bottoms_per_instrument_year": 0.96,
+   "top_months": 28,
+   "bottom_months": 25
+  },
+  "commodities": {
+   "instruments": 11,
+   "instrument_years": 32.0,
+   "tops": 44,
+   "bottoms": 38,
+   "tops_per_instrument_year": 1.37,
+   "bottoms_per_instrument_year": 1.19,
+   "top_months": 16,
+   "bottom_months": 13
+  },
+  "rates_fx": {
+   "instruments": 20,
+   "instrument_years": 56.8,
+   "tops": 130,
+   "bottoms": 125,
+   "tops_per_instrument_year": 2.29,
+   "bottoms_per_instrument_year": 2.2,
+   "top_months": 31,
+   "bottom_months": 30
+  },
+  "all": {
+   "instruments": 108,
+   "instrument_years": 431.6,
+   "tops": 1141,
+   "bottoms": 1162,
+   "tops_per_instrument_year": 2.64,
+   "bottoms_per_instrument_year": 2.69,
+   "top_months": 80,
+   "bottom_months": 79
+  }
+ },
+ "1D": {
+  "crypto": {
+   "instruments": 36,
+   "instrument_years": 254.3,
+   "tops": 114,
+   "bottoms": 242,
+   "tops_per_instrument_year": 0.45,
+   "bottoms_per_instrument_year": 0.95,
+   "top_months": 36,
+   "bottom_months": 48
+  },
+  "equities": {
+   "instruments": 41,
+   "instrument_years": 688.8,
+   "tops": 525,
+   "bottoms": 381,
+   "tops_per_instrument_year": 0.76,
+   "bottoms_per_instrument_year": 0.55,
+   "top_months": 132,
+   "bottom_months": 97
+  },
+  "commodities": {
+   "instruments": 11,
+   "instrument_years": 180.8,
+   "tops": 159,
+   "bottoms": 135,
+   "tops_per_instrument_year": 0.88,
+   "bottoms_per_instrument_year": 0.75,
+   "top_months": 85,
+   "bottom_months": 75
+  },
+  "rates_fx": {
+   "instruments": 20,
+   "instrument_years": 336.2,
+   "tops": 159,
+   "bottoms": 158,
+   "tops_per_instrument_year": 0.47,
+   "bottoms_per_instrument_year": 0.47,
+   "top_months": 85,
+   "bottom_months": 85
+  },
+  "all": {
+   "instruments": 108,
+   "instrument_years": 1460.0,
+   "tops": 957,
+   "bottoms": 916,
+   "tops_per_instrument_year": 0.66,
+   "bottoms_per_instrument_year": 0.63,
+   "top_months": 175,
+   "bottom_months": 161
+  }
+ },
+ "1W": {
+  "crypto": {
+   "instruments": 31,
+   "instrument_years": 233.7,
+   "tops": 89,
+   "bottoms": 56,
+   "tops_per_instrument_year": 0.38,
+   "bottoms_per_instrument_year": 0.24,
+   "top_months": 24,
+   "bottom_months": 17
+  },
+  "equities": {
+   "instruments": 41,
+   "instrument_years": 688.3,
+   "tops": 195,
+   "bottoms": 188,
+   "tops_per_instrument_year": 0.28,
+   "bottoms_per_instrument_year": 0.27,
+   "top_months": 81,
+   "bottom_months": 57
+  },
+  "commodities": {
+   "instruments": 11,
+   "instrument_years": 180.7,
+   "tops": 54,
+   "bottoms": 44,
+   "tops_per_instrument_year": 0.3,
+   "bottoms_per_instrument_year": 0.24,
+   "top_months": 44,
+   "bottom_months": 33
+  },
+  "rates_fx": {
+   "instruments": 20,
+   "instrument_years": 335.8,
+   "tops": 82,
+   "bottoms": 93,
+   "tops_per_instrument_year": 0.24,
+   "bottoms_per_instrument_year": 0.28,
+   "top_months": 58,
+   "bottom_months": 51
+  },
+  "all": {
+   "instruments": 103,
+   "instrument_years": 1438.5,
+   "tops": 420,
+   "bottoms": 381,
+   "tops_per_instrument_year": 0.29,
+   "bottoms_per_instrument_year": 0.26,
+   "top_months": 138,
+   "bottom_months": 106
+  }
+ }
+}

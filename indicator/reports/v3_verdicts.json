@@ -1,0 +1,130 @@
+{
+ "1H|bullish|crypto": [
+  "PROMISING",
+  "n=4348, r +0.27 [+0.02, +0.49] vs random -0.12, p 0.005 (Holm 0.139), DSR 0.00, positive in 3/6 periods, C0 -0.10"
+ ],
+ "1H|bullish|equities": [
+  "UNPROVEN",
+  "n=630, r -0.10 [-0.53, +0.35] vs random +0.27, p 0.975 (Holm 1.000), DSR 0.15, positive in 3/6 periods, C0 +0.13"
+ ],
+ "1H|bullish|commodities": [
+  "UNPROVEN",
+  "n=156, r +0.77 [-0.11, +1.61] vs random +0.32, p 0.144 (Holm 1.000), DSR 0.33, positive in 5/6 periods, C0 +0.22"
+ ],
+ "1H|bullish|rates_fx": [
+  "UNPROVEN",
+  "n=622, r -0.33 [-0.69, -0.01] vs random -0.25, p 0.731 (Holm 1.000), DSR 0.00, positive in 2/6 periods, C0 -0.31"
+ ],
+ "1H|bearish|crypto": [
+  "UNPROVEN",
+  "n=5386, r -0.13 [-0.34, +0.07] vs random -0.25, p 0.010 (Holm 0.249), DSR 0.00, positive in 2/6 periods, C0 -0.27"
+ ],
+ "1H|bearish|equities": [
+  "UNPROVEN",
+  "n=415, r -0.68 [-1.13, -0.24] vs random -0.34, p 0.955 (Holm 1.000), DSR 0.00, positive in 0/6 periods, C0 -0.43"
+ ],
+ "1H|bearish|commodities": [
+  "UNPROVEN",
+  "n=118, r -0.79 [-1.46, -0.18] vs random -0.51, p 0.697 (Holm 1.000), DSR 0.00, positive in 1/6 periods, C0 -0.72"
+ ],
+ "1H|bearish|rates_fx": [
+  "UNPROVEN",
+  "n=474, r -0.15 [-0.61, +0.29] vs random -0.23, p 0.338 (Holm 1.000), DSR 0.00, positive in 2/6 periods, C0 -0.31"
+ ],
+ "4H|bullish|crypto": [
+  "PROMISING",
+  "n=983, r +0.84 [+0.23, +1.48] vs random +0.26, p 0.005 (Holm 0.139), DSR 0.18, positive in 4/6 periods, C0 +0.55"
+ ],
+ "4H|bullish|equities": [
+  "UNPROVEN",
+  "n=229, r +0.38 [-0.53, +1.18] vs random +0.85, p 0.915 (Holm 1.000), DSR 0.39, positive in 4/6 periods, C0 +0.45"
+ ],
+ "4H|bullish|commodities": [
+  "UNPROVEN",
+  "n=48, r +1.51 [-0.27, +3.35] vs random +1.46, p 0.468 (Holm 1.000), DSR 0.77, positive in 4/6 periods, C0 +1.12"
+ ],
+ "4H|bullish|rates_fx": [
+  "UNPROVEN",
+  "n=197, r -0.66 [-1.33, -0.01] vs random -0.20, p 0.950 (Holm 1.000), DSR 0.00, positive in 2/6 periods, C0 -0.31"
+ ],
+ "4H|bearish|crypto": [
+  "PROMISING",
+  "n=1605, r +0.01 [-0.50, +0.55] vs random -0.34, p 0.005 (Holm 0.139), DSR 0.00, positive in 4/6 periods, C0 -0.12"
+ ],
+ "4H|bearish|equities": [
+  "UNPROVEN",
+  "n=64, r +0.05 [-1.20, +1.43] vs random -0.20, p 0.333 (Holm 1.000), DSR 0.05, positive in 4/6 periods, C0 -0.83"
+ ],
+ "4H|bearish|commodities": [
+  "UNPROVEN",
+  "n=23 MAJOR signals (< 30)"
+ ],
+ "4H|bearish|rates_fx": [
+  "UNPROVEN",
+  "n=109, r +0.27 [-0.81, +1.46] vs random -0.05, p 0.174 (Holm 1.000), DSR 0.00, positive in 3/6 periods, C0 -0.32"
+ ],
+ "1D|bullish|crypto": [
+  "UNPROVEN",
+  "n=177, r +0.14 [-0.74, +0.99] vs random +0.64, p 0.940 (Holm 1.000), DSR 0.17, positive in 2/6 periods, C0 +1.30"
+ ],
+ "1D|bullish|equities": [
+  "UNPROVEN",
+  "n=849, r +0.56 [+0.11, +0.97] vs random +0.51, p 0.313 (Holm 1.000), DSR 0.40, positive in 5/6 periods, C0 +0.37"
+ ],
+ "1D|bullish|commodities": [
+  "UNPROVEN",
+  "n=125, r -0.15 [-1.00, +0.69] vs random +0.20, p 0.831 (Holm 1.000), DSR 0.06, positive in 1/6 periods, C0 +0.12"
+ ],
+ "1D|bullish|rates_fx": [
+  "UNPROVEN",
+  "n=313, r +0.39 [+0.03, +0.77] vs random +0.17, p 0.119 (Holm 1.000), DSR 0.45, positive in 5/6 periods, C0 +0.13"
+ ],
+ "1D|bearish|crypto": [
+  "UNPROVEN",
+  "n=389, r -0.20 [-1.09, +0.57] vs random -0.51, p 0.109 (Holm 1.000), DSR 0.00, positive in 2/6 periods, C0 -0.19"
+ ],
+ "1D|bearish|equities": [
+  "UNPROVEN",
+  "n=230, r -0.43 [-1.06, +0.19] vs random -0.43, p 0.522 (Holm 1.000), DSR 0.00, positive in 1/6 periods, C0 -0.70"
+ ],
+ "1D|bearish|commodities": [
+  "UNPROVEN",
+  "n=160, r -0.39 [-0.92, +0.14] vs random -0.03, p 0.905 (Holm 1.000), DSR 0.00, positive in 1/6 periods, C0 -0.26"
+ ],
+ "1D|bearish|rates_fx": [
+  "UNPROVEN",
+  "n=194, r -0.04 [-0.52, +0.44] vs random -0.08, p 0.423 (Holm 1.000), DSR 0.02, positive in 3/6 periods, C0 -0.21"
+ ],
+ "1W|bullish|crypto": [
+  "UNPROVEN",
+  "n=16 MAJOR signals (< 30)"
+ ],
+ "1W|bullish|equities": [
+  "UNPROVEN",
+  "n=196, r +0.77 [+0.27, +1.24] vs random +0.75, p 0.438 (Holm 1.000), DSR 0.95, positive in 5/6 periods, C0 +0.67"
+ ],
+ "1W|bullish|commodities": [
+  "UNPROVEN",
+  "n=23 MAJOR signals (< 30)"
+ ],
+ "1W|bullish|rates_fx": [
+  "UNPROVEN",
+  "n=67, r +0.35 [-0.49, +1.07] vs random +0.37, p 0.522 (Holm 1.000), DSR 0.31, positive in 4/6 periods, C0 +0.29"
+ ],
+ "1W|bearish|crypto": [
+  "UNPROVEN",
+  "n=49, r -0.96 [-3.48, +0.26] vs random -1.29, p 0.542 (Holm 1.000), DSR 0.00, positive in 1/4 periods, C0 -0.39"
+ ],
+ "1W|bearish|equities": [
+  "UNPROVEN",
+  "n=22 MAJOR signals (< 30)"
+ ],
+ "1W|bearish|commodities": [
+  "UNPROVEN",
+  "n=56, r -0.05 [-0.95, +0.86] vs random -0.05, p 0.493 (Holm 1.000), DSR 0.06, positive in 2/5 periods, C0 -0.11"
+ ],
+ "1W|bearish|rates_fx": [
+  "UNPROVEN",
+  "n=43, r -0.27 [-0.87, +0.32] vs random -0.06, p 0.736 (Holm 1.000), DSR 0.03, positive in 1/6 periods, C0 -0.28"
+ ]
+}

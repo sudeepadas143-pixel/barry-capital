@@ -1,0 +1,34 @@
+{
+ "1H crypto": [
+  "PROMISING",
+  "fresh n=6887: mean r +0.074 [-0.08, +0.22] vs random -0.178, p 0.003 (Holm 0.027); unfiltered breaks -0.172; dev windows p 0.033"
+ ],
+ "1H other": [
+  "UNPROVEN",
+  "fresh n=1153: mean r -0.299 [-0.55, -0.05] vs random -0.118, p 0.924 (Holm 1.000); unfiltered breaks -0.230; dev windows p 0.033"
+ ],
+ "4H crypto": [
+  "PROMISING",
+  "fresh n=1829: mean r +0.433 [+0.04, +0.85] vs random -0.110, p 0.003 (Holm 0.027); unfiltered breaks +0.239; dev windows p 0.525"
+ ],
+ "4H other": [
+  "UNPROVEN",
+  "fresh n=300: mean r -0.240 [-0.86, +0.33] vs random +0.229, p 0.973 (Holm 1.000); unfiltered breaks -0.204; dev windows p 0.525"
+ ],
+ "1D crypto": [
+  "UNPROVEN",
+  "fresh n=392: mean r -0.119 [-0.73, +0.43] vs random -0.180, p 0.419 (Holm 1.000); unfiltered breaks +0.514; dev windows p 0.777"
+ ],
+ "1D other": [
+  "UNPROVEN",
+  "fresh n=898: mean r +0.096 [-0.15, +0.35] vs random +0.198, p 0.824 (Holm 1.000); unfiltered breaks -0.080; dev windows p 0.777"
+ ],
+ "1W crypto": [
+  "UNPROVEN",
+  "fresh n=46: mean r -0.331 [-2.73, +1.55] vs random -0.764, p 0.478 (Holm 1.000); unfiltered breaks +0.853; dev windows p 0.947"
+ ],
+ "1W other": [
+  "UNPROVEN",
+  "fresh n=216: mean r +0.401 [-0.02, +0.75] vs random +0.436, p 0.578 (Holm 1.000); unfiltered breaks -0.019; dev windows p 0.947"
+ ]
+}

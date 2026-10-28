@@ -1,0 +1,4953 @@
+{
+ "purpose": "fingerprint of the cached V5 exploration data; see research/v5_manifest.py",
+ "freeze": "2026-10-27 23:59:59+00:00",
+ "generated_at": "2026-10-27T13:31:13+00:00",
+ "git_head_at_generation": "52e1fadc72e9cba392ed354e09b786b1943bcdad",
+ "file_count": 270,
+ "combined_sha256": "57e107b08c6912a08042639c633604b90e612a60e06fe024b88b84a20e40530d",
+ "eval_symbols": [
+  "SPY",
+  "QQQ",
+  "IWM",
+  "EFA",
+  "EEM",
+  "AAPL",
+  "JPM",
+  "XOM",
+  "INTC",
+  "BA",
+  "PFE",
+  "T",
+  "F",
+  "TLT",
+  "IEF",
+  "GLD",
+  "SLV",
+  "USO",
+  "DBA",
+  "EURUSD=X",
+  "USDJPY=X",
+  "GBPUSD=X",
+  "AUDUSD=X",
+  "BTCUSDT",
+  "ETHUSDT",
+  "XRPUSDT",
+  "LTCUSDT",
+  "ADAUSDT",
+  "BNBUSDT",
+  "LINKUSDT",
+  "SOLUSDT",
+  "DOGEUSDT",
+  "TRXUSDT",
+  "BCHUSDT",
+  "DOTUSDT",
+  "ATOMUSDT",
+  "ETCUSDT",
+  "XLMUSDT",
+  "FILUSDT",
+  "ALGOUSDT",
+  "NEOUSDT",
+  "ZECUSDT",
+  "ICXUSDT",
+  "ZILUSDT",
+  "LUNAUSDT",
+  "FTTUSDT",
+  "SRMUSDT",
+  "WAVESUSDT",
+  "MATICUSDT",
+  "MSFT",
+  "KO",
+  "WMT",
+  "CVX",
+  "C",
+  "DIS",
+  "VZ",
+  "NKE",
+  "DIA",
+  "EWJ",
+  "FXI",
+  "EWZ",
+  "HYG",
+  "LQD",
+  "UNG",
+  "CPER",
+  "CORN",
+  "USDCAD=X",
+  "USDCHF=X",
+  "NZDUSD=X",
+  "EURJPY=X",
+  "AVAXUSDT",
+  "NEARUSDT",
+  "UNIUSDT",
+  "AAVEUSDT",
+  "XTZUSDT",
+  "EOSUSDT",
+  "VETUSDT",
+  "THETAUSDT",
+  "HBARUSDT",
+  "ICPUSDT",
+  "ORCL",
+  "CSCO",
+  "HD",
+  "MRK",
+  "PG",
+  "UNH",
+  "CAT",
+  "MMM",
+  "PEP",
+  "ADBE",
+  "XLE",
+  "XLF",
+  "XLK",
+  "XLU",
+  "EWG",
+  "EWU",
+  "PPLT",
+  "PALL",
+  "WEAT",
+  "DBB",
+  "TIP",
+  "SHY",
+  "MUB",
+  "EMB",
+  "USDSEK=X",
+  "USDNOK=X",
+  "USDMXN=X",
+  "USDZAR=X"
+ ],
+ "excluded_from_pooling": [
+  "BTC-USD"
+ ],
+ "files": {
+  "AAPL_1d.csv.gz": {
+   "symbol": "AAPL",
+   "kind": "1d",
+   "bytes": 438061,
+   "rows": 11560,
+   "first": "1980-12-12 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "8e73b08d14fbb176164b3313ddfb8b62b0d39e39120c68066fa03ad0d7017099"
+  },
+  "AAPL_1h.csv.gz": {
+   "symbol": "AAPL",
+   "kind": "1h",
+   "bytes": 113687,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "cc14507db7f00b48f36f6379b6791d6b4fbd56c0495ae8794d067d96ed256d8e"
+  },
+  "AAVEUSDT_1d.csv.gz": {
+   "symbol": "AAVEUSDT",
+   "kind": "1d",
+   "bytes": 43778,
+   "rows": 2203,
+   "first": "2020-10-15 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "1ec4c0d0499881f74f9aa533a97bb77a1c416fa98e3bd33bb67e2656b765e868"
+  },
+  "AAVEUSDT_1h.csv.gz": {
+   "symbol": "AAVEUSDT",
+   "kind": "1h",
+   "bytes": 898993,
+   "rows": 52860,
+   "first": "2020-10-15 03:00:00+00:00",
+   "last": "2026-10-27 10:00:00+00:00",
+   "sha256": "47357d5350f714507135c7a2ce23a94e5f80151bb770e7ab56da0f3771805d35"
+  },
+  "ADAUSDT_15m.csv.gz": {
+   "symbol": "ADAUSDT",
+   "kind": "15m",
+   "bytes": 4691588,
+   "rows": 298665,
+   "first": "2018-04-17 04:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "1b0db851c4e83e4ef8a670c7d00f8dc578ea92684bc2d3029acf5115ebda83c5"
+  },
+  "ADAUSDT_1d.csv.gz": {
+   "symbol": "ADAUSDT",
+   "kind": "1d",
+   "bytes": 62673,
+   "rows": 3115,
+   "first": "2018-04-17 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "ea24680042e859e3a262d7309bb5411df72d84ed02c9d864ded5c7d3bf4e7332"
+  },
+  "ADAUSDT_1h.csv.gz": {
+   "symbol": "ADAUSDT",
+   "kind": "1h",
+   "bytes": 1281043,
+   "rows": 74674,
+   "first": "2018-04-17 04:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "e28ec0a38291b3fe1999da9afacc1edfe9979c6b1c948b3d116464b48126c460"
+  },
+  "ADAUSDT_funding.csv.gz": {
+   "symbol": "ADAUSDT",
+   "kind": "funding",
+   "bytes": 39880,
+   "rows": 7339,
+   "first": "2020-01-19 16:00:00+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "ce8f64812baff17d8e8c02e3ad6e462f6f60881fbece67e5aeae63dabb15a26c"
+  },
+  "ADAUSDT_oi.csv.gz": {
+   "symbol": "ADAUSDT",
+   "kind": "oi",
+   "bytes": 720206,
+   "rows": 42950,
+   "first": "2021-12-01 00:00:00+00:00",
+   "last": "2026-10-25 23:00:00+00:00",
+   "sha256": "23d57caeb774b4fa2edce5b2ae902b71165fcb50480a020f501141f939948eb5"
+  },
+  "ADAUSDT_perp1h.csv.gz": {
+   "symbol": "ADAUSDT",
+   "kind": "perp1h",
+   "bytes": 993405,
+   "rows": 58432,
+   "first": "2020-01-31 08:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "a45d5328aa8f862f2f1298df4a4965577e2e5e3c560cf5b78a04371a4317ef84"
+  },
+  "ADBE_1d.csv.gz": {
+   "symbol": "ADBE",
+   "kind": "1d",
+   "bytes": 269631,
+   "rows": 10128,
+   "first": "1986-08-13 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "cc19dc0daf3fc32bb2bfffe5ed5be86aa5ac0db2eeee380e5250025a70d6d1a9"
+  },
+  "ADBE_1h.csv.gz": {
+   "symbol": "ADBE",
+   "kind": "1h",
+   "bytes": 112265,
+   "rows": 5077,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "dae15e4c8bbb3ee965e1fcc9002e28a683ca93e0da619a7946418c910309f4dc"
+  },
+  "ALGOUSDT_15m.csv.gz": {
+   "symbol": "ALGOUSDT",
+   "kind": "15m",
+   "bytes": 3586618,
+   "rows": 257493,
+   "first": "2019-06-22 00:00:00+00:00",
+   "last": "2026-10-27 07:15:00+00:00",
+   "sha256": "7cd86c675a29fff6a41b2a2bd03ac9edcc8c8c5203021a4c875e65fbae4a51c6"
+  },
+  "ALGOUSDT_1d.csv.gz": {
+   "symbol": "ALGOUSDT",
+   "kind": "1d",
+   "bytes": 50180,
+   "rows": 2684,
+   "first": "2019-06-22 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "04ac63ffed41ec780a3117a2812622e04fc80468326e94a1114c2d66d7c6c093"
+  },
+  "ALGOUSDT_1h.csv.gz": {
+   "symbol": "ALGOUSDT",
+   "kind": "1h",
+   "bytes": 1001110,
+   "rows": 64379,
+   "first": "2019-06-22 00:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "f95c9010ccc5ac5c486f7df7529dbf2dbbb90e480e179d2ab6d576cb80dd6852"
+  },
+  "ATOMUSDT_15m.csv.gz": {
+   "symbol": "ATOMUSDT",
+   "kind": "15m",
+   "bytes": 4003889,
+   "rows": 262616,
+   "first": "2019-04-29 04:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "4c04653d2777beb58ad0de1a99ff0d764253ab613510cbe56a1b4fe3549279b8"
+  },
+  "ATOMUSDT_1d.csv.gz": {
+   "symbol": "ATOMUSDT",
+   "kind": "1d",
+   "bytes": 53296,
+   "rows": 2738,
+   "first": "2019-04-29 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "806875c3d4e03bca7eac6c6508e1bb5c1d28626fdfc385b86bd1d8c59016d5f0"
+  },
+  "ATOMUSDT_1h.csv.gz": {
+   "symbol": "ATOMUSDT",
+   "kind": "1h",
+   "bytes": 1098433,
+   "rows": 65661,
+   "first": "2019-04-29 04:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "79eb69e8823b8952d8dd699ade3ace25f13d784c5fc8ae77c1f17612aa4bada0"
+  },
+  "AUDUSD_X_1d.csv.gz": {
+   "symbol": "AUDUSD=X",
+   "kind": "1d",
+   "bytes": 163434,
+   "rows": 5319,
+   "first": "2006-05-16 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "9ce04a8bcabe7d4aa0ffc54c6f08515b9eb0678d2fbb7995d5d657c5a62ee5d0"
+  },
+  "AUDUSD_X_1h.csv.gz": {
+   "symbol": "AUDUSD=X",
+   "kind": "1h",
+   "bytes": 386662,
+   "rows": 17313,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "698626b893dcefb9aa718b8fe7f45ff85cf75519155b674b9ba26b8224310bfa"
+  },
+  "AVAXUSDT_1d.csv.gz": {
+   "symbol": "AVAXUSDT",
+   "kind": "1d",
+   "bytes": 42790,
+   "rows": 2226,
+   "first": "2020-09-22 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "f0b7fe14ae9aa198407c567523c94b0e87e8e29d38503efb18f5c2cd64753c18"
+  },
+  "AVAXUSDT_1h.csv.gz": {
+   "symbol": "AVAXUSDT",
+   "kind": "1h",
+   "bytes": 870203,
+   "rows": 53409,
+   "first": "2020-09-22 06:00:00+00:00",
+   "last": "2026-10-27 10:00:00+00:00",
+   "sha256": "f5ea3e939d7d274f8a99a10b7735069df72b0f5deb3006e529a8f6d39cf0f209"
+  },
+  "BA_1d.csv.gz": {
+   "symbol": "BA",
+   "kind": "1d",
+   "bytes": 545124,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "323ed7173c7d2f6e1b5a93c57da67e1e5829759e9dd956e35d6cd04848da987c"
+  },
+  "BA_1h.csv.gz": {
+   "symbol": "BA",
+   "kind": "1h",
+   "bytes": 111436,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "77dc3d7bd33bbb99fdee80194989c39a6aa0e2c889638fa23b989fc4e207933c"
+  },
+  "BCHUSDT_15m.csv.gz": {
+   "symbol": "BCHUSDT",
+   "kind": "15m",
+   "bytes": 3609757,
+   "rows": 242237,
+   "first": "2019-11-28 10:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "34978b1a14ba1e63272c8426fdc425bfa480342d1d53f11edd074bf8d104e6d5"
+  },
+  "BCHUSDT_1d.csv.gz": {
+   "symbol": "BCHUSDT",
+   "kind": "1d",
+   "bytes": 48935,
+   "rows": 2525,
+   "first": "2019-11-28 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "e919c86424a8ae04494a9bf74a0ef10287b2612e62dfb60633cfc4a9083dab9f"
+  },
+  "BCHUSDT_1h.csv.gz": {
+   "symbol": "BCHUSDT",
+   "kind": "1h",
+   "bytes": 995598,
+   "rows": 60565,
+   "first": "2019-11-28 10:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "7554952d9c58f89c0ef2ebc650190a96d144230440efcd8e0fcf43d20bfab0d3"
+  },
+  "BNBUSDT_15m.csv.gz": {
+   "symbol": "BNBUSDT",
+   "kind": "15m",
+   "bytes": 5277902,
+   "rows": 314072,
+   "first": "2017-11-06 03:45:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "31682c5320d25b1ae884ada8da6a8eda595ff2c5e5db1eddcbc275d97d5d2f5d"
+  },
+  "BNBUSDT_1d.csv.gz": {
+   "symbol": "BNBUSDT",
+   "kind": "1d",
+   "bytes": 67996,
+   "rows": 3277,
+   "first": "2017-11-06 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "50f6e9744fbeaecdf29d4bd702aa6ae064c1d041a5df1ff37686e0788fdb48a5"
+  },
+  "BNBUSDT_1h.csv.gz": {
+   "symbol": "BNBUSDT",
+   "kind": "1h",
+   "bytes": 1426805,
+   "rows": 78529,
+   "first": "2017-11-06 03:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "270d23156738d5bba9f5d5dc8684e68b9ea8fa8c0e190e1dcdb39bcde98f9752"
+  },
+  "BNBUSDT_funding.csv.gz": {
+   "symbol": "BNBUSDT",
+   "kind": "funding",
+   "bytes": 39403,
+   "rows": 7274,
+   "first": "2020-02-10 08:00:00+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "e7704836ec7cbe0a3d1cf55e85c76934db047e63e3f94b17f283a3d171c76d8f"
+  },
+  "BNBUSDT_oi.csv.gz": {
+   "symbol": "BNBUSDT",
+   "kind": "oi",
+   "bytes": 712118,
+   "rows": 42950,
+   "first": "2021-12-01 00:00:00+00:00",
+   "last": "2026-10-25 23:00:00+00:00",
+   "sha256": "c3073ca63c7db62efae6fd3faf26c72e88d1ebe6d42f6876609f8c10bf83cc2e"
+  },
+  "BNBUSDT_perp1h.csv.gz": {
+   "symbol": "BNBUSDT",
+   "kind": "perp1h",
+   "bytes": 1064611,
+   "rows": 58192,
+   "first": "2020-02-10 08:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "a2f08f7f967e02fa61feaae3139d80eaed5b5908ab60c3308c1f6d5922513ac3"
+  },
+  "BTC-USD_1d.csv.gz": {
+   "symbol": "BTC-USD",
+   "kind": "1d",
+   "bytes": 128415,
+   "rows": 4424,
+   "first": "2014-09-17 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "05063503a0fad8ca8d6a50ba1dc30ebf915860fe88f63827a6a397673d725920"
+  },
+  "BTC-USD_1h.csv.gz": {
+   "symbol": "BTC-USD",
+   "kind": "1h",
+   "bytes": 405155,
+   "rows": 17472,
+   "first": "2024-10-28 00:00:00+00:00",
+   "last": "2026-10-27 08:00:00+00:00",
+   "sha256": "c994665db3e9af4d0e338bc666e6b7d31d55b316d69e5f4015831859bff94335"
+  },
+  "BTCUSDT_15m.csv.gz": {
+   "symbol": "BTCUSDT",
+   "kind": "15m",
+   "bytes": 7023354,
+   "rows": 321818,
+   "first": "2017-08-17 04:00:00+00:00",
+   "last": "2026-10-27 06:45:00+00:00",
+   "sha256": "64ff5e3716e0ccdd2acd1fc47cae1dcb5daa491b37c85b42f7069306b6016958"
+  },
+  "BTCUSDT_1d.csv.gz": {
+   "symbol": "BTCUSDT",
+   "kind": "1d",
+   "bytes": 84232,
+   "rows": 3358,
+   "first": "2017-08-17 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "1fba3c6d22bb33bc1a238e3eaf0ecd8302b82b01c09980c0e263a572c8eb26ee"
+  },
+  "BTCUSDT_1h.csv.gz": {
+   "symbol": "BTCUSDT",
+   "kind": "1h",
+   "bytes": 1859401,
+   "rows": 80466,
+   "first": "2017-08-17 04:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "f9b3d262d9a5a8de7babd00e397dd5f8d5cbe0bdec0a7e9f13ad6eb19bf6ad9a"
+  },
+  "BTCUSDT_funding.csv.gz": {
+   "symbol": "BTCUSDT",
+   "kind": "funding",
+   "bytes": 41731,
+   "rows": 7395,
+   "first": "2020-01-01 00:00:00+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "72aec378126d975ccce3b6cace3eac5316b54d4bab5771ac81b72d5956bc5189"
+  },
+  "BTCUSDT_oi.csv.gz": {
+   "symbol": "BTCUSDT",
+   "kind": "oi",
+   "bytes": 726376,
+   "rows": 42950,
+   "first": "2021-12-01 00:00:00+00:00",
+   "last": "2026-10-25 23:00:00+00:00",
+   "sha256": "171e324d512ab3750b2d31f5561f332506cc578b40b34205a2a6b6bd79eda911"
+  },
+  "BTCUSDT_perp1h.csv.gz": {
+   "symbol": "BTCUSDT",
+   "kind": "perp1h",
+   "bytes": 1253886,
+   "rows": 59160,
+   "first": "2020-01-01 00:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "9e7134a4c249509ffd16911d5dd8d0e30598a094349e909b50e2a3c3d55d0120"
+  },
+  "CAT_1d.csv.gz": {
+   "symbol": "CAT",
+   "kind": "1d",
+   "bytes": 563237,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "c0c3c2b4e4c05d8787f0349c18f3cdb1bfff672f6c45ffb87b3d416e4c905f6d"
+  },
+  "CAT_1h.csv.gz": {
+   "symbol": "CAT",
+   "kind": "1h",
+   "bytes": 109839,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "f31881187ff1f21431170ebb70ef075c343e075279fdcb1f1ed434c024c86bd5"
+  },
+  "CORN_1d.csv.gz": {
+   "symbol": "CORN",
+   "kind": "1d",
+   "bytes": 62770,
+   "rows": 4121,
+   "first": "2010-06-09 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "45b6202eadd2898665347178c4f4128442a9d44d24352237489b4f5a038e056f"
+  },
+  "CORN_1h.csv.gz": {
+   "symbol": "CORN",
+   "kind": "1h",
+   "bytes": 93918,
+   "rows": 5068,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "3f1ca1b3890b3c41aab62b5d04ea4f59444c0458d492d08a23a7c02e827c6855"
+  },
+  "CPER_1d.csv.gz": {
+   "symbol": "CPER",
+   "kind": "1d",
+   "bytes": 50369,
+   "rows": 3757,
+   "first": "2011-11-15 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "d43f3a590ca0241fe851c04694b13780800cdc3216eb834fbc30d2ed59baadfb"
+  },
+  "CPER_1h.csv.gz": {
+   "symbol": "CPER",
+   "kind": "1h",
+   "bytes": 100504,
+   "rows": 5072,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "746557d86179f65a5ea8b1a4eeacf24fc23d2ef6379830ec705ce7846baad957"
+  },
+  "CSCO_1d.csv.gz": {
+   "symbol": "CSCO",
+   "kind": "1d",
+   "bytes": 357582,
+   "rows": 9239,
+   "first": "1990-02-16 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "b9748922cd80283446c169dd932817b90e272d115962e7d45c5d23d0ce7279a6"
+  },
+  "CSCO_1h.csv.gz": {
+   "symbol": "CSCO",
+   "kind": "1h",
+   "bytes": 103748,
+   "rows": 5077,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "9b58db63adc4178563c3836b021df48d8e49a918c21dad6430d28b16dd78be86"
+  },
+  "CVX_1d.csv.gz": {
+   "symbol": "CVX",
+   "kind": "1d",
+   "bytes": 563736,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "3c8408506edaf7e8a1b8eaf69723aeb191d429f016fb5a2c7038046878b1ccd5"
+  },
+  "CVX_1h.csv.gz": {
+   "symbol": "CVX",
+   "kind": "1h",
+   "bytes": 103477,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "e0152c3f450bb6a1c9e75257903d1160a20d499e9e0af1cc085431fcafb37f53"
+  },
+  "C_1d.csv.gz": {
+   "symbol": "C",
+   "kind": "1d",
+   "bytes": 437759,
+   "rows": 12557,
+   "first": "1977-01-03 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "810cd955ef178aa883223e76ace81e815a85dcbf168741c9fadc7cad11753501"
+  },
+  "C_1h.csv.gz": {
+   "symbol": "C",
+   "kind": "1h",
+   "bytes": 103441,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "0d9fb9654e71712234c8c85f46b97fb664f7f5ce172c9b7cb7ddd26ebb382f98"
+  },
+  "DBA_1d.csv.gz": {
+   "symbol": "DBA",
+   "kind": "1d",
+   "bytes": 170644,
+   "rows": 4983,
+   "first": "2007-01-05 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "658268b7bc8ae9ee899ef23eff0416ca5e3b6afa853d3e5245f2766c5768bc74"
+  },
+  "DBA_1h.csv.gz": {
+   "symbol": "DBA",
+   "kind": "1h",
+   "bytes": 95994,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "6620cf55582ae747797b40f9e06cb96d5db572938d16701dde6cf2146c6488b6"
+  },
+  "DBB_1d.csv.gz": {
+   "symbol": "DBB",
+   "kind": "1d",
+   "bytes": 168937,
+   "rows": 4983,
+   "first": "2007-01-05 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "facdc951101704f2223655c6316386e7686020889823c3588756cd56d4080ddf"
+  },
+  "DBB_1h.csv.gz": {
+   "symbol": "DBB",
+   "kind": "1h",
+   "bytes": 91448,
+   "rows": 5066,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "25e0d68958e8ffec43ab4e1aee19dcaa2f91c3b90e41eec80f4c719fefc6d9f9"
+  },
+  "DIA_1d.csv.gz": {
+   "symbol": "DIA",
+   "kind": "1d",
+   "bytes": 293445,
+   "rows": 7237,
+   "first": "1998-01-20 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "b828f2e7a6dc836c516294d3a60141d1c966bf3b610585e5261d983561ff183c"
+  },
+  "DIA_1h.csv.gz": {
+   "symbol": "DIA",
+   "kind": "1h",
+   "bytes": 101944,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "0f6d3a2964021ff254d699d908f431280e3a7dfb17c5ae3f112ee845417434a2"
+  },
+  "DIS_1d.csv.gz": {
+   "symbol": "DIS",
+   "kind": "1d",
+   "bytes": 575730,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "43f474a30c440cf61e3209975b3937330c42d3d7dc50aad6ac583b8073205dae"
+  },
+  "DIS_1h.csv.gz": {
+   "symbol": "DIS",
+   "kind": "1h",
+   "bytes": 103660,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "5f0cd5db3770239aac1b981899985b09c934b33afe89bd2000815c222d6b1e03"
+  },
+  "DOGEUSDT_15m.csv.gz": {
+   "symbol": "DOGEUSDT",
+   "kind": "15m",
+   "bytes": 4137005,
+   "rows": 256196,
+   "first": "2019-07-05 12:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "ea3bfbb8e6e63c4a08a2d03aa11d78965648e00dffc3858d6474334c79193831"
+  },
+  "DOGEUSDT_1d.csv.gz": {
+   "symbol": "DOGEUSDT",
+   "kind": "1d",
+   "bytes": 55246,
+   "rows": 2671,
+   "first": "2019-07-05 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "a7568d072eae208e092fad3a68372e11b725cdec35177c09d561dfa4e264a6f2"
+  },
+  "DOGEUSDT_1h.csv.gz": {
+   "symbol": "DOGEUSDT",
+   "kind": "1h",
+   "bytes": 1135052,
+   "rows": 64055,
+   "first": "2019-07-05 12:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "254a3f0357ea50cebd595e68c56f138d93f7e550ec13420faa315f1ecc966a9f"
+  },
+  "DOGEUSDT_funding.csv.gz": {
+   "symbol": "DOGEUSDT",
+   "kind": "funding",
+   "bytes": 37783,
+   "rows": 6821,
+   "first": "2020-07-10 08:00:00.001000+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "5d63e444a900bd03c8caccd74f862735a782e5bd83550030978f5ba3973181e2"
+  },
+  "DOGEUSDT_perp1h.csv.gz": {
+   "symbol": "DOGEUSDT",
+   "kind": "perp1h",
+   "bytes": 994168,
+   "rows": 54567,
+   "first": "2020-07-10 09:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "f1b1955b85e8bf483a1bf92ff0d35eefa596ef5d485171e31ef2b10f4ebf0ba7"
+  },
+  "DOTUSDT_15m.csv.gz": {
+   "symbol": "DOTUSDT",
+   "kind": "15m",
+   "bytes": 3299562,
+   "rows": 216900,
+   "first": "2020-08-18 23:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "1210b74c12af07057e7e83ef5a3493282bf4933ccc7c8fb4c82035d481ef0a5d"
+  },
+  "DOTUSDT_1d.csv.gz": {
+   "symbol": "DOTUSDT",
+   "kind": "1d",
+   "bytes": 44379,
+   "rows": 2261,
+   "first": "2020-08-18 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "7a443c549c9d301e40b707a7356a21f5d26a3bb5d345acdef5a53e5bbc107847"
+  },
+  "DOTUSDT_1h.csv.gz": {
+   "symbol": "DOTUSDT",
+   "kind": "1h",
+   "bytes": 905069,
+   "rows": 54228,
+   "first": "2020-08-18 23:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "ffdaa341f305d77e11eb03cd76c4cac8f1fcfb5ec73d05c51935467870aa0fa5"
+  },
+  "EEM_1d.csv.gz": {
+   "symbol": "EEM",
+   "kind": "1d",
+   "bytes": 235875,
+   "rows": 5922,
+   "first": "2003-04-14 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "c3ed21022f48a9e8a816862e9bb7fd0ffd8cac6d3c0b051511f57bb2b1c6090c"
+  },
+  "EEM_1h.csv.gz": {
+   "symbol": "EEM",
+   "kind": "1h",
+   "bytes": 97535,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "33d416b01f488777f171c3ee6eddd99b4691287cdc22945af508c06072e82885"
+  },
+  "EFA_1d.csv.gz": {
+   "symbol": "EFA",
+   "kind": "1d",
+   "bytes": 250060,
+   "rows": 6328,
+   "first": "2001-08-27 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "2edd0e68218c135cc405e0cc21a21f8af188119ab82c0925a8b0afb2da65571b"
+  },
+  "EFA_1h.csv.gz": {
+   "symbol": "EFA",
+   "kind": "1h",
+   "bytes": 98469,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "8cf2515ea7427e3b74b6bb139746e0e3f9f0a12a630636c204d11f2b31db7778"
+  },
+  "EMB_1d.csv.gz": {
+   "symbol": "EMB",
+   "kind": "1d",
+   "bytes": 178746,
+   "rows": 4742,
+   "first": "2007-12-19 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "62ddc95c071c6ba81ab84896aa4477fed4ef5156dbca32c598eaffd23404e4e9"
+  },
+  "EMB_1h.csv.gz": {
+   "symbol": "EMB",
+   "kind": "1h",
+   "bytes": 96096,
+   "rows": 5077,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "c518e26499f9d8a0c351c586309134954ec1ce35472425bd46bcedd52639c622"
+  },
+  "EOSUSDT_1d.csv.gz": {
+   "symbol": "EOSUSDT",
+   "kind": "1d",
+   "bytes": 50575,
+   "rows": 2556,
+   "first": "2018-05-28 00:00:00+00:00",
+   "last": "2025-05-26 00:00:00+00:00",
+   "sha256": "c5370804bdd291e1803fc9179303f1215e728973444ad58a5be3f778bb28f3e7"
+  },
+  "EOSUSDT_1h.csv.gz": {
+   "symbol": "EOSUSDT",
+   "kind": "1h",
+   "bytes": 1040296,
+   "rows": 61230,
+   "first": "2018-05-28 05:00:00+00:00",
+   "last": "2025-05-26 02:00:00+00:00",
+   "sha256": "b8fdc5066793bac894470c19fc0fdd7854e7e5380dd70e27b661e08b72929bbe"
+  },
+  "ETCUSDT_15m.csv.gz": {
+   "symbol": "ETCUSDT",
+   "kind": "15m",
+   "bytes": 4371667,
+   "rows": 293335,
+   "first": "2018-06-12 02:30:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "a04ff1f851e5b43ff4c0180437ea6876e5759811e1a7f4bcf0315a07eeffd0fb"
+  },
+  "ETCUSDT_1d.csv.gz": {
+   "symbol": "ETCUSDT",
+   "kind": "1d",
+   "bytes": 58845,
+   "rows": 3059,
+   "first": "2018-06-12 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "50ab010a5bd8e3908e9d2745073c1f9ebf8465b18f9c68235da4a16274a0b434"
+  },
+  "ETCUSDT_1h.csv.gz": {
+   "symbol": "ETCUSDT",
+   "kind": "1h",
+   "bytes": 1202523,
+   "rows": 73333,
+   "first": "2018-06-12 02:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "8eb8b112003cdfb7c12fbc5342e5229269ed53e5d72f9674fe1927d07499b0a4"
+  },
+  "ETHUSDT_15m.csv.gz": {
+   "symbol": "ETHUSDT",
+   "kind": "15m",
+   "bytes": 6218245,
+   "rows": 321818,
+   "first": "2017-08-17 04:00:00+00:00",
+   "last": "2026-10-27 06:45:00+00:00",
+   "sha256": "d2a718e14867ec4d71519f5f2cc467ec1ffb6f95c55a852b0486b98e3fec7115"
+  },
+  "ETHUSDT_1d.csv.gz": {
+   "symbol": "ETHUSDT",
+   "kind": "1d",
+   "bytes": 76937,
+   "rows": 3358,
+   "first": "2017-08-17 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "4d2e1db8acd53d4ac17f943e45c44dfc8c7fcebbf7d7504568b9e04b7bf880eb"
+  },
+  "ETHUSDT_1h.csv.gz": {
+   "symbol": "ETHUSDT",
+   "kind": "1h",
+   "bytes": 1662001,
+   "rows": 80466,
+   "first": "2017-08-17 04:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "d2af9a1cec059d78ef48418f1c2b60a2804e00c880f1be723d8b99502647c8f1"
+  },
+  "ETHUSDT_funding.csv.gz": {
+   "symbol": "ETHUSDT",
+   "kind": "funding",
+   "bytes": 41693,
+   "rows": 7395,
+   "first": "2020-01-01 00:00:00+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "389ce9ae7505e60a6dfcd8e27abf536edd64ad5d917f8f2fb44dadca146dcea2"
+  },
+  "ETHUSDT_oi.csv.gz": {
+   "symbol": "ETHUSDT",
+   "kind": "oi",
+   "bytes": 765928,
+   "rows": 42950,
+   "first": "2021-12-01 00:00:00+00:00",
+   "last": "2026-10-25 23:00:00+00:00",
+   "sha256": "e2b5ecd36e56750c6ca644b64b323f67d00c5a0cd541f6c653a452081bb949f3"
+  },
+  "ETHUSDT_perp1h.csv.gz": {
+   "symbol": "ETHUSDT",
+   "kind": "perp1h",
+   "bytes": 1227053,
+   "rows": 59160,
+   "first": "2020-01-01 00:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "dbec75a3fda381065e5f620578c4bcc684172e48b8ae68f461ff5ecf44c16950"
+  },
+  "EURJPY_X_1d.csv.gz": {
+   "symbol": "EURJPY=X",
+   "kind": "1d",
+   "bytes": 110082,
+   "rows": 6168,
+   "first": "2003-01-23 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "79a88aea0f9b16ff670445183bf53859c55b166a87f7748200d58a6aa3c3c06e"
+  },
+  "EURJPY_X_1h.csv.gz": {
+   "symbol": "EURJPY=X",
+   "kind": "1h",
+   "bytes": 282007,
+   "rows": 17258,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "782a29999adf5d8bae378f25b41772050c1b2248c127457accdf297c6efbe828"
+  },
+  "EURUSD_X_1d.csv.gz": {
+   "symbol": "EURUSD=X",
+   "kind": "1d",
+   "bytes": 185232,
+   "rows": 5943,
+   "first": "2003-12-01 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "450982b06791018880719f863b793709745645c9c39ffc3068630f9148899b26"
+  },
+  "EURUSD_X_1h.csv.gz": {
+   "symbol": "EURUSD=X",
+   "kind": "1h",
+   "bytes": 222489,
+   "rows": 17247,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "a0b523d8a32cac4a09eedbaa1b9e61747cc28a30eb596c4e6e2791ccf9b9a246"
+  },
+  "EWG_1d.csv.gz": {
+   "symbol": "EWG",
+   "kind": "1d",
+   "bytes": 270903,
+   "rows": 7702,
+   "first": "1996-03-18 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "2fa783b8d39db122679df4a3ad504e899e8fd496ca04b01816c8a315ca51bc38"
+  },
+  "EWG_1h.csv.gz": {
+   "symbol": "EWG",
+   "kind": "1h",
+   "bytes": 95187,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "71ba52461e9c1b20f7735384be6baf9bc11c705717f38db6a0dc2f51f488b9f4"
+  },
+  "EWJ_1d.csv.gz": {
+   "symbol": "EWJ",
+   "kind": "1d",
+   "bytes": 262659,
+   "rows": 7702,
+   "first": "1996-03-18 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "a5abb707fec19137efdb2ed98acc48ed033515b1922272c335fe7af2dc5a6e5f"
+  },
+  "EWJ_1h.csv.gz": {
+   "symbol": "EWJ",
+   "kind": "1h",
+   "bytes": 97873,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "1b4987418d4330768b33ad380d6a86b536262e4cdf5cf0ca37ae0bc5ae598b6c"
+  },
+  "EWU_1d.csv.gz": {
+   "symbol": "EWU",
+   "kind": "1d",
+   "bytes": 263739,
+   "rows": 7702,
+   "first": "1996-03-18 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "fb0768c7a9bf92058ca06bb6238ac557aa7e458a26e515cd26b05d2cbbf54fb1"
+  },
+  "EWU_1h.csv.gz": {
+   "symbol": "EWU",
+   "kind": "1h",
+   "bytes": 92923,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "1dfec8d4dee19b072da5c73be4ab4ae14a84e8ce16823e5c0acaf3636db2e9cf"
+  },
+  "EWZ_1d.csv.gz": {
+   "symbol": "EWZ",
+   "kind": "1d",
+   "bytes": 258939,
+   "rows": 6610,
+   "first": "2000-07-14 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "57bd1ec14c2456dd761e54ad78fb544f34e5ed7fde2258e06e86219c7c2ef566"
+  },
+  "EWZ_1h.csv.gz": {
+   "symbol": "EWZ",
+   "kind": "1h",
+   "bytes": 99138,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "842c2f024b70e72eb6fe2bedb24aa67481567f363140f75c87042281f46bce26"
+  },
+  "FILUSDT_15m.csv.gz": {
+   "symbol": "FILUSDT",
+   "kind": "15m",
+   "bytes": 3194304,
+   "rows": 211357,
+   "first": "2020-10-15 17:00:00+00:00",
+   "last": "2026-10-27 07:15:00+00:00",
+   "sha256": "2448dbada16c2e02fdc45a4d01d14a2fa78b9c13b0a27070da02fc36541d67ff"
+  },
+  "FILUSDT_1d.csv.gz": {
+   "symbol": "FILUSDT",
+   "kind": "1d",
+   "bytes": 43118,
+   "rows": 2203,
+   "first": "2020-10-15 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "862a03baf9b8fc003ec83c5fa96eea0c25d203a3d1534a93b6b375674bab5e8a"
+  },
+  "FILUSDT_1h.csv.gz": {
+   "symbol": "FILUSDT",
+   "kind": "1h",
+   "bytes": 878008,
+   "rows": 52842,
+   "first": "2020-10-15 17:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "22133d938810c5b0caecb758b95a03430947fb217be042d1730e64b35093d9b2"
+  },
+  "FTTUSDT_15m.csv.gz": {
+   "symbol": "FTTUSDT",
+   "kind": "15m",
+   "bytes": 3166252,
+   "rows": 210289,
+   "first": "2019-12-20 03:00:00+00:00",
+   "last": "2026-10-27 07:15:00+00:00",
+   "sha256": "a77183ce18d0f452725a8c3423ec849e374eed31a0d5a7fac3193f40bb1a96d3"
+  },
+  "FTTUSDT_1d.csv.gz": {
+   "symbol": "FTTUSDT",
+   "kind": "1d",
+   "bytes": 43101,
+   "rows": 2193,
+   "first": "2019-12-20 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "f4b17d843a185a4b0121b56086b475a5133aa6d4f093b55d22a7289b4f1fc207"
+  },
+  "FTTUSDT_1h.csv.gz": {
+   "symbol": "FTTUSDT",
+   "kind": "1h",
+   "bytes": 878867,
+   "rows": 52578,
+   "first": "2019-12-20 03:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "de412c5a86d0b7448c81b6fab2d1fff15760bf207b75fb917e0e2c492ab457a2"
+  },
+  "FXI_1d.csv.gz": {
+   "symbol": "FXI",
+   "kind": "1d",
+   "bytes": 221790,
+   "rows": 5547,
+   "first": "2004-10-08 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "4f2f98b5e1d636a9cfb303dfd53f48d8bf86dc114877a6b087016a905776da0c"
+  },
+  "FXI_1h.csv.gz": {
+   "symbol": "FXI",
+   "kind": "1h",
+   "bytes": 98904,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "8b04d6774069eb731f9c2a5a2fbb7a2fabcebebb2810d3a8892b4d44dca18788"
+  },
+  "F_1d.csv.gz": {
+   "symbol": "F",
+   "kind": "1d",
+   "bytes": 494130,
+   "rows": 13714,
+   "first": "1972-06-01 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "7b5c36bd5ba0c72e50a5b36776c051a95a04bee53baaa60e9cf9136fe549314d"
+  },
+  "F_1h.csv.gz": {
+   "symbol": "F",
+   "kind": "1h",
+   "bytes": 98413,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "c96397e91ce78783de371e820a2ac7ed80a98bcb20e2b0c57192c9b282fa6e51"
+  },
+  "GBPUSD_X_1d.csv.gz": {
+   "symbol": "GBPUSD=X",
+   "kind": "1d",
+   "bytes": 187882,
+   "rows": 5955,
+   "first": "2003-12-01 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "5f5f9ec86b42566dd7100cbd79a672af1ccbfd7c7620dc770e4f4b20d196a2c3"
+  },
+  "GBPUSD_X_1h.csv.gz": {
+   "symbol": "GBPUSD=X",
+   "kind": "1h",
+   "bytes": 427629,
+   "rows": 17250,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "b0a32c83aa43bf19a5436618a3a95812b706ef2655407ffaf67f7e8601cf8e71"
+  },
+  "GLD_1d.csv.gz": {
+   "symbol": "GLD",
+   "kind": "1d",
+   "bytes": 101713,
+   "rows": 5518,
+   "first": "2004-11-18 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "46880e2ef552fd2271d825262fd3d71683f5286c4497d806b9652279df295c83"
+  },
+  "GLD_1h.csv.gz": {
+   "symbol": "GLD",
+   "kind": "1h",
+   "bytes": 107047,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "c658e37bb402e093b40789c4cb85954396ee7477651aacb0cbe56fbd757c9e1c"
+  },
+  "HBARUSDT_1d.csv.gz": {
+   "symbol": "HBARUSDT",
+   "kind": "1d",
+   "bytes": 48815,
+   "rows": 2585,
+   "first": "2019-09-29 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "f14ae66b2ac2ce382cbd7288b51200ace9feb42ee809f87c2a113f871b0341d3"
+  },
+  "HBARUSDT_1h.csv.gz": {
+   "symbol": "HBARUSDT",
+   "kind": "1h",
+   "bytes": 972936,
+   "rows": 62012,
+   "first": "2019-09-29 04:00:00+00:00",
+   "last": "2026-10-27 11:00:00+00:00",
+   "sha256": "5f390a27d947ec834afe6ecef05cf467688c653eb438c1545252fc36e3dd01c8"
+  },
+  "HD_1d.csv.gz": {
+   "symbol": "HD",
+   "kind": "1d",
+   "bytes": 410334,
+   "rows": 11365,
+   "first": "1981-09-22 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "09cc20214eecd85627f7f796cf3dc6f52b7b59dc2a1f3c05c2f636f662d2942a"
+  },
+  "HD_1h.csv.gz": {
+   "symbol": "HD",
+   "kind": "1h",
+   "bytes": 107902,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "92802b636d2dae693f1e3d0d826e0fe8b2b535fbf4d5ad3bbc16acf35fb245e9"
+  },
+  "HYG_1d.csv.gz": {
+   "symbol": "HYG",
+   "kind": "1d",
+   "bytes": 189511,
+   "rows": 4918,
+   "first": "2007-04-11 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "f6bd39a2ca8a46591bd3e1eda4e8be425b5381e8e13de5dc24b647687643e599"
+  },
+  "HYG_1h.csv.gz": {
+   "symbol": "HYG",
+   "kind": "1h",
+   "bytes": 88615,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "4851e5cb45883ef33b65623692e110d88e2ac681fdced5dfce54d6d3273f95a1"
+  },
+  "ICPUSDT_1d.csv.gz": {
+   "symbol": "ICPUSDT",
+   "kind": "1d",
+   "bytes": 38248,
+   "rows": 1995,
+   "first": "2021-05-11 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "5ab957620649c333371018f55a3bd7220651db40baab1907f783d4b70a2b49dc"
+  },
+  "ICPUSDT_1h.csv.gz": {
+   "symbol": "ICPUSDT",
+   "kind": "1h",
+   "bytes": 782991,
+   "rows": 47884,
+   "first": "2021-05-11 01:00:00+00:00",
+   "last": "2026-10-27 11:00:00+00:00",
+   "sha256": "7b2cfa49ef3e150a6b5defbd22ee1cb86ac7448bb6805c6d0cf7490c80d76e0a"
+  },
+  "ICXUSDT_15m.csv.gz": {
+   "symbol": "ICXUSDT",
+   "kind": "15m",
+   "bytes": 3928733,
+   "rows": 288016,
+   "first": "2018-06-13 08:00:00+00:00",
+   "last": "2026-09-03 02:45:00+00:00",
+   "sha256": "657ca89418993d34145f74aa531b6840f188c45d9625fd811f4413313a54b5d2"
+  },
+  "ICXUSDT_1d.csv.gz": {
+   "symbol": "ICXUSDT",
+   "kind": "1d",
+   "bytes": 55611,
+   "rows": 3005,
+   "first": "2018-06-13 00:00:00+00:00",
+   "last": "2026-09-03 00:00:00+00:00",
+   "sha256": "5d6c7d5d0d897b4b997bb146c683c0537216f22fc21eb67aef678f2c9153ca45"
+  },
+  "ICXUSDT_1h.csv.gz": {
+   "symbol": "ICXUSDT",
+   "kind": "1h",
+   "bytes": 1098687,
+   "rows": 72003,
+   "first": "2018-06-13 08:00:00+00:00",
+   "last": "2026-09-03 02:00:00+00:00",
+   "sha256": "dea618fb3180f01194ab10a628552c73d41a826cf60becccc6f3aa39503aa3e1"
+  },
+  "IEF_1d.csv.gz": {
+   "symbol": "IEF",
+   "kind": "1d",
+   "bytes": 234051,
+   "rows": 6100,
+   "first": "2002-07-30 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "1b77f5f746770ce53e4afb058a0f7708e44c65dbf86753d1566d0983ec1e6295"
+  },
+  "IEF_1h.csv.gz": {
+   "symbol": "IEF",
+   "kind": "1h",
+   "bytes": 103378,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "0426e22da7fe784ba370e7550b3d6b36676448d5fb9d40e5f1bd7f3b2fdd8b6b"
+  },
+  "INTC_1d.csv.gz": {
+   "symbol": "INTC",
+   "kind": "1d",
+   "bytes": 416781,
+   "rows": 11748,
+   "first": "1980-03-17 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "c7d9eb3187f437bed281dd3b2f135da4229e76e6543974e9849fc868f50f0a4b"
+  },
+  "INTC_1h.csv.gz": {
+   "symbol": "INTC",
+   "kind": "1h",
+   "bytes": 112618,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "a2340086b6acc14c46028133e0f8795466c42ce33254466f6cbd454eac45393c"
+  },
+  "IWM_1d.csv.gz": {
+   "symbol": "IWM",
+   "kind": "1d",
+   "bytes": 270939,
+   "rows": 6643,
+   "first": "2000-05-26 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "f4351f68c198dbc5168120d6cbcd86ed7f135469d51ef707dd88d997da392cf4"
+  },
+  "IWM_1h.csv.gz": {
+   "symbol": "IWM",
+   "kind": "1h",
+   "bytes": 103752,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "a01e24eea73771069bd7bf2608e3495c3e8f9d82bdcad9aa8bc12f3cc17e7a56"
+  },
+  "JPM_1d.csv.gz": {
+   "symbol": "JPM",
+   "kind": "1d",
+   "bytes": 434512,
+   "rows": 11748,
+   "first": "1980-03-17 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "b0805fea3f547289030fc9c0740a2bdfaadde80cf3d1c50cff5c209d8502217a"
+  },
+  "JPM_1h.csv.gz": {
+   "symbol": "JPM",
+   "kind": "1h",
+   "bytes": 107786,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "a995844efd593ec1970579298de70278f9f7a33c7b6b201a8fbd441436df56a4"
+  },
+  "KO_1d.csv.gz": {
+   "symbol": "KO",
+   "kind": "1d",
+   "bytes": 570440,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "17aeb7f5fd20826b409b6aeb0fe2f9ee89bd91184efdf50e0dc45030188e1387"
+  },
+  "KO_1h.csv.gz": {
+   "symbol": "KO",
+   "kind": "1h",
+   "bytes": 100706,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "9e027be3d9ec2019e0639864f8565cfc6aca8907ef1fa545210e8070ca6357bf"
+  },
+  "LINKUSDT_15m.csv.gz": {
+   "symbol": "LINKUSDT",
+   "kind": "15m",
+   "bytes": 4295613,
+   "rows": 272456,
+   "first": "2019-01-16 10:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "9bb22cd061269e3675c0ee47ef832dc106b87a31e9c1f745f080cb40dde6d6f9"
+  },
+  "LINKUSDT_1d.csv.gz": {
+   "symbol": "LINKUSDT",
+   "kind": "1d",
+   "bytes": 56472,
+   "rows": 2841,
+   "first": "2019-01-16 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "63721a7f2e742d75536f444c429ccc77bc3178a8cff4a6cdce74b87116379c82"
+  },
+  "LINKUSDT_1h.csv.gz": {
+   "symbol": "LINKUSDT",
+   "kind": "1h",
+   "bytes": 1172712,
+   "rows": 68120,
+   "first": "2019-01-16 10:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "c31cc280bfd07ccbe01f95dc9330a7f59dbbb1e0741797b9b6d20203b78abf24"
+  },
+  "LINKUSDT_funding.csv.gz": {
+   "symbol": "LINKUSDT",
+   "kind": "funding",
+   "bytes": 39022,
+   "rows": 7346,
+   "first": "2020-01-17 08:00:00+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "f50fb3adc9d86d2c49754a6ba4d7bf45c80c076368e86028032980cce0a8cdca"
+  },
+  "LINKUSDT_oi.csv.gz": {
+   "symbol": "LINKUSDT",
+   "kind": "oi",
+   "bytes": 745939,
+   "rows": 42950,
+   "first": "2021-12-01 00:00:00+00:00",
+   "last": "2026-10-25 23:00:00+00:00",
+   "sha256": "6450d619ca634443af372e84c108f78974005af11f8df6109838fa0909428f88"
+  },
+  "LINKUSDT_perp1h.csv.gz": {
+   "symbol": "LINKUSDT",
+   "kind": "perp1h",
+   "bytes": 1075341,
+   "rows": 58768,
+   "first": "2020-01-17 08:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "25ed87a7c258928e26cd46c6a546a8c0ce3a33b9146b19d178f14eeea347b72e"
+  },
+  "LQD_1d.csv.gz": {
+   "symbol": "LQD",
+   "kind": "1d",
+   "bytes": 234565,
+   "rows": 6100,
+   "first": "2002-07-30 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "559584ab7a2bfb83eed2f5cf34d9ba457822c1227ff7ad2a78bffe81751dd092"
+  },
+  "LQD_1h.csv.gz": {
+   "symbol": "LQD",
+   "kind": "1h",
+   "bytes": 96831,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "aacefad9c2ee297c273171729f315e63a50fb0d58a56d0f974258751eb90327e"
+  },
+  "LTCUSDT_15m.csv.gz": {
+   "symbol": "LTCUSDT",
+   "kind": "15m",
+   "bytes": 4945876,
+   "rows": 310519,
+   "first": "2017-12-13 03:30:00+00:00",
+   "last": "2026-10-27 06:45:00+00:00",
+   "sha256": "1f80740151f2b9c56a05cf5d7fa67172f8d3c4796303bcfc606bb14bcc0b32df"
+  },
+  "LTCUSDT_1d.csv.gz": {
+   "symbol": "LTCUSDT",
+   "kind": "1d",
+   "bytes": 65191,
+   "rows": 3240,
+   "first": "2017-12-13 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "7c5131375c5f1314fab61fb078f342176eeaa591654fe17d7fef97927b38e4fd"
+  },
+  "LTCUSDT_1h.csv.gz": {
+   "symbol": "LTCUSDT",
+   "kind": "1h",
+   "bytes": 1348529,
+   "rows": 77641,
+   "first": "2017-12-13 03:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "b50433c44dcc0c2039f871df6d645119c016038247bcff86e943348542acae6b"
+  },
+  "LTCUSDT_funding.csv.gz": {
+   "symbol": "LTCUSDT",
+   "kind": "funding",
+   "bytes": 40443,
+   "rows": 7370,
+   "first": "2020-01-09 08:00:00+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "d1c2f12d520f75ce866b533612799e44e7b58e39c2cb102ff218a102532f30c9"
+  },
+  "LTCUSDT_oi.csv.gz": {
+   "symbol": "LTCUSDT",
+   "kind": "oi",
+   "bytes": 751870,
+   "rows": 42950,
+   "first": "2021-12-01 00:00:00+00:00",
+   "last": "2026-10-25 23:00:00+00:00",
+   "sha256": "266c49fd2d32e33a00ab3b2ffcb4b67d30296b72484792422572fb1050377514"
+  },
+  "LTCUSDT_perp1h.csv.gz": {
+   "symbol": "LTCUSDT",
+   "kind": "perp1h",
+   "bytes": 1031423,
+   "rows": 58840,
+   "first": "2020-01-09 08:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "d034e40bd37f8b8b6a71aca5b67c2347c146252a768cc3d443a7ea985b0d9718"
+  },
+  "LUNAUSDT_15m.csv.gz": {
+   "symbol": "LUNAUSDT",
+   "kind": "15m",
+   "bytes": 3333706,
+   "rows": 214916,
+   "first": "2020-08-21 10:00:00+00:00",
+   "last": "2026-10-27 07:15:00+00:00",
+   "sha256": "64cba7c25117c8623c50a45a86f0fff2b1cd3e2d135b9aaef8940086cef33be9"
+  },
+  "LUNAUSDT_1d.csv.gz": {
+   "symbol": "LUNAUSDT",
+   "kind": "1d",
+   "bytes": 45124,
+   "rows": 2241,
+   "first": "2020-08-21 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "cd61df2f3443a6b69309705789be86b0bd38ff3c9e464d8cccc640acf9bfee7d"
+  },
+  "LUNAUSDT_1h.csv.gz": {
+   "symbol": "LUNAUSDT",
+   "kind": "1h",
+   "bytes": 915978,
+   "rows": 53732,
+   "first": "2020-08-21 10:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "f675c4b865f52ad3326a3387c4bd05c43953ad57da9d29610834391d8f3b9d63"
+  },
+  "MATICUSDT_15m.csv.gz": {
+   "symbol": "MATICUSDT",
+   "kind": "15m",
+   "bytes": 2934602,
+   "rows": 188251,
+   "first": "2019-04-26 15:00:00+00:00",
+   "last": "2024-09-10 02:45:00+00:00",
+   "sha256": "35e408e454af1c72da9f9267a4a6cb06e33b841f16aa7d8b3db89d837bab7af1"
+  },
+  "MATICUSDT_1d.csv.gz": {
+   "symbol": "MATICUSDT",
+   "kind": "1d",
+   "bytes": 39164,
+   "rows": 1965,
+   "first": "2019-04-26 00:00:00+00:00",
+   "last": "2024-09-10 00:00:00+00:00",
+   "sha256": "bc5a19987602f3b5dfc00883d59ffff07f3127eae173a95c20289754bc9f8889"
+  },
+  "MATICUSDT_1h.csv.gz": {
+   "symbol": "MATICUSDT",
+   "kind": "1h",
+   "bytes": 803413,
+   "rows": 47070,
+   "first": "2019-04-26 15:00:00+00:00",
+   "last": "2024-09-10 02:00:00+00:00",
+   "sha256": "27b9607a3fe3199828d9a48c370d33af2170b6d531418f33e33b00934d3ec750"
+  },
+  "MMM_1d.csv.gz": {
+   "symbol": "MMM",
+   "kind": "1d",
+   "bytes": 600126,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "75dd1f5318f6c63ec38349fa01444a61425e86333ac1bb6d5cd056a0e1fc8241"
+  },
+  "MMM_1h.csv.gz": {
+   "symbol": "MMM",
+   "kind": "1h",
+   "bytes": 104168,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "dbe76a75b97666ce4352cd7af963d0e8c3199e634b005e17dca1e6253d17726f"
+  },
+  "MRK_1d.csv.gz": {
+   "symbol": "MRK",
+   "kind": "1d",
+   "bytes": 608160,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "091de6878851f55b9e73abcb14661ff265a5a9c901a3f2425f116cc679cfab09"
+  },
+  "MRK_1h.csv.gz": {
+   "symbol": "MRK",
+   "kind": "1h",
+   "bytes": 103248,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "56404cd5390afa3ce6852821182d9af68bf96b3f074c81085bf601a175bbbaac"
+  },
+  "MSFT_1d.csv.gz": {
+   "symbol": "MSFT",
+   "kind": "1d",
+   "bytes": 397210,
+   "rows": 10234,
+   "first": "1986-03-13 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "3708c897698c9f223da6aaf53113494ad03dce062f6889ae6fe3ad185f141cf8"
+  },
+  "MSFT_1h.csv.gz": {
+   "symbol": "MSFT",
+   "kind": "1h",
+   "bytes": 114050,
+   "rows": 5077,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "db868035c40a080fea50cea0180f3ba800f0620900e1f19b8f79916b8307e42a"
+  },
+  "MUB_1d.csv.gz": {
+   "symbol": "MUB",
+   "kind": "1d",
+   "bytes": 176691,
+   "rows": 4813,
+   "first": "2007-09-10 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "5b113d138712e5dc0ba8af6465c9109eb236836da8e445ad0329c55f592efc60"
+  },
+  "MUB_1h.csv.gz": {
+   "symbol": "MUB",
+   "kind": "1h",
+   "bytes": 97518,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "ca797cbc392cd7b5d51183de6c274a8480d730477068325e05080a0e1f1c3242"
+  },
+  "NEARUSDT_1d.csv.gz": {
+   "symbol": "NEARUSDT",
+   "kind": "1d",
+   "bytes": 42415,
+   "rows": 2204,
+   "first": "2020-10-14 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "7a7d2bc37152152e1539782b7bec87dbe42ffa8129eb575b484f2d792e8d2306"
+  },
+  "NEARUSDT_1h.csv.gz": {
+   "symbol": "NEARUSDT",
+   "kind": "1h",
+   "bytes": 864622,
+   "rows": 52882,
+   "first": "2020-10-14 05:00:00+00:00",
+   "last": "2026-10-27 10:00:00+00:00",
+   "sha256": "5d9a5c8b193b0abc76bc59fb01098a2d7ee69e6f88329670747c3274110310d2"
+  },
+  "NEOUSDT_15m.csv.gz": {
+   "symbol": "NEOUSDT",
+   "kind": "15m",
+   "bytes": 4495671,
+   "rows": 312729,
+   "first": "2017-11-20 03:30:00+00:00",
+   "last": "2026-10-27 07:15:00+00:00",
+   "sha256": "7bec1b2782f840c0232e54d2d4f8cbb380681215064f4ee7a2c93536a9f4db73"
+  },
+  "NEOUSDT_1d.csv.gz": {
+   "symbol": "NEOUSDT",
+   "kind": "1d",
+   "bytes": 61508,
+   "rows": 3263,
+   "first": "2017-11-20 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "492609a38da38b3ec7a0574e6848f41d8a53b85bca3438fdc08d2f61e720a761"
+  },
+  "NEOUSDT_1h.csv.gz": {
+   "symbol": "NEOUSDT",
+   "kind": "1h",
+   "bytes": 1245861,
+   "rows": 78194,
+   "first": "2017-11-20 03:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "4d4a421ce505e059c59a6e233bf22064e336a36c18dab63abe0c0fcbc20af445"
+  },
+  "NKE_1d.csv.gz": {
+   "symbol": "NKE",
+   "kind": "1d",
+   "bytes": 417192,
+   "rows": 11568,
+   "first": "1980-12-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "75d6a42b7710ebfd1e73b730d9d31dd7d4aa0decdc426af297038994470c91eb"
+  },
+  "NKE_1h.csv.gz": {
+   "symbol": "NKE",
+   "kind": "1h",
+   "bytes": 105166,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "f76a5357cfe8b5733f80efb7604a112351d46acc74be5de594850a0fe7189c5f"
+  },
+  "NZDUSD_X_1d.csv.gz": {
+   "symbol": "NZDUSD=X",
+   "kind": "1d",
+   "bytes": 174050,
+   "rows": 5944,
+   "first": "2003-12-01 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "00ad865d982e1593a9cac22bf2d1e9be909df4b20b4f328a5f539a752a1ccf0d"
+  },
+  "NZDUSD_X_1h.csv.gz": {
+   "symbol": "NZDUSD=X",
+   "kind": "1h",
+   "bytes": 303908,
+   "rows": 17317,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "c5b72cb56082ba684e53406130d3c436a6d5bb528403b00acda7613814d0c6fe"
+  },
+  "ORCL_1d.csv.gz": {
+   "symbol": "ORCL",
+   "kind": "1d",
+   "bytes": 376499,
+   "rows": 10235,
+   "first": "1986-03-12 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "21e6ffabd1d87f81c87461d7a58e100037f95ab8d1fe58d872eb0dd26177b6fd"
+  },
+  "ORCL_1h.csv.gz": {
+   "symbol": "ORCL",
+   "kind": "1h",
+   "bytes": 110606,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "f8577e6438edd18dcbfe106a60a252e4519d240f4f6ff0cfcdff2604bc1d025b"
+  },
+  "PALL_1d.csv.gz": {
+   "symbol": "PALL",
+   "kind": "1d",
+   "bytes": 77181,
+   "rows": 4225,
+   "first": "2010-01-08 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "3b0a29d3109ca9646c1395941e7066d35fae6563efc42cf3e58e35709d972e75"
+  },
+  "PALL_1h.csv.gz": {
+   "symbol": "PALL",
+   "kind": "1h",
+   "bytes": 110229,
+   "rows": 5074,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "73ce71d79872061e459aa21250f839d8f05a7d7c057da456775aea1d54c60e47"
+  },
+  "PEP_1d.csv.gz": {
+   "symbol": "PEP",
+   "kind": "1d",
+   "bytes": 472910,
+   "rows": 13714,
+   "first": "1972-06-01 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "0537ca55bb7b2efa85924e736b72a37c123be4c2d2a776aea7dbed5d8242279c"
+  },
+  "PEP_1h.csv.gz": {
+   "symbol": "PEP",
+   "kind": "1h",
+   "bytes": 103811,
+   "rows": 5077,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "90901fc81d8a82b0801ee6f07ae25c8d1942bbf886d859709831af52ea25d179"
+  },
+  "PFE_1d.csv.gz": {
+   "symbol": "PFE",
+   "kind": "1d",
+   "bytes": 489502,
+   "rows": 13714,
+   "first": "1972-06-01 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "45cd0209d152db9c96dbd9787c4ab76e6a4bdd0bda36ae9d8781366800ebecd0"
+  },
+  "PFE_1h.csv.gz": {
+   "symbol": "PFE",
+   "kind": "1h",
+   "bytes": 101370,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "f1e0f2a7ccbe74cb0b4685b9abbe0129eb36cf6cde1ecfe57e15cd7d33a86af5"
+  },
+  "PG_1d.csv.gz": {
+   "symbol": "PG",
+   "kind": "1d",
+   "bytes": 580807,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "4846968651f48bdc3e66020dc722dd66031269d754e79f7cd4586a165e56aec8"
+  },
+  "PG_1h.csv.gz": {
+   "symbol": "PG",
+   "kind": "1h",
+   "bytes": 100743,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "9ac6974533488effa7c1c4e2fde7f4cad0ef7f520a5e8489a31dd6be2ed861da"
+  },
+  "PPLT_1d.csv.gz": {
+   "symbol": "PPLT",
+   "kind": "1d",
+   "bytes": 78963,
+   "rows": 4225,
+   "first": "2010-01-08 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "4ff36b0d2fe1af0ba78a903dc71a2eea9b41ee2bc93c68c5fdc97893afaacd88"
+  },
+  "PPLT_1h.csv.gz": {
+   "symbol": "PPLT",
+   "kind": "1h",
+   "bytes": 114745,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "f157cc768869b4a49a150bb16abd74171c23ed887ba4fad3f261194ae2646ba2"
+  },
+  "QQQ_1d.csv.gz": {
+   "symbol": "QQQ",
+   "kind": "1d",
+   "bytes": 285054,
+   "rows": 6951,
+   "first": "1999-03-10 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "cd3d8e35dfb8e9e679a82651342e507a10f16566eb4f6c1a9c0f0dc3ce6020bf"
+  },
+  "QQQ_1h.csv.gz": {
+   "symbol": "QQQ",
+   "kind": "1h",
+   "bytes": 113040,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "b738e6a3c826d0bd49f6f9de748fa589e0066801b35bcdf15655aaf0dac33821"
+  },
+  "SHY_1d.csv.gz": {
+   "symbol": "SHY",
+   "kind": "1d",
+   "bytes": 194457,
+   "rows": 6100,
+   "first": "2002-07-30 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "960703bbc6099fcb2d45f49cf45c67fe5220ae44bdaf748894ad7e154c731ec7"
+  },
+  "SHY_1h.csv.gz": {
+   "symbol": "SHY",
+   "kind": "1h",
+   "bytes": 87842,
+   "rows": 5077,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "c9a2addf9d6e2724f408c70ac9d59bacccd4e81350a51f612447d751e9614c14"
+  },
+  "SLV_1d.csv.gz": {
+   "symbol": "SLV",
+   "kind": "1d",
+   "bytes": 90839,
+   "rows": 5156,
+   "first": "2006-04-28 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "59a8ab435921b747b7daf317a77763b80235110c8245a25c245144d8d2ff91a7"
+  },
+  "SLV_1h.csv.gz": {
+   "symbol": "SLV",
+   "kind": "1h",
+   "bytes": 107876,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "cbfb230cc67a09e8bef1bac9adad756b4ce66e0db511cd17e4cb959a51a447fb"
+  },
+  "SOLUSDT_15m.csv.gz": {
+   "symbol": "SOLUSDT",
+   "kind": "15m",
+   "bytes": 3580255,
+   "rows": 217640,
+   "first": "2020-08-11 06:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "1a2c83d5b60cff743d353a32b8167a6264d245b6d4bbd1ca6025a88260bf0c7e"
+  },
+  "SOLUSDT_1d.csv.gz": {
+   "symbol": "SOLUSDT",
+   "kind": "1d",
+   "bytes": 46623,
+   "rows": 2268,
+   "first": "2020-08-11 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "f04248f0ed1c9bf336b1bb2737332bc342b84d87b0a08353bf1a3bdcaadea4d8"
+  },
+  "SOLUSDT_1h.csv.gz": {
+   "symbol": "SOLUSDT",
+   "kind": "1h",
+   "bytes": 970947,
+   "rows": 54413,
+   "first": "2020-08-11 06:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "b6636fa229de157497ef34d890fd3b7e4705c562ef719c5e08e119147ff30d00"
+  },
+  "SOLUSDT_funding.csv.gz": {
+   "symbol": "SOLUSDT",
+   "kind": "funding",
+   "bytes": 38827,
+   "rows": 6700,
+   "first": "2020-09-13 16:00:00.004000+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "0553e380a9d21e8ba1907b0bb86b140930fdb9ce56077c3cae0f29a47a8597d1"
+  },
+  "SOLUSDT_perp1h.csv.gz": {
+   "symbol": "SOLUSDT",
+   "kind": "perp1h",
+   "bytes": 944598,
+   "rows": 52865,
+   "first": "2020-09-14 07:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "81336063aa10d5bb1f55ff9b97fa44a942571b5692c54b1748931ddc70d262a1"
+  },
+  "SPY_1d.csv.gz": {
+   "symbol": "SPY",
+   "kind": "1d",
+   "bytes": 342544,
+   "rows": 8493,
+   "first": "1993-01-29 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "c3ef8f33ae8558cb630b3e7a72dbf693dd0388762c6c362c9402d3a5e18cf364"
+  },
+  "SPY_1h.csv.gz": {
+   "symbol": "SPY",
+   "kind": "1h",
+   "bytes": 108658,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "5c557cb6f1bcaac32802da459dc80641f1eaab9f293b0073376ed803e31976d5"
+  },
+  "SRMUSDT_15m.csv.gz": {
+   "symbol": "SRMUSDT",
+   "kind": "15m",
+   "bytes": 1251145,
+   "rows": 80414,
+   "first": "2020-08-11 13:30:00+00:00",
+   "last": "2022-11-28 02:45:00+00:00",
+   "sha256": "ccb4f9e55bec482aadc0e9a6f2a4c540969c854c351e9435a6b5679ac9d2df42"
+  },
+  "SRMUSDT_1d.csv.gz": {
+   "symbol": "SRMUSDT",
+   "kind": "1d",
+   "bytes": 16904,
+   "rows": 840,
+   "first": "2020-08-11 00:00:00+00:00",
+   "last": "2022-11-28 00:00:00+00:00",
+   "sha256": "a5986954f93882888cb9def5b631353eba98874a21c91f3314fc9bf1e9f0bd52"
+  },
+  "SRMUSDT_1h.csv.gz": {
+   "symbol": "SRMUSDT",
+   "kind": "1h",
+   "bytes": 342372,
+   "rows": 20107,
+   "first": "2020-08-11 13:00:00+00:00",
+   "last": "2022-11-28 02:00:00+00:00",
+   "sha256": "2ad1a4efa2a8ea11289cd434d6a88a9fe20065d839c4d78ffeaa9d426194105f"
+  },
+  "THETAUSDT_1d.csv.gz": {
+   "symbol": "THETAUSDT",
+   "kind": "1d",
+   "bytes": 51101,
+   "rows": 2757,
+   "first": "2019-04-10 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "e39dde14c85c697e1cde301a364bc179a1dc07dcfffc583955f6b23b155e070b"
+  },
+  "THETAUSDT_1h.csv.gz": {
+   "symbol": "THETAUSDT",
+   "kind": "1h",
+   "bytes": 1014533,
+   "rows": 66122,
+   "first": "2019-04-10 04:00:00+00:00",
+   "last": "2026-10-27 11:00:00+00:00",
+   "sha256": "de40c05b4d2018808578d569fe0d8a6ffbcd36c28bff391c44c30917c875958c"
+  },
+  "TIP_1d.csv.gz": {
+   "symbol": "TIP",
+   "kind": "1d",
+   "bytes": 216871,
+   "rows": 5758,
+   "first": "2003-12-05 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "03f25d9e8a13689281c50642c13e2fc21e11c2c90e8c64212e305293efc70bf3"
+  },
+  "TIP_1h.csv.gz": {
+   "symbol": "TIP",
+   "kind": "1h",
+   "bytes": 98504,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "1b9711f1c59cac82a91c2675061288927d4c6d1acfbf9d9a2af9f9ac96ed793e"
+  },
+  "TLT_1d.csv.gz": {
+   "symbol": "TLT",
+   "kind": "1d",
+   "bytes": 244735,
+   "rows": 6100,
+   "first": "2002-07-30 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "da2b5059a13c0939eb1ee23f16e963bdbd184476d61c54946bd95fd5527bebcc"
+  },
+  "TLT_1h.csv.gz": {
+   "symbol": "TLT",
+   "kind": "1h",
+   "bytes": 107053,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "fedee8bbde9d00e0ec52153a1e36b7b3fbe41d5f3dde3d152a000ffbfa374577"
+  },
+  "TRXUSDT_15m.csv.gz": {
+   "symbol": "TRXUSDT",
+   "kind": "15m",
+   "bytes": 4378293,
+   "rows": 293355,
+   "first": "2018-06-11 11:30:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "1f88b4deb2ea492d8b004beb7309c5f0fbc21326360cbc3f294804698a82cc23"
+  },
+  "TRXUSDT_1d.csv.gz": {
+   "symbol": "TRXUSDT",
+   "kind": "1d",
+   "bytes": 60078,
+   "rows": 3060,
+   "first": "2018-06-11 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "e49646466eb2d37ccf00cc64831babb5315278921264518e07e5e4871e6dc454"
+  },
+  "TRXUSDT_1h.csv.gz": {
+   "symbol": "TRXUSDT",
+   "kind": "1h",
+   "bytes": 1205835,
+   "rows": 73348,
+   "first": "2018-06-11 11:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "34dd8421f5a193c33f96f9bb66fd3bc60f7bb3a894d046cdb3d9f9b11341edd0"
+  },
+  "TRXUSDT_perp1h.csv.gz": {
+   "symbol": "TRXUSDT",
+   "kind": "perp1h",
+   "bytes": 990816,
+   "rows": 58696,
+   "first": "2020-01-15 08:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "57f4733ad97383d291323f1e191c770ee0ea66208c1f634b9ec32c6d90bcd7bf"
+  },
+  "T_1d.csv.gz": {
+   "symbol": "T",
+   "kind": "1d",
+   "bytes": 411752,
+   "rows": 10816,
+   "first": "1983-11-21 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "f780854c9aac560fd0037646fbe40fa308cf2cbce7d6d1a5abeb1fa8d2c3d6f2"
+  },
+  "T_1h.csv.gz": {
+   "symbol": "T",
+   "kind": "1h",
+   "bytes": 97836,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "d3c29ad591f2a71c3ea8e471c01957c36d051532918bf17318709c572e5db0fc"
+  },
+  "UNG_1d.csv.gz": {
+   "symbol": "UNG",
+   "kind": "1d",
+   "bytes": 86667,
+   "rows": 4913,
+   "first": "2007-04-18 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "06248ef6315fc6ab7aa78540b978710405c5a1e86d740b16b9e552d60e784bba"
+  },
+  "UNG_1h.csv.gz": {
+   "symbol": "UNG",
+   "kind": "1h",
+   "bytes": 106713,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "047e2ec2d1ac707af1c4a9b10bd3106649e039b91e98a2588cc3f8e39742af4a"
+  },
+  "UNH_1d.csv.gz": {
+   "symbol": "UNH",
+   "kind": "1d",
+   "bytes": 380148,
+   "rows": 10587,
+   "first": "1984-10-17 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "1b56b982e5da1afeea00e22ffbc92a3d86171e8f2352e6c66b214d144df93f0f"
+  },
+  "UNH_1h.csv.gz": {
+   "symbol": "UNH",
+   "kind": "1h",
+   "bytes": 112222,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "06189498852ecec3a75d10a75d958e0fa97ac0bb847b3947d51542718db608d4"
+  },
+  "UNIUSDT_1d.csv.gz": {
+   "symbol": "UNIUSDT",
+   "kind": "1d",
+   "bytes": 43740,
+   "rows": 2231,
+   "first": "2020-09-17 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "b19644f5362bea1698dc1ce270dca87e695cd7d34446609f2c31a07584d2f684"
+  },
+  "UNIUSDT_1h.csv.gz": {
+   "symbol": "UNIUSDT",
+   "kind": "1h",
+   "bytes": 905303,
+   "rows": 53532,
+   "first": "2020-09-17 03:00:00+00:00",
+   "last": "2026-10-27 10:00:00+00:00",
+   "sha256": "0366f6d844c6ad04c211048e72751846214316f428c2ec84068067b67adecc33"
+  },
+  "USDCAD_X_1d.csv.gz": {
+   "symbol": "USDCAD=X",
+   "kind": "1d",
+   "bytes": 160879,
+   "rows": 6011,
+   "first": "2003-09-17 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "08aee661ed00b599a05a9d6776a20527c5b15156f0752b593cd739a78948a07b"
+  },
+  "USDCAD_X_1h.csv.gz": {
+   "symbol": "USDCAD=X",
+   "kind": "1h",
+   "bytes": 413958,
+   "rows": 17319,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "baffd38bd4d5679374001df10fbcadb2aff8ccdcf31b07474622b4f2b55bcfb7"
+  },
+  "USDCHF_X_1d.csv.gz": {
+   "symbol": "USDCHF=X",
+   "kind": "1d",
+   "bytes": 159772,
+   "rows": 6009,
+   "first": "2003-09-17 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "00da53f9a168bbf8d817e72229e28aeb74f0d8d37a912b8f27db3fb1f636077d"
+  },
+  "USDCHF_X_1h.csv.gz": {
+   "symbol": "USDCHF=X",
+   "kind": "1h",
+   "bytes": 429981,
+   "rows": 17185,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 07:00:00+00:00",
+   "sha256": "5e40fa2a672ebdc1f3250a1df1e9603b641091ba71e31db8fdeaa827773735f5"
+  },
+  "USDJPY_X_1d.csv.gz": {
+   "symbol": "USDJPY=X",
+   "kind": "1d",
+   "bytes": 128405,
+   "rows": 7777,
+   "first": "1996-10-30 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "b179d0207cd53cf18e4b184089c56bbb26b4d59f6b44221b54625803dc41cf06"
+  },
+  "USDJPY_X_1h.csv.gz": {
+   "symbol": "USDJPY=X",
+   "kind": "1h",
+   "bytes": 280355,
+   "rows": 17151,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "809557a10c0ca286b560d73f9e53abab030b6c27e5a15eaf1f89224d2bc2305e"
+  },
+  "USDMXN_X_1d.csv.gz": {
+   "symbol": "USDMXN=X",
+   "kind": "1d",
+   "bytes": 153489,
+   "rows": 5964,
+   "first": "2003-12-01 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "712c55eea73c639e3ccc7f6b247bc5ba344299f032a5384ac746609bb7741d9a"
+  },
+  "USDMXN_X_1h.csv.gz": {
+   "symbol": "USDMXN=X",
+   "kind": "1h",
+   "bytes": 385690,
+   "rows": 17274,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 12:00:00+00:00",
+   "sha256": "b05439bf9dad50587e51dab930ef99f20b2fcbcff1ffac579bdb8710721aa5a0"
+  },
+  "USDNOK_X_1d.csv.gz": {
+   "symbol": "USDNOK=X",
+   "kind": "1d",
+   "bytes": 177921,
+   "rows": 6402,
+   "first": "2001-07-16 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "ef2342526b33cc9831a5333643c88d4c55d0254ba682ae08686ce354fb57986d"
+  },
+  "USDNOK_X_1h.csv.gz": {
+   "symbol": "USDNOK=X",
+   "kind": "1h",
+   "bytes": 514906,
+   "rows": 17155,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 12:00:00+00:00",
+   "sha256": "1ff40565692f565232d31f9e5011390b6b9251965de9210f33b040dc12546b30"
+  },
+  "USDSEK_X_1d.csv.gz": {
+   "symbol": "USDSEK=X",
+   "kind": "1d",
+   "bytes": 178056,
+   "rows": 6402,
+   "first": "2001-07-16 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "839c0052bf5711f3a92974061ced7366dad302a010d113212fa6374eccf3cbb8"
+  },
+  "USDSEK_X_1h.csv.gz": {
+   "symbol": "USDSEK=X",
+   "kind": "1h",
+   "bytes": 503068,
+   "rows": 16959,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 12:00:00+00:00",
+   "sha256": "44887257c5c78a530b8907ef7c3e3a3548b9cd48f9df90551a8986933bc7ae41"
+  },
+  "USDZAR_X_1d.csv.gz": {
+   "symbol": "USDZAR=X",
+   "kind": "1d",
+   "bytes": 158638,
+   "rows": 5957,
+   "first": "2003-12-01 00:00:00+00:00",
+   "last": "2026-10-27 00:00:00+00:00",
+   "sha256": "57f9166b804aa6acb56b5b9b0aec90668ab5847d9ca2520d9ac885a93afecb7c"
+  },
+  "USDZAR_X_1h.csv.gz": {
+   "symbol": "USDZAR=X",
+   "kind": "1h",
+   "bytes": 454759,
+   "rows": 17315,
+   "first": "2024-01-10 00:00:00+00:00",
+   "last": "2026-10-27 12:00:00+00:00",
+   "sha256": "6619abde39544e2db852de99d988aa59c46648626bd737e862827b654f5bd991"
+  },
+  "USO_1d.csv.gz": {
+   "symbol": "USO",
+   "kind": "1d",
+   "bytes": 92308,
+   "rows": 5169,
+   "first": "2006-04-10 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "e39b37e7e60d1a820e4d55698756d75f5f50002a1f68bbaabffc1fc14a0f1063"
+  },
+  "USO_1h.csv.gz": {
+   "symbol": "USO",
+   "kind": "1h",
+   "bytes": 99250,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "1e003e006b83db74d5aa2d19887a2ad453e6ec942bc0f1db73756093226ad706"
+  },
+  "VETUSDT_1d.csv.gz": {
+   "symbol": "VETUSDT",
+   "kind": "1d",
+   "bytes": 60651,
+   "rows": 3016,
+   "first": "2018-07-25 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "5e3c3a260010e334abdb5970742dbeeaab91a05754f6c9002332e63cdb865cb1"
+  },
+  "VETUSDT_1h.csv.gz": {
+   "symbol": "VETUSDT",
+   "kind": "1h",
+   "bytes": 1231573,
+   "rows": 72322,
+   "first": "2018-07-25 04:00:00+00:00",
+   "last": "2026-10-27 11:00:00+00:00",
+   "sha256": "dda6659be3d940c6a98e6d40101c407947278ea3754bab14abce01373b441bfc"
+  },
+  "VZ_1d.csv.gz": {
+   "symbol": "VZ",
+   "kind": "1d",
+   "bytes": 411774,
+   "rows": 10816,
+   "first": "1983-11-21 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "eba3191ebe4476380839ce99f3f41a9054d7fce552af24e78cb182824530f33d"
+  },
+  "VZ_1h.csv.gz": {
+   "symbol": "VZ",
+   "kind": "1h",
+   "bytes": 101644,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "929ea0edaa1642710530e0e09dfe5c4e6d20a771cbe9e9d156d16a92428b0abe"
+  },
+  "WAVESUSDT_15m.csv.gz": {
+   "symbol": "WAVESUSDT",
+   "kind": "15m",
+   "bytes": 2859031,
+   "rows": 189495,
+   "first": "2019-01-18 10:00:00+00:00",
+   "last": "2024-06-17 02:45:00+00:00",
+   "sha256": "949079ebf3245b58a99f366b6bd5705fc3d2fc8586beec3672bc8b96e162865d"
+  },
+  "WAVESUSDT_1d.csv.gz": {
+   "symbol": "WAVESUSDT",
+   "kind": "1d",
+   "bytes": 38992,
+   "rows": 1978,
+   "first": "2019-01-18 00:00:00+00:00",
+   "last": "2024-06-17 00:00:00+00:00",
+   "sha256": "dd91549f9fbd7345e4865387e4fb128184075467e63813cc29be96f69523b799"
+  },
+  "WAVESUSDT_1h.csv.gz": {
+   "symbol": "WAVESUSDT",
+   "kind": "1h",
+   "bytes": 792628,
+   "rows": 47381,
+   "first": "2019-01-18 10:00:00+00:00",
+   "last": "2024-06-17 02:00:00+00:00",
+   "sha256": "96a2a35a5d06211dffabcaa0816e8967f6a40da465852f1bb5c762b8ed1bd79f"
+  },
+  "WEAT_1d.csv.gz": {
+   "symbol": "WEAT",
+   "kind": "1d",
+   "bytes": 52432,
+   "rows": 3798,
+   "first": "2011-09-19 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "7376957701430f1667ba2f6348523d61193b4df9dcd592a9df9a4d2e34aa7339"
+  },
+  "WEAT_1h.csv.gz": {
+   "symbol": "WEAT",
+   "kind": "1h",
+   "bytes": 91666,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "bd41da9c39d2d2e0f5a9b3734cec8c1606e5f06ad05399bb17911a0b26d32ede"
+  },
+  "WMT_1d.csv.gz": {
+   "symbol": "WMT",
+   "kind": "1d",
+   "bytes": 479150,
+   "rows": 13654,
+   "first": "1972-08-25 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "eea0fdffa3a1d2e16b51aa922774d3e990340c51a18636c9d9961fda2359ffe3"
+  },
+  "WMT_1h.csv.gz": {
+   "symbol": "WMT",
+   "kind": "1h",
+   "bytes": 105507,
+   "rows": 5077,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "a6deda2831699b54ccb86643175606323bf2ed3ea0ba72ea918d2878521cefb0"
+  },
+  "XLE_1d.csv.gz": {
+   "symbol": "XLE",
+   "kind": "1d",
+   "bytes": 281992,
+   "rows": 7003,
+   "first": "1998-12-22 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "8a7518ad4f0d9b67d3340076f7551f5a2d23009d60de0ac14d290b35bdfcf72f"
+  },
+  "XLE_1h.csv.gz": {
+   "symbol": "XLE",
+   "kind": "1h",
+   "bytes": 102154,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "bf201641cb6fcf80c321149a8868b2402b6b94c5c997fa14508dfdb87742f861"
+  },
+  "XLF_1d.csv.gz": {
+   "symbol": "XLF",
+   "kind": "1d",
+   "bytes": 279407,
+   "rows": 7003,
+   "first": "1998-12-22 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "a562e8b6be316b4147649f2d0a62c9babd1cfa47721bd4f858703329128dfe60"
+  },
+  "XLF_1h.csv.gz": {
+   "symbol": "XLF",
+   "kind": "1h",
+   "bytes": 100215,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "991ed43ad70951fa952ee960c34e7003ccf9a3de57ff441e31b1b52d1145f946"
+  },
+  "XLK_1d.csv.gz": {
+   "symbol": "XLK",
+   "kind": "1d",
+   "bytes": 275034,
+   "rows": 7003,
+   "first": "1998-12-22 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "c249fe73e93a32506a6c1e0f044c07eaf66f3d7f674131c4853353afb0e20041"
+  },
+  "XLK_1h.csv.gz": {
+   "symbol": "XLK",
+   "kind": "1h",
+   "bytes": 103119,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "2dd6649c6b21ae5ee6c3b31efa136572171388536d1149faa160b2dabe004d3c"
+  },
+  "XLMUSDT_15m.csv.gz": {
+   "symbol": "XLMUSDT",
+   "kind": "15m",
+   "bytes": 4177747,
+   "rows": 294420,
+   "first": "2018-05-31 09:30:00+00:00",
+   "last": "2026-10-27 07:15:00+00:00",
+   "sha256": "5fb80eaf0c78c632c57ce0baf157ec69c6aef6e57c3d0fbb8b46442136e8dbe0"
+  },
+  "XLMUSDT_1d.csv.gz": {
+   "symbol": "XLMUSDT",
+   "kind": "1d",
+   "bytes": 57966,
+   "rows": 3071,
+   "first": "2018-05-31 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "efea0e77eff48f98b288ece9f843216a2b83c6a266d1ca35ea013a0c481707ed"
+  },
+  "XLMUSDT_1h.csv.gz": {
+   "symbol": "XLMUSDT",
+   "kind": "1h",
+   "bytes": 1160104,
+   "rows": 73614,
+   "first": "2018-05-31 09:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "691de154714bbc01fb6ae6a303d646bce2aa6c2ede6005a64265ebd46bb7f929"
+  },
+  "XLU_1d.csv.gz": {
+   "symbol": "XLU",
+   "kind": "1d",
+   "bytes": 271736,
+   "rows": 7003,
+   "first": "1998-12-22 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "2cab22f192a2a24ba45617343840a3375686f6b4359401fc9e3cbabdb80a4a28"
+  },
+  "XLU_1h.csv.gz": {
+   "symbol": "XLU",
+   "kind": "1h",
+   "bytes": 100482,
+   "rows": 5076,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 19:30:00+00:00",
+   "sha256": "24e0c4b16107691615a6617bf1b33dcdeaa6a99a58a66cf5e4c17a087fb12a0a"
+  },
+  "XOM_1d.csv.gz": {
+   "symbol": "XOM",
+   "kind": "1d",
+   "bytes": 573205,
+   "rows": 16313,
+   "first": "1962-01-02 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "a387882585912fbd0152dcf6919259cd0397b59bbc869ee41ceae1ffdc19100c"
+  },
+  "XOM_1h.csv.gz": {
+   "symbol": "XOM",
+   "kind": "1h",
+   "bytes": 103451,
+   "rows": 5075,
+   "first": "2023-11-28 14:30:00+00:00",
+   "last": "2026-10-26 18:30:00+00:00",
+   "sha256": "b8ff5e90adf6bc1b8e37814acbb07ee57a01fcf6c57af6fad641c20a5f7597e1"
+  },
+  "XRPUSDT_15m.csv.gz": {
+   "symbol": "XRPUSDT",
+   "kind": "15m",
+   "bytes": 4841338,
+   "rows": 297016,
+   "first": "2018-05-04 08:00:00+00:00",
+   "last": "2026-10-27 06:45:00+00:00",
+   "sha256": "5069c2af1396939ab6d14092c939424cda23cc1c354ec74df90d4453efe30382"
+  },
+  "XRPUSDT_1d.csv.gz": {
+   "symbol": "XRPUSDT",
+   "kind": "1d",
+   "bytes": 63108,
+   "rows": 3098,
+   "first": "2018-05-04 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "abe7d25f40007708c3a13e2fb0caefbd8bb68683dfa129400761ac4ac823584b"
+  },
+  "XRPUSDT_1h.csv.gz": {
+   "symbol": "XRPUSDT",
+   "kind": "1h",
+   "bytes": 1316323,
+   "rows": 74262,
+   "first": "2018-05-04 08:00:00+00:00",
+   "last": "2026-10-27 05:00:00+00:00",
+   "sha256": "7e89ae537fd8105bfe54acbbc70cb7f8f7b82d375d4cdf501bc9e7b1474008db"
+  },
+  "XRPUSDT_funding.csv.gz": {
+   "symbol": "XRPUSDT",
+   "kind": "funding",
+   "bytes": 41067,
+   "rows": 7379,
+   "first": "2020-01-06 08:00:00+00:00",
+   "last": "2026-09-30 16:00:00.002000+00:00",
+   "sha256": "858e13667426d67d860aaf18ad7939f22708420337dece61bb71a90819fa4ae6"
+  },
+  "XRPUSDT_oi.csv.gz": {
+   "symbol": "XRPUSDT",
+   "kind": "oi",
+   "bytes": 762142,
+   "rows": 42950,
+   "first": "2021-12-01 00:00:00+00:00",
+   "last": "2026-10-25 23:00:00+00:00",
+   "sha256": "3fea4eac7a80ee70ace71c74e5f39409a9b70105399bd931a4a6f54b69b6c6e6"
+  },
+  "XRPUSDT_perp1h.csv.gz": {
+   "symbol": "XRPUSDT",
+   "kind": "perp1h",
+   "bytes": 1043224,
+   "rows": 58912,
+   "first": "2020-01-06 08:00:00+00:00",
+   "last": "2026-09-30 23:00:00+00:00",
+   "sha256": "9be61f98c9f9240d71d05d8d6be15913a12bff1410893a7d41d63c7bc1d4a745"
+  },
+  "XTZUSDT_1d.csv.gz": {
+   "symbol": "XTZUSDT",
+   "kind": "1d",
+   "bytes": 47957,
+   "rows": 2590,
+   "first": "2019-09-24 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "cd6449151de68df0aace2e2a7ca3aac835edc7335f0db6885f6f2c94971891b9"
+  },
+  "XTZUSDT_1h.csv.gz": {
+   "symbol": "XTZUSDT",
+   "kind": "1h",
+   "bytes": 964533,
+   "rows": 62125,
+   "first": "2019-09-24 11:00:00+00:00",
+   "last": "2026-10-27 11:00:00+00:00",
+   "sha256": "71055d181306d647d044bbb128bd0d9b7a935f6028180947aa88f1fec39ce86f"
+  },
+  "ZECUSDT_15m.csv.gz": {
+   "symbol": "ZECUSDT",
+   "kind": "15m",
+   "bytes": 3982040,
+   "rows": 266361,
+   "first": "2019-03-21 04:00:00+00:00",
+   "last": "2026-10-27 07:15:00+00:00",
+   "sha256": "e5d2a3f94a6e335794d53eb9ea10ed4dddb2f3e288d6ec9f83e55548a572a1b0"
+  },
+  "ZECUSDT_1d.csv.gz": {
+   "symbol": "ZECUSDT",
+   "kind": "1d",
+   "bytes": 53911,
+   "rows": 2777,
+   "first": "2019-03-21 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "ea5236f110fb5e956d9473ac737ee60bcd73f2cd9a09479fac85a0b0f5db8d73"
+  },
+  "ZECUSDT_1h.csv.gz": {
+   "symbol": "ZECUSDT",
+   "kind": "1h",
+   "bytes": 1100542,
+   "rows": 66597,
+   "first": "2019-03-21 04:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "81e5a22dc2665645c86b0b104089242de708458f07e89404a86183c7d9d888fc"
+  },
+  "ZILUSDT_15m.csv.gz": {
+   "symbol": "ZILUSDT",
+   "kind": "15m",
+   "bytes": 3895314,
+   "rows": 269189,
+   "first": "2019-02-19 11:00:00+00:00",
+   "last": "2026-10-27 07:15:00+00:00",
+   "sha256": "e6993d5058fa4ed6215b2318ab23d9efa8c91ed3278b6995218f504b9d3d9114"
+  },
+  "ZILUSDT_1d.csv.gz": {
+   "symbol": "ZILUSDT",
+   "kind": "1d",
+   "bytes": 53967,
+   "rows": 2807,
+   "first": "2019-02-19 00:00:00+00:00",
+   "last": "2026-10-26 00:00:00+00:00",
+   "sha256": "8279e22f89168cb013caf1e81fc8b6afc35e1de6fc0b355d1344ffc378a45322"
+  },
+  "ZILUSDT_1h.csv.gz": {
+   "symbol": "ZILUSDT",
+   "kind": "1h",
+   "bytes": 1077025,
+   "rows": 67304,
+   "first": "2019-02-19 11:00:00+00:00",
+   "last": "2026-10-27 06:00:00+00:00",
+   "sha256": "69280a8390b96c0519859f562b6c4ca9e703047d5ae188d91edaf241a26c9008"
+  }
+ },
+ "coverage": {
+  "AAPL": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 11559,
+    "first": "1980-12-12 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2394,
+    "first": "1980-12-08 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "AAVEUSDT": {
+   "1H": {
+    "rows": 52859,
+    "first": "2020-10-15 03:00:00+00:00",
+    "last": "2026-10-27 09:00:00+00:00"
+   },
+   "4H": {
+    "rows": 13220,
+    "first": "2020-10-15 00:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2202,
+    "first": "2020-10-15 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 315,
+    "first": "2020-10-12 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ADAUSDT": {
+   "1H": {
+    "rows": 74673,
+    "first": "2018-04-17 04:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 18681,
+    "first": "2018-04-17 04:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3114,
+    "first": "2018-04-17 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 445,
+    "first": "2018-04-16 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ADBE": {
+   "1H": {
+    "rows": 5076,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 10127,
+    "first": "1986-08-13 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2098,
+    "first": "1986-08-11 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ALGOUSDT": {
+   "1H": {
+    "rows": 64378,
+    "first": "2019-06-22 00:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 16103,
+    "first": "2019-06-22 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2683,
+    "first": "2019-06-22 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 384,
+    "first": "2019-06-17 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ATOMUSDT": {
+   "1H": {
+    "rows": 65660,
+    "first": "2019-04-29 04:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 16424,
+    "first": "2019-04-29 04:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2737,
+    "first": "2019-04-29 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 391,
+    "first": "2019-04-29 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "AUDUSD=X": {
+   "1H": {
+    "rows": 17312,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4457,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 5318,
+    "first": "2006-05-16 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1067,
+    "first": "2006-05-15 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "AVAXUSDT": {
+   "1H": {
+    "rows": 53408,
+    "first": "2020-09-22 06:00:00+00:00",
+    "last": "2026-10-27 09:00:00+00:00"
+   },
+   "4H": {
+    "rows": 13357,
+    "first": "2020-09-22 04:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2225,
+    "first": "2020-09-22 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 318,
+    "first": "2020-09-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "BA": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "BCHUSDT": {
+   "1H": {
+    "rows": 60564,
+    "first": "2019-11-28 10:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 15148,
+    "first": "2019-11-28 08:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2524,
+    "first": "2019-11-28 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 361,
+    "first": "2019-11-25 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "BNBUSDT": {
+   "1H": {
+    "rows": 78528,
+    "first": "2017-11-06 03:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 19647,
+    "first": "2017-11-06 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3276,
+    "first": "2017-11-06 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 468,
+    "first": "2017-11-06 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "BTC-USD": {
+   "1H": {
+    "rows": 17471,
+    "first": "2024-10-28 00:00:00+00:00",
+    "last": "2026-10-27 07:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4370,
+    "first": "2024-10-28 00:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 4423,
+    "first": "2014-09-17 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 632,
+    "first": "2014-09-15 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "BTCUSDT": {
+   "1H": {
+    "rows": 80465,
+    "first": "2017-08-17 04:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 20132,
+    "first": "2017-08-17 04:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3357,
+    "first": "2017-08-17 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 480,
+    "first": "2017-08-14 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "C": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 12556,
+    "first": "1977-01-03 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2599,
+    "first": "1977-01-03 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "CAT": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "CORN": {
+   "1H": {
+    "rows": 5067,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4120,
+    "first": "2010-06-09 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 855,
+    "first": "2010-06-07 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "CPER": {
+   "1H": {
+    "rows": 5071,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 3756,
+    "first": "2011-11-15 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 780,
+    "first": "2011-11-14 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "CSCO": {
+   "1H": {
+    "rows": 5076,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 9238,
+    "first": "1990-02-16 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1915,
+    "first": "1990-02-12 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "CVX": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "DBA": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4982,
+    "first": "2007-01-05 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1034,
+    "first": "2007-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "DBB": {
+   "1H": {
+    "rows": 5065,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4982,
+    "first": "2007-01-05 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1034,
+    "first": "2007-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "DIA": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 7236,
+    "first": "1998-01-20 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1501,
+    "first": "1998-01-19 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "DIS": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "DOGEUSDT": {
+   "1H": {
+    "rows": 64054,
+    "first": "2019-07-05 12:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 16022,
+    "first": "2019-07-05 12:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2670,
+    "first": "2019-07-05 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 382,
+    "first": "2019-07-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "DOTUSDT": {
+   "1H": {
+    "rows": 54227,
+    "first": "2020-08-18 23:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 13562,
+    "first": "2020-08-18 20:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2260,
+    "first": "2020-08-18 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 323,
+    "first": "2020-08-17 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EEM": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 5921,
+    "first": "2003-04-14 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1228,
+    "first": "2003-04-14 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EFA": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 6327,
+    "first": "2001-08-27 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1313,
+    "first": "2001-08-27 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EMB": {
+   "1H": {
+    "rows": 5076,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4741,
+    "first": "2007-12-19 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 984,
+    "first": "2007-12-17 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EOSUSDT": {
+   "1H": {
+    "rows": 61229,
+    "first": "2018-05-28 05:00:00+00:00",
+    "last": "2025-05-26 01:00:00+00:00"
+   },
+   "4H": {
+    "rows": 15320,
+    "first": "2018-05-28 04:00:00+00:00",
+    "last": "2025-05-25 20:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2555,
+    "first": "2018-05-28 00:00:00+00:00",
+    "last": "2025-05-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 365,
+    "first": "2018-05-28 00:00:00+00:00",
+    "last": "2025-05-19 00:00:00+00:00"
+   }
+  },
+  "ETCUSDT": {
+   "1H": {
+    "rows": 73332,
+    "first": "2018-06-12 02:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 18346,
+    "first": "2018-06-12 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3058,
+    "first": "2018-06-12 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 437,
+    "first": "2018-06-11 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ETHUSDT": {
+   "1H": {
+    "rows": 80465,
+    "first": "2017-08-17 04:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 20132,
+    "first": "2017-08-17 04:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3357,
+    "first": "2017-08-17 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 480,
+    "first": "2017-08-14 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EURJPY=X": {
+   "1H": {
+    "rows": 17257,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 06:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4450,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 6167,
+    "first": "2003-01-23 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1237,
+    "first": "2003-01-20 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EURUSD=X": {
+   "1H": {
+    "rows": 17246,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4448,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 5942,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1193,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EWG": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 7701,
+    "first": "1996-03-18 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1597,
+    "first": "1996-03-18 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EWJ": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 7701,
+    "first": "1996-03-18 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1597,
+    "first": "1996-03-18 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EWU": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 7701,
+    "first": "1996-03-18 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1597,
+    "first": "1996-03-18 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "EWZ": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 6609,
+    "first": "2000-07-14 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1372,
+    "first": "2000-07-10 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "F": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 13713,
+    "first": "1972-06-01 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2839,
+    "first": "1972-05-29 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "FILUSDT": {
+   "1H": {
+    "rows": 52841,
+    "first": "2020-10-15 17:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 13215,
+    "first": "2020-10-15 16:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2202,
+    "first": "2020-10-15 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 315,
+    "first": "2020-10-12 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "FTTUSDT": {
+   "1H": {
+    "rows": 52577,
+    "first": "2019-12-20 03:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 13152,
+    "first": "2019-12-20 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2192,
+    "first": "2019-12-20 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 315,
+    "first": "2019-12-16 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "FXI": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 5546,
+    "first": "2004-10-08 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1151,
+    "first": "2004-10-04 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "GBPUSD=X": {
+   "1H": {
+    "rows": 17249,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4448,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 5954,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1195,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "GLD": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 5517,
+    "first": "2004-11-18 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1145,
+    "first": "2004-11-15 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "HBARUSDT": {
+   "1H": {
+    "rows": 62011,
+    "first": "2019-09-29 04:00:00+00:00",
+    "last": "2026-10-27 10:00:00+00:00"
+   },
+   "4H": {
+    "rows": 15510,
+    "first": "2019-09-29 04:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2584,
+    "first": "2019-09-29 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 370,
+    "first": "2019-09-23 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "HD": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 11364,
+    "first": "1981-09-22 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2353,
+    "first": "1981-09-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "HYG": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4917,
+    "first": "2007-04-11 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1020,
+    "first": "2007-04-09 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ICPUSDT": {
+   "1H": {
+    "rows": 47883,
+    "first": "2021-05-11 01:00:00+00:00",
+    "last": "2026-10-27 10:00:00+00:00"
+   },
+   "4H": {
+    "rows": 11972,
+    "first": "2021-05-11 00:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 1994,
+    "first": "2021-05-11 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 285,
+    "first": "2021-05-10 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ICXUSDT": {
+   "1H": {
+    "rows": 72002,
+    "first": "2018-06-13 08:00:00+00:00",
+    "last": "2026-09-03 01:00:00+00:00"
+   },
+   "4H": {
+    "rows": 18013,
+    "first": "2018-06-13 08:00:00+00:00",
+    "last": "2026-09-02 20:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3004,
+    "first": "2018-06-13 00:00:00+00:00",
+    "last": "2026-09-02 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 429,
+    "first": "2018-06-11 00:00:00+00:00",
+    "last": "2026-08-24 00:00:00+00:00"
+   }
+  },
+  "IEF": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 6099,
+    "first": "2002-07-30 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1265,
+    "first": "2002-07-29 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "INTC": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 11747,
+    "first": "1980-03-17 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2432,
+    "first": "1980-03-17 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "IWM": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 6642,
+    "first": "2000-05-26 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1379,
+    "first": "2000-05-22 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "JPM": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 11747,
+    "first": "1980-03-17 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2432,
+    "first": "1980-03-17 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "KO": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "LINKUSDT": {
+   "1H": {
+    "rows": 68119,
+    "first": "2019-01-16 10:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 17040,
+    "first": "2019-01-16 08:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2840,
+    "first": "2019-01-16 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 406,
+    "first": "2019-01-14 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "LQD": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 6099,
+    "first": "2002-07-30 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1265,
+    "first": "2002-07-29 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "LTCUSDT": {
+   "1H": {
+    "rows": 77640,
+    "first": "2017-12-13 03:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 19425,
+    "first": "2017-12-13 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3239,
+    "first": "2017-12-13 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 463,
+    "first": "2017-12-11 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "LUNAUSDT": {
+   "1H": {
+    "rows": 15067,
+    "first": "2020-08-21 10:00:00+00:00",
+    "last": "2022-05-11 23:00:00+00:00"
+   },
+   "4H": {
+    "rows": 3772,
+    "first": "2020-08-21 08:00:00+00:00",
+    "last": "2022-05-11 20:00:00+00:00"
+   },
+   "1D": {
+    "rows": 629,
+    "first": "2020-08-21 00:00:00+00:00",
+    "last": "2022-05-11 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 91,
+    "first": "2020-08-17 00:00:00+00:00",
+    "last": "2022-05-09 00:00:00+00:00"
+   }
+  },
+  "MATICUSDT": {
+   "1H": {
+    "rows": 47069,
+    "first": "2019-04-26 15:00:00+00:00",
+    "last": "2024-09-10 01:00:00+00:00"
+   },
+   "4H": {
+    "rows": 11777,
+    "first": "2019-04-26 12:00:00+00:00",
+    "last": "2024-09-09 20:00:00+00:00"
+   },
+   "1D": {
+    "rows": 1964,
+    "first": "2019-04-26 00:00:00+00:00",
+    "last": "2024-09-09 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 281,
+    "first": "2019-04-22 00:00:00+00:00",
+    "last": "2024-09-02 00:00:00+00:00"
+   }
+  },
+  "MMM": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "MRK": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "MSFT": {
+   "1H": {
+    "rows": 5076,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 10233,
+    "first": "1986-03-13 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2120,
+    "first": "1986-03-10 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "MUB": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4812,
+    "first": "2007-09-10 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 998,
+    "first": "2007-09-10 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "NEARUSDT": {
+   "1H": {
+    "rows": 52881,
+    "first": "2020-10-14 05:00:00+00:00",
+    "last": "2026-10-27 09:00:00+00:00"
+   },
+   "4H": {
+    "rows": 13225,
+    "first": "2020-10-14 04:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2203,
+    "first": "2020-10-14 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 315,
+    "first": "2020-10-12 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "NEOUSDT": {
+   "1H": {
+    "rows": 78193,
+    "first": "2017-11-20 03:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 19563,
+    "first": "2017-11-20 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3262,
+    "first": "2017-11-20 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 466,
+    "first": "2017-11-20 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "NKE": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 11567,
+    "first": "1980-12-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2395,
+    "first": "1980-12-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "NZDUSD=X": {
+   "1H": {
+    "rows": 17316,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 06:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4457,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 5943,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1195,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ORCL": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 10234,
+    "first": "1986-03-12 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2120,
+    "first": "1986-03-10 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "PALL": {
+   "1H": {
+    "rows": 5073,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4224,
+    "first": "2010-01-08 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 877,
+    "first": "2010-01-04 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "PEP": {
+   "1H": {
+    "rows": 5076,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 13713,
+    "first": "1972-06-01 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2839,
+    "first": "1972-05-29 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "PFE": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 13713,
+    "first": "1972-06-01 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2839,
+    "first": "1972-05-29 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "PG": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "PPLT": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4224,
+    "first": "2010-01-08 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 877,
+    "first": "2010-01-04 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "QQQ": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 6950,
+    "first": "1999-03-10 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1442,
+    "first": "1999-03-08 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "SHY": {
+   "1H": {
+    "rows": 5076,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 6099,
+    "first": "2002-07-30 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1265,
+    "first": "2002-07-29 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "SLV": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 5155,
+    "first": "2006-04-28 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1070,
+    "first": "2006-04-24 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "SOLUSDT": {
+   "1H": {
+    "rows": 54412,
+    "first": "2020-08-11 06:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 13608,
+    "first": "2020-08-11 04:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2267,
+    "first": "2020-08-11 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 324,
+    "first": "2020-08-10 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "SPY": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 8492,
+    "first": "1993-01-29 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1761,
+    "first": "1993-01-25 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "SRMUSDT": {
+   "1H": {
+    "rows": 20106,
+    "first": "2020-08-11 13:00:00+00:00",
+    "last": "2022-11-28 01:00:00+00:00"
+   },
+   "4H": {
+    "rows": 5031,
+    "first": "2020-08-11 12:00:00+00:00",
+    "last": "2022-11-27 20:00:00+00:00"
+   },
+   "1D": {
+    "rows": 839,
+    "first": "2020-08-11 00:00:00+00:00",
+    "last": "2022-11-27 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 120,
+    "first": "2020-08-10 00:00:00+00:00",
+    "last": "2022-11-21 00:00:00+00:00"
+   }
+  },
+  "T": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 10815,
+    "first": "1983-11-21 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2240,
+    "first": "1983-11-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "THETAUSDT": {
+   "1H": {
+    "rows": 66121,
+    "first": "2019-04-10 04:00:00+00:00",
+    "last": "2026-10-27 10:00:00+00:00"
+   },
+   "4H": {
+    "rows": 16539,
+    "first": "2019-04-10 04:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2756,
+    "first": "2019-04-10 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 394,
+    "first": "2019-04-08 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "TIP": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 5757,
+    "first": "2003-12-05 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1195,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "TLT": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 6099,
+    "first": "2002-07-30 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1265,
+    "first": "2002-07-29 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "TRXUSDT": {
+   "1H": {
+    "rows": 73347,
+    "first": "2018-06-11 11:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 18350,
+    "first": "2018-06-11 08:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3059,
+    "first": "2018-06-11 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 437,
+    "first": "2018-06-11 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "UNG": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 4912,
+    "first": "2007-04-18 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1019,
+    "first": "2007-04-16 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "UNH": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 10586,
+    "first": "1984-10-17 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2193,
+    "first": "1984-10-15 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "UNIUSDT": {
+   "1H": {
+    "rows": 53531,
+    "first": "2020-09-17 03:00:00+00:00",
+    "last": "2026-10-27 09:00:00+00:00"
+   },
+   "4H": {
+    "rows": 13388,
+    "first": "2020-09-17 00:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2230,
+    "first": "2020-09-17 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 319,
+    "first": "2020-09-14 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "USDCAD=X": {
+   "1H": {
+    "rows": 17318,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 06:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4457,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 6010,
+    "first": "2003-09-17 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1206,
+    "first": "2003-09-15 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "USDCHF=X": {
+   "1H": {
+    "rows": 17184,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 06:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4449,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 6008,
+    "first": "2003-09-17 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1206,
+    "first": "2003-09-15 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "USDJPY=X": {
+   "1H": {
+    "rows": 17150,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4445,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 7776,
+    "first": "1996-10-30 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1563,
+    "first": "1996-10-28 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "USDMXN=X": {
+   "1H": {
+    "rows": 17273,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 11:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4454,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 08:00:00+00:00"
+   },
+   "1D": {
+    "rows": 5963,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1195,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "USDNOK=X": {
+   "1H": {
+    "rows": 17154,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 11:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4447,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 08:00:00+00:00"
+   },
+   "1D": {
+    "rows": 6401,
+    "first": "2001-07-16 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1285,
+    "first": "2001-07-16 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "USDSEK=X": {
+   "1H": {
+    "rows": 16958,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 11:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4429,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 08:00:00+00:00"
+   },
+   "1D": {
+    "rows": 6401,
+    "first": "2001-07-16 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1285,
+    "first": "2001-07-16 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "USDZAR=X": {
+   "1H": {
+    "rows": 17314,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 11:00:00+00:00"
+   },
+   "4H": {
+    "rows": 4457,
+    "first": "2024-01-10 00:00:00+00:00",
+    "last": "2026-10-27 08:00:00+00:00"
+   },
+   "1D": {
+    "rows": 5956,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-26 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1195,
+    "first": "2003-12-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "USO": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 5168,
+    "first": "2006-04-10 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1072,
+    "first": "2006-04-10 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "VETUSDT": {
+   "1H": {
+    "rows": 72321,
+    "first": "2018-07-25 04:00:00+00:00",
+    "last": "2026-10-27 10:00:00+00:00"
+   },
+   "4H": {
+    "rows": 18091,
+    "first": "2018-07-25 04:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3015,
+    "first": "2018-07-25 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 431,
+    "first": "2018-07-23 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "VZ": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 10815,
+    "first": "1983-11-21 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2240,
+    "first": "1983-11-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "WAVESUSDT": {
+   "1H": {
+    "rows": 47380,
+    "first": "2019-01-18 10:00:00+00:00",
+    "last": "2024-06-17 01:00:00+00:00"
+   },
+   "4H": {
+    "rows": 11855,
+    "first": "2019-01-18 08:00:00+00:00",
+    "last": "2024-06-16 20:00:00+00:00"
+   },
+   "1D": {
+    "rows": 1977,
+    "first": "2019-01-18 00:00:00+00:00",
+    "last": "2024-06-16 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 283,
+    "first": "2019-01-14 00:00:00+00:00",
+    "last": "2024-06-10 00:00:00+00:00"
+   }
+  },
+  "WEAT": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 3797,
+    "first": "2011-09-19 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 788,
+    "first": "2011-09-19 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "WMT": {
+   "1H": {
+    "rows": 5076,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 13653,
+    "first": "1972-08-25 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 2827,
+    "first": "1972-08-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "XLE": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 7002,
+    "first": "1998-12-22 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1453,
+    "first": "1998-12-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "XLF": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 7002,
+    "first": "1998-12-22 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1453,
+    "first": "1998-12-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "XLK": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 7002,
+    "first": "1998-12-22 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1453,
+    "first": "1998-12-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "XLMUSDT": {
+   "1H": {
+    "rows": 73613,
+    "first": "2018-05-31 09:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 18416,
+    "first": "2018-05-31 08:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3070,
+    "first": "2018-05-31 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 439,
+    "first": "2018-05-28 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "XLU": {
+   "1H": {
+    "rows": 5075,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 18:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 7002,
+    "first": "1998-12-22 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 1453,
+    "first": "1998-12-21 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "XOM": {
+   "1H": {
+    "rows": 5074,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 17:30:00+00:00"
+   },
+   "4H": {
+    "rows": 1451,
+    "first": "2023-11-28 14:30:00+00:00",
+    "last": "2026-10-26 13:30:00+00:00"
+   },
+   "1D": {
+    "rows": 16312,
+    "first": "1962-01-02 00:00:00+00:00",
+    "last": "2026-10-23 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 3382,
+    "first": "1962-01-01 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "XRPUSDT": {
+   "1H": {
+    "rows": 74261,
+    "first": "2018-05-04 08:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "4H": {
+    "rows": 18578,
+    "first": "2018-05-04 08:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 3097,
+    "first": "2018-05-04 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 443,
+    "first": "2018-04-30 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "XTZUSDT": {
+   "1H": {
+    "rows": 62124,
+    "first": "2019-09-24 11:00:00+00:00",
+    "last": "2026-10-27 10:00:00+00:00"
+   },
+   "4H": {
+    "rows": 15539,
+    "first": "2019-09-24 08:00:00+00:00",
+    "last": "2026-10-27 04:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2589,
+    "first": "2019-09-24 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 370,
+    "first": "2019-09-23 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ZECUSDT": {
+   "1H": {
+    "rows": 66596,
+    "first": "2019-03-21 04:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 16658,
+    "first": "2019-03-21 04:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2776,
+    "first": "2019-03-21 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 397,
+    "first": "2019-03-18 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  },
+  "ZILUSDT": {
+   "1H": {
+    "rows": 67303,
+    "first": "2019-02-19 11:00:00+00:00",
+    "last": "2026-10-27 05:00:00+00:00"
+   },
+   "4H": {
+    "rows": 16836,
+    "first": "2019-02-19 08:00:00+00:00",
+    "last": "2026-10-27 00:00:00+00:00"
+   },
+   "1D": {
+    "rows": 2806,
+    "first": "2019-02-19 00:00:00+00:00",
+    "last": "2026-10-25 00:00:00+00:00"
+   },
+   "1W": {
+    "rows": 401,
+    "first": "2019-02-18 00:00:00+00:00",
+    "last": "2026-10-19 00:00:00+00:00"
+   }
+  }
+ }
+}

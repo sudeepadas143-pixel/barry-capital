@@ -8,3 +8,6 @@ art-out
 investors-layers.zip
 *-pfp*.png
 steves-investors.zip
+indicator/data/*.csv.gz
+__pycache__
+.pytest_cache

@@ -24,7 +24,6 @@ RESULTS = ROOT / "reports" / "cycle2_results.json"
 OUT = ROOT / "pine" / "Kenny_Divergence_Indicator.pine"
 BUCKET = {"1W": 3, "1D": 2, "4H": 1, "1H": 0}
 TIERS = ("warning", "standard", "high")
-CHUNK = 32
 
 _s = importlib.util.spec_from_file_location("cycle_export_pine", ROOT / "scripts" / "cycle_export_pine.py")
 _X = importlib.util.module_from_spec(_s)
@@ -36,12 +35,10 @@ PINE_FEAT = {**_X.PINE_FEAT,  # CY-2 features (research/cycle2_features.py), sam
 
 
 def _f(x: float) -> str:
-    """Pine float literal (always with a decimal point so array.from infers float)."""
-    s = repr(float(x))
-    if "e" in s and "." not in s.split("e")[0]:
-        m, e = s.split("e")
-        s = f"{m}.0e{e}"
-    return s
+    """Pine float literal: positional (no exponent), always with a decimal point."""
+    import numpy as np
+    s = np.format_float_positional(float(x), unique=True, trim="0")
+    return s if "." in s else s + ".0"
 
 
 def flatten(sp: dict) -> dict:
@@ -72,40 +69,80 @@ def flat_logodds(fl: dict, x) -> float:
     return s
 
 
-def _fill(name: str, vals: list, fmt, b: int) -> list[str]:
-    """One small `if` per chunk: TradingView rejects long if-blocks (CE10205 "if statement is too long")."""
-    out = []
-    for i in range(0, len(vals), CHUNK):
-        out += [f"if barstate.isfirst and bucket == {b}",
-                f"    {name}.concat(array.from({', '.join(fmt(v) for v in vals[i:i + CHUNK])}))"]
+STR_CHUNK = 900                 # characters per Pine string literal (kept well under Pine's string limits)
+
+
+def _g9(x: float) -> str:
+    """10 significant digits, never exponent notation (str.tonumber input)."""
+    import numpy as np
+    return np.format_float_positional(float(x), precision=10, unique=False, fractional=False, trim="-")
+
+
+def encode(fl: dict) -> list[str]:
+    """Flat trees -> compact text: nodes separated by ';', a split node is 'f,t,m,l,r' (absolute
+    child indices), a leaf is its value; 'T' marks the first node of a tree. Split into string
+    chunks only at node boundaries. TradingView rejects long scripts (CE10295), so the trees
+    travel as a few string literals instead of thousands of array elements."""
+    roots = set(fl["roots"])
+    toks = []
+    for k in range(len(fl["nf"])):
+        t = _g9(fl["nv"][k]) if fl["nf"][k] < 0 else f"{fl['nf'][k]},{_g9(fl['nt'][k])},{fl['nm'][k]},{fl['nl'][k]},{fl['nr'][k]}"
+        toks.append(("T" if k in roots else "") + t)
+    chunks, cur = [], ""
+    for t in toks:
+        if cur and len(cur) + 1 + len(t) > STR_CHUNK:
+            chunks.append(cur)
+            cur = t
+        else:
+            cur = f"{cur};{t}" if cur else t
+    if cur:
+        chunks.append(cur)
+    return chunks
+
+
+def decode(chunks: list[str]) -> dict:
+    """Python twin of the Pine loadModel() function."""
+    out = {k: [] for k in ("nf", "nt", "nm", "nl", "nr", "nv", "roots")}
+    for ch in chunks:
+        for tok in ch.split(";"):
+            if tok.startswith("T"):
+                out["roots"].append(len(out["nf"]))
+                tok = tok[1:]
+            p = tok.split(",")
+            if len(p) == 1:
+                vals = (-1, 0.0, 0, -1, -1, float(p[0]))
+            else:
+                vals = (int(float(p[0])), float(p[1]), int(float(p[2])), int(float(p[3])), int(float(p[4])), 0.0)
+            for k, v in zip(("nf", "nt", "nm", "nl", "nr", "nv"), vals):
+                out[k].append(v)
     return out
 
 
-def model_block(S: dict, d: str) -> str:
-    """Per-bucket model loading for direction d (runs once, on the first bar). Arrays start empty
-    (`var`), so only the active bucket's chunks fill them."""
+def model_block(S: dict, d: str) -> tuple[str, str]:
+    """(data functions, first-bar loading block) for direction d."""
     D = d.capitalize()
-    L = []
+    funcs, L = [], [f"if barstate.isfirst"]
     for tf, b in BUCKET.items():
         if tf not in S["tfs"]:
             continue
         sp = S["tfs"][tf]["models"][d]
         th = sp["theta"]
-        L += [f"if barstate.isfirst and bucket == {b}", f"    th{D}W := {_f(th['warning'])}", f"    th{D}S := {_f(th['standard'])}",
-              f"    th{D}H := {_f(th['high'])}", f"    name{D} := \"{sp['model']}\""]
+        L += [f"    if bucket == {b}", f"        th{D}W := {_f(th['warning'])}", f"        th{D}S := {_f(th['standard'])}",
+              f"        th{D}H := {_f(th['high'])}", f"        name{D} := \"{sp['model']}\""]
         if sp["kind"] == "gb":
             FV_ORDER_PINE(sp["features"])                                # refuses unportable features
             fl = flatten(sp)
-            L += [f"    gb{D} := true", f"    base{D} := {_f(fl['base'])}"]
-            for k, fmt in (("nf", str), ("nt", _f), ("nm", str), ("nl", str), ("nr", str), ("nv", _f), ("roots", str)):
-                L += _fill(f"{k}{D}", fl[k], fmt, b)
+            fn = f"data{D}{b}"
+            funcs += [f"{fn}() =>", "    a = array.new<string>()"] + [f'    a.push("{c}")' for c in encode(fl)] + ["    a"]
+            L += [f"        gb{D} := true", f"        base{D} := {_f(fl['base'])}",
+                  f"        loadModel({fn}(), nf{D}, nt{D}, nm{D}, nl{D}, nr{D}, nv{D}, roots{D})"]
         elif sp["kind"] == "base":
-            L += [f"    gb{D} := false", f"    sign{D} := {_f(sp['sign'])}"]
+            L += [f"        gb{D} := false", f"        sign{D} := {_f(sp['sign'])}"]
             if sp["feature"] != "ext_c":
                 raise ValueError("baseline must be B_ext")
         else:
             raise ValueError(f"unsupported model kind {sp['kind']!r}")
-    return "\n".join(L)
+    return "\n".join(funcs), "\n".join(L)
 
 
 def FV_ORDER_PINE(feats):  # noqa: N802
@@ -300,6 +337,31 @@ var array<int> nrBot = array.new<int>()
 var array<float> nvBot = array.new<float>()
 var array<int> rootsBot = array.new<int>()
 
+// unpack the compact tree text (see scripts/kenny_export_pine.py encode/decode); runs on the first bar only
+loadModel(array<string> chunks, array<int> nf, array<float> nt, array<int> nm, array<int> nl, array<int> nr, array<float> nv, array<int> roots) =>
+    for ch in chunks
+        for tok in str.split(ch, ";")
+            string t = tok
+            if str.startswith(t, "T")
+                roots.push(nf.size())
+                t := str.substring(t, 1)
+            p = str.split(t, ",")
+            if p.size() == 1
+                nf.push(-1)
+                nt.push(0.0)
+                nm.push(0)
+                nl.push(-1)
+                nr.push(-1)
+                nv.push(str.tonumber(p.get(0)))
+            else
+                nf.push(int(str.tonumber(p.get(0))))
+                nt.push(str.tonumber(p.get(1)))
+                nm.push(int(str.tonumber(p.get(2))))
+                nl.push(int(str.tonumber(p.get(3))))
+                nr.push(int(str.tonumber(p.get(4))))
+                nv.push(0.0)
+    nf.size()
+
 __MODELS__
 
 coreOk = not (na(fExtC) or na(fExtF) or na(fRng) or na(fSlope) or na(fSinceHH) or na(fSinceLL) or na(fAtrRank))
@@ -312,8 +374,8 @@ if coreOk and gbBot
     pBot := gbScore(nfBot, ntBot, nmBot, nlBot, nrBot, nvBot, rootsBot, baseBot, fv)
 
 // ---------------------------------------------------------------- states (CYCLE2_CONFIG.md §4-5)
-prevTop = nz(ta.highest(pTop, Q)[1], -1e10)      // computed on every bar (consistent series history)
-prevBot = nz(ta.highest(pBot, Q)[1], -1e10)
+prevTop = nz(ta.highest(pTop, Q)[1], -999999999.0)      // computed on every bar (consistent series history)
+prevBot = nz(ta.highest(pBot, Q)[1], -999999999.0)
 onset(float p, float prev, float th) => barstate.isconfirmed and not na(p) and p >= th and not (prev >= th)
 warnTop = onset(pTop, prevTop, thTopW)
 stdTop  = onset(pTop, prevTop, thTopS)
@@ -323,7 +385,8 @@ stdBot  = onset(pBot, prevBot, thBotS)
 highBot = onset(pBot, prevBot, thBotH)
 
 // completed higher-timeframe trend (previous closed HTF candle): +1 up, -1 down
-htfTrend = request.security(syminfo.tickerid, htfStr, (close > ta.ema(close, 21) ? 1 : -1)[1], lookahead = barmerge.lookahead_on)
+htfDir() => close > ta.ema(close, 21) ? 1 : -1
+htfTrend = request.security(syminfo.tickerid, htfStr, htfDir()[1], lookahead = barmerge.lookahead_on)
 
 var array<int>   tS = array.new<int>()
 var array<float> tX = array.new<float>()
@@ -474,7 +537,9 @@ DEFAULT_BUY, DEFAULT_SELL = "K_H", "K_CONF"   # reports/KB_RESULTS.md and report
 def generate(S: dict, R: dict | None = None, buy: str = DEFAULT_BUY, sell: str = DEFAULT_SELL) -> str:
     feats = feature_order(S)
     fv = ", ".join(FV_ORDER_PINE(feats)) if feats else "0.0"
-    blocks = model_block(S, "top") + "\n\n" + model_block(S, "bot")
+    ft, lt = model_block(S, "top")
+    fb, lb = model_block(S, "bot")
+    blocks = "\n".join(x for x in (ft, fb) if x) + "\n\n" + lt + "\n\n" + lb
     src = TEMPLATE.replace("__FV__", fv).replace("__MODELS__", blocks).replace("__EVID__", evidence_block(S, R))
     for k, v in selection(buy, sell).items():
         src = src.replace(k, v)
@@ -482,27 +547,13 @@ def generate(S: dict, R: dict | None = None, buy: str = DEFAULT_BUY, sell: str =
 
 
 def parse_arrays(src: str, d: str, bucket: int) -> dict:
-    """Read the flat arrays for (direction, bucket) back out of generated Pine (for parity tests)."""
+    """Read the tree data for (direction, bucket) back out of generated Pine (for parity tests)."""
     D = d.capitalize()
-    out = {k: [] for k in ("nf", "nt", "nm", "nl", "nr", "nv", "roots")}
-    base, cur = None, None
-    for ln in src.splitlines():
-        m = re.match(r"if barstate\.isfirst and bucket == (\d)$", ln)
-        if m:
-            cur = int(m.group(1))
-            continue
-        if cur != bucket or not ln.startswith("    "):
-            if not ln.startswith("    "):
-                cur = None
-            continue
-        m = re.match(rf"    (nf|nt|nm|nl|nr|nv|roots){D}\.concat\(array\.from\((.*)\)\)$", ln)
-        if m:
-            out[m.group(1)] += [float(x) for x in m.group(2).split(", ")]
-        m = re.match(rf"    base{D} := (\S+)$", ln)
-        if m:
-            base = float(m.group(1))
-    out = {k: ([int(x) for x in v] if k in ("nf", "nm", "nl", "nr", "roots") else v) for k, v in out.items()}
-    out["base"] = base
+    body = src.split(f"data{D}{bucket}() =>\n")[1].split("\n    a\n")[0]
+    out = decode(re.findall(r'^    a\.push\("([^"]*)"\)$', body, re.M))
+    blk = src.split("if barstate.isfirst\n")[1 if d == "top" else 2]
+    part = blk.split(f"    if bucket == {bucket}\n")[1].split("\n    if bucket")[0]
+    out["base"] = float(re.search(rf"base{D} := (\S+)", part).group(1))
     return out
 
 

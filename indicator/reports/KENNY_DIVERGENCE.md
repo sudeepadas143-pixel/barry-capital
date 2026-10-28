@@ -117,6 +117,9 @@ reach similar win rates at 4H and 1H only with far more false alerts.
 * `pinewf pine-lint`: only the known false positive (PL001 on `[1]` + `lookahead_on`, the
   completed-HTF-candle idiom).
 * `pynescript` parses the script. It is a syntax parser and rejects a deliberately broken copy.
+* TradingView limits hit on a phone compile and fixed: CE10205 ("if statement is too long") and
+  CE10295 ("main body too long"). Tree data is now compact text inside functions, unpacked once on
+  the first candle; a test guards both limits.
 * **Not compiled in TradingView.** No TradingView compiler is reachable from this environment,
   so type errors or runtime limits (loop or array limits, request count) are unverified.
 

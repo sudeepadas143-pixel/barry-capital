@@ -152,3 +152,28 @@ def test_shipped_pine_parses_when_a_pine_parser_is_available():
     """Syntax check with pynescript (not a TradingView compile); skipped when it is not installed."""
     ast = pytest.importorskip("pynescript.ast")
     ast.parse(PINE.read_text())
+
+
+def test_shipped_pine_respects_tradingview_size_rules():
+    """Guards for TradingView compile limits hit in practice: CE10205 (an `if` block too long) and
+    CE10295 (main body too long: tree data lives in string literals inside functions)."""
+    src = PINE.read_text()
+    lines = src.splitlines()
+    assert src.count("//@version=6") == 1
+    assert max(len(ln) for ln in lines) <= 1000
+    assert not re.search(r"\b\d+(\.\d+)?e[-+]?\d+\b", src)            # no exponent literals (str.tonumber, Pine literals)
+    body, run = 0, 0
+    for ln in lines:                                                   # longest top-level `if` body
+        if ln.startswith("if "):
+            run = 0
+        elif ln.startswith("    ") and run is not None:
+            run += 1
+            body = max(body, run)
+        elif ln and not ln.startswith("//"):
+            run = None if not ln.startswith("if ") else 0
+    assert body <= 60
+    main = [ln for ln in lines if ln.strip() and not ln.lstrip().startswith("//") and not ln.startswith("    ")]
+    assert len(main) <= 250, len(main)
+    m, S = _spec()
+    fl = K.decode(K.encode(K.flatten(S["tfs"]["1W"]["models"]["top"])))
+    assert fl["roots"] == K.flatten(S["tfs"]["1W"]["models"]["top"])["roots"]

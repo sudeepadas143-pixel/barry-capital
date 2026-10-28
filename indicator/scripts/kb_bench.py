@@ -269,8 +269,8 @@ def render():
          "after COST_BPS. Δ columns are against K_CONF (calendar-cluster wild bootstrap, 95% CI).", ""]
     for tf, T in R["tfs"].items():
         L += [f"## {tf} ({T['instruments']} instruments, {T['asset_years']:.0f} asset-years; shipped model top {T['models']['top']}, bottom {T['models']['bot']})", "",
-              "| dir · candidate | alerts/asset-yr | recall | precision* | lift | win | MFE/MAE | net mean | net 2× | lead | Δwin [CI] | Δnet [CI] (halves) | Δnear [CI] | material |",
-              "|---|---:|---:|---:|---:|---:|---|---:|---:|---:|---|---|---|---|"]
+              "| dir · candidate | alerts/asset-yr | n trades | recall | precision* | FA/asset-yr | lift | win | MFE/MAE | net mean | net median | pair-median net | net 2× | lead (median candles) | Δwin [CI] | Δnet [CI] (halves) | Δnear [CI] | material |",
+              "|---|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---|---|---|---|"]
         for d in DIRS:
             for n, v in T[d].items():
                 s = v["shipped"]
@@ -279,9 +279,11 @@ def render():
                 w, t, nr = c.get("win", {}), c.get("net", {}), c.get("near", {})
                 ci = lambda x: f"[{_g(x['ci95'][0], 3, True)}, {_g(x['ci95'][1], 3, True)}]" if x.get("ci95") else ""  # noqa: E731
                 halves = "/".join(_g(h, 3, True) for h in t.get("by_half", {}).values())
-                L.append(f"| {'SELL' if d == 'top' else 'BUY'} · {n} | {_g(v['rate'])} | {_g(det.get('recall'))} | {_g(det.get('precision'))} | {_g(lf.get('lift'))} | "
-                         f"{_g(tr.get('win_rate'))} | {_g(tr.get('mfe_med'))}/{_g(tr.get('mae_med'))} | {_g(tr.get('net_mean'), 4, True)} | {_g(tr.get('net2_mean'), 4, True)} | "
-                         f"{_g(det.get('lead'), 0)} | {_g(w.get('delta'), 3, True)} {ci(w)} | {_g(t.get('delta'), 4, True)} {ci(t)} ({halves}) | "
+                L.append(f"| {'SELL' if d == 'top' else 'BUY'} · {n} | {_g(v['rate'])} | {tr.get('n', '–')} | {_g(det.get('recall'))} | {_g(det.get('precision'))} | "
+                         f"{_g(det.get('false_alarms_per_instrument_year'))} | {_g(lf.get('lift'))} | "
+                         f"{_g(tr.get('win_rate'))} | {_g(tr.get('mfe_med'))}/{_g(tr.get('mae_med'))} | {_g(tr.get('net_mean'), 4, True)} | {_g(tr.get('net_median'), 4, True)} | "
+                         f"{_g(tr.get('pair_median_of_mean_net'), 4, True)} | {_g(tr.get('net2_mean'), 4, True)} | "
+                         f"{_g(det.get('lead_median'), 0)} | {_g(w.get('delta'), 3, True)} {ci(w)} | {_g(t.get('delta'), 4, True)} {ci(t)} ({halves}) | "
                          f"{_g(nr.get('delta'), 3, True)} {ci(nr)} | {'**yes**' if v.get('material') else ('ref' if n == REF else 'no')} |")
         L.append("")
     L += ["## Decisions (KB_CONFIG.md §4)", "",

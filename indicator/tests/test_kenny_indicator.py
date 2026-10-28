@@ -119,7 +119,8 @@ def test_default_chart_is_only_buy_and_sell_triangles():
             assert "showStates" in prev, ln
     for flag in ("showStates", "showBg", "showTbl"):
         assert re.search(rf"^{flag}\s+= input\.bool\(false", src, re.M), flag
-    assert 'input.string("Confirmed", "BUY/SELL signal"' in src
+    assert 'input.string("High Conviction", "BUY signal"' in src and 'input.string("Confirmed", "SELL signal"' in src
+    assert 'rawBuy  = buyMode == "High Conviction" ? highBot' in src and 'rawSell = sellMode == "Confirmed" ? confTop' in src
     assert "buySig := bar_index - lastBuy > Q" in src and "not (rawBuy and rawSell)" in src
 
 
@@ -145,3 +146,9 @@ def test_pine_dedupe_matches_research_dedupe():
                 ls = i
         b, s = KS.dedupe_final(np.flatnonzero(rb), np.flatnonzero(rs_), Q)
         assert list(b) == buy and list(s) == sell
+
+
+def test_shipped_pine_parses_when_a_pine_parser_is_available():
+    """Syntax check with pynescript (not a TradingView compile); skipped when it is not installed."""
+    ast = pytest.importorskip("pynescript.ast")
+    ast.parse(PINE.read_text())

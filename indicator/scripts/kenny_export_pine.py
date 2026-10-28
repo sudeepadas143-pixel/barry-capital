@@ -157,8 +157,8 @@ TEMPLATE = r'''//@version=6
 //     High Conviction - probability crosses the HIGH threshold (fewer, more precise; still early)
 //     Confirmed       - after a standard-threshold zone, within L/2 candles: close beyond EMA21
 //                       and a D/4 ATR retreat from the extreme (later, fewer false alerts)
-//   One state (input "BUY/SELL signal"; default chosen in reports/KB_RESULTS.md) draws the
-//   triangles. A candle with both BUY and SELL draws neither; a same-direction repeat within
+//   One state per side draws the triangles (defaults: BUY = High Conviction, SELL = Confirmed;
+//   reports/KENNY_DIVERGENCE.md). A candle with both BUY and SELL draws neither; a same-direction repeat within
 //   Q candles is suppressed. Timeframe sets the turn scale: >= 1W major, >= 1D intermediate,
 //   >= 1H swing, < 1H local (reuses the 1H model; UNVALIDATED).
 //
@@ -175,8 +175,10 @@ indicator("Kenny's Divergence Indicator", shorttitle = "Kenny Div", overlay = tr
 
 // ---------------------------------------------------------------- inputs
 grpS = "Signal"
-sigMode  = input.string("__SIGDEF__", "BUY/SELL signal", options = [__SIGOPTS__], group = grpS,
-                        tooltip = "Which internal state draws the BUY/SELL triangles. Early Warning = earliest and most false alerts; High Conviction = fewer, more precise, still early; Confirmed = later entry, fewer false alerts. The default was chosen in reports/KB_RESULTS.md.")
+buyMode  = input.string("__BUYDEF__", "BUY signal", options = [__BUYOPTS__], group = grpS,
+                        tooltip = "Internal state that draws the green BUY triangle. Early Warning = earliest, most false alerts; High Conviction = fewer, more precise, before the turn; Confirmed = after the turn, later entry. Defaults: reports/KENNY_DIVERGENCE.md.")
+sellMode = input.string("__SELLDEF__", "SELL signal", options = [__SELLOPTS__], group = grpS,
+                        tooltip = "Internal state that draws the red SELL triangle (same states as BUY).")
 showBuy  = input.bool(true, "BUY triangles", group = grpS)
 showSell = input.bool(true, "SELL triangles", group = grpS)
 volMode  = input.string("Auto", "Volume features", options = ["Auto", "Off"], group = grpS,
@@ -451,22 +453,31 @@ SIGNALS = {  # research candidate (reports/KB_CONFIG.md) -> (menu label, Pine BU
 }
 
 
-def selection(default: str) -> dict:
+def _menu(default: str, side: int) -> tuple[str, str]:
     if default not in SIGNALS:
         raise ValueError(f"default signal {default!r} has no Pine implementation")
     order = [default] + [k for k in SIGNALS if k != default]
-    buy = " : ".join(f'sigMode == "{SIGNALS[k][0]}" ? {SIGNALS[k][1]}' for k in order[:-1]) + f" : {SIGNALS[order[-1]][1]}"
-    sell = " : ".join(f'sigMode == "{SIGNALS[k][0]}" ? {SIGNALS[k][2]}' for k in order[:-1]) + f" : {SIGNALS[order[-1]][2]}"
-    return {"__SIGDEF__": SIGNALS[default][0], "__SIGOPTS__": ", ".join(f'"{SIGNALS[k][0]}"' for k in order),
-            "__SELBUY__": buy, "__SELSELL__": sell}
+    var = "buyMode" if side == 1 else "sellMode"
+    expr = " : ".join(f'{var} == "{SIGNALS[k][0]}" ? {SIGNALS[k][side]}' for k in order[:-1]) + f" : {SIGNALS[order[-1]][side]}"
+    return ", ".join(f'"{SIGNALS[k][0]}"' for k in order), expr
 
 
-def generate(S: dict, R: dict | None = None, default: str = "K_CONF") -> str:
+def selection(buy: str, sell: str) -> dict:
+    bo, be = _menu(buy, 1)
+    so, se = _menu(sell, 2)
+    return {"__BUYDEF__": SIGNALS[buy][0], "__BUYOPTS__": bo, "__SELBUY__": be,
+            "__SELLDEF__": SIGNALS[sell][0], "__SELLOPTS__": so, "__SELSELL__": se}
+
+
+DEFAULT_BUY, DEFAULT_SELL = "K_H", "K_CONF"   # reports/KB_RESULTS.md and reports/KENNY_DIVERGENCE.md
+
+
+def generate(S: dict, R: dict | None = None, buy: str = DEFAULT_BUY, sell: str = DEFAULT_SELL) -> str:
     feats = feature_order(S)
     fv = ", ".join(FV_ORDER_PINE(feats)) if feats else "0.0"
     blocks = model_block(S, "top") + "\n\n" + model_block(S, "bot")
     src = TEMPLATE.replace("__FV__", fv).replace("__MODELS__", blocks).replace("__EVID__", evidence_block(S, R))
-    for k, v in selection(default).items():
+    for k, v in selection(buy, sell).items():
         src = src.replace(k, v)
     return src
 

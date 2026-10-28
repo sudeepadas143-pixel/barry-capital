@@ -2877,13 +2877,1414 @@
    "instruments": 108,
    "baseline_errors": [],
    "n_vol_instruments": 96
+  },
+  "4H": {
+   "selection": {
+    "top|vol": {
+     "G_ref_val_ap": 0.2760744773103787,
+     "val_ap": {
+      "B_ext": 0.22947582038344638,
+      "B_rsi": 0.20264720775243317,
+      "B_rng": 0.21679617639918153,
+      "L_price": 0.22921729014249645,
+      "L_mom": 0.2352112351830196,
+      "L_vol": 0.23412751897427247,
+      "L_int": 0.23411714987125884
+     },
+     "val_base_rate": 0.14295983466618745,
+     "selected_core": "B_ext",
+     "context": {},
+     "calibration": {
+      "target_onsets_per_asset_year": 6.851871515795064,
+      "achieved": 6.841098132908594,
+      "events_per_asset_year": 3.425935757897532
+     }
+    },
+    "top|novol": {
+     "val_ap": {
+      "B_ext": 0.22947582038344638,
+      "B_rsi": 0.20264720775243317,
+      "B_rng": 0.21679617639918153,
+      "L_price": 0.2291848611828879,
+      "L_mom": 0.23513946497971172
+     },
+     "val_base_rate": 0.14295983466618745,
+     "selected_core": "B_ext",
+     "context": {},
+     "calibration": {
+      "target_onsets_per_asset_year": 6.851871515795064,
+      "achieved": 6.841098132908594,
+      "events_per_asset_year": 3.425935757897532
+     }
+    },
+    "bot|vol": {
+     "G_ref_val_ap": 0.4382244084966436,
+     "val_ap": {
+      "B_ext": 0.3026421444258131,
+      "B_rsi": 0.22767114476694483,
+      "B_rng": 0.3386963635521168,
+      "L_price": 0.36152911453241826,
+      "L_mom": 0.3625243405699743,
+      "L_vol": 0.36076411059465646,
+      "L_int": 0.35895611880188694
+     },
+     "val_base_rate": 0.1365030871725094,
+     "selected_core": "L_price",
+     "context": {
+      "htf_rng": {
+       "ap_without": 0.35951764729091157,
+       "ap_with": 0.3709965082267,
+       "kept": true,
+       "rows": 77682
+      }
+     },
+     "calibration": {
+      "target_onsets_per_asset_year": 7.498274488983277,
+      "achieved": 7.379767277232105,
+      "events_per_asset_year": 3.7491372444916387
+     }
+    },
+    "bot|novol": {
+     "val_ap": {
+      "B_ext": 0.3026421444258131,
+      "B_rsi": 0.22767114476694483,
+      "B_rng": 0.3386963635521168,
+      "L_price": 0.3617534271258198,
+      "L_mom": 0.3629782246817111
+     },
+     "val_base_rate": 0.1365030871725094,
+     "selected_core": "L_price",
+     "context": {
+      "htf_rng": {
+       "ap_without": 0.35951764729091157,
+       "ap_with": 0.3709965082267,
+       "kept": true,
+       "rows": 77682
+      }
+     },
+     "calibration": {
+      "target_onsets_per_asset_year": 7.498274488983277,
+      "achieved": 7.379767277232105,
+      "events_per_asset_year": 3.7491372444916387
+     }
+    }
+   },
+   "evaluation": {
+    "top": {
+     "models": {
+      "SHIPPED": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 864,
+        "alerts": 1216,
+        "events_censored": 386,
+        "alerts_censored": 209,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.5578703703703703,
+         0.496213058480417,
+         0.6203622903339833
+        ],
+        "precision": [
+         0.3963815789473684,
+         0.3327572481615707,
+         0.4635555601245978
+        ],
+        "matched": 482,
+        "duplicates": 52,
+        "false_alarms": 682,
+        "precision_excluding_duplicates": 0.41408934707903783,
+        "false_alarms_per_100_candles": 0.1512587522705447,
+        "false_alarms_per_instrument_year": 2.1645980454063554,
+        "alerts_per_instrument_year": 3.859459271574968,
+        "lead_median": [
+         13.0,
+         10.0,
+         18.0
+        ],
+        "lead_iqr": [
+         2.0,
+         30.75
+        ],
+        "remaining_median": 0.7989906535444906,
+        "remaining_share_gt_half": 0.8858921161825726,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1216,
+        "near": 0.43914473684210525,
+        "bench": 0.37496475697689813,
+        "lift": 1.171162699083107,
+        "excess": 0.06417997986520714,
+        "ci95": [
+         -0.005341848496013046,
+         0.13370180822642733
+        ],
+        "p_wild": 0.0361,
+        "G": 29,
+        "valid": true
+       },
+       "developing": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 864,
+        "alerts": 1218,
+        "events_censored": 386,
+        "alerts_censored": 207,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.5706018518518519,
+         0.5084541400472509,
+         0.6322691484482494
+        ],
+        "precision": [
+         0.40476190476190477,
+         0.33948671956439563,
+         0.4737509577025706
+        ],
+        "matched": 493,
+        "duplicates": 63,
+        "false_alarms": 662,
+        "precision_excluding_duplicates": 0.42683982683982685,
+        "false_alarms_per_100_candles": 0.1468230117347516,
+        "false_alarms_per_instrument_year": 2.1011200968607144,
+        "alerts_per_instrument_year": 3.8658070664295323,
+        "lead_median": [
+         11.0,
+         8.0,
+         16.0
+        ],
+        "lead_iqr": [
+         0.0,
+         32.0
+        ],
+        "remaining_median": 0.7853526949149574,
+        "remaining_share_gt_half": 0.8661257606490872,
+        "evaluable": true
+       },
+       "confirmed": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 864,
+        "alerts": 1224,
+        "events_censored": 386,
+        "alerts_censored": 171,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.4537037037037037,
+         0.40726116750780134,
+         0.5045905607349354
+        ],
+        "precision": [
+         0.3202614379084967,
+         0.2712074315690896,
+         0.3667125806826772
+        ],
+        "matched": 392,
+        "duplicates": 19,
+        "false_alarms": 813,
+        "precision_excluding_duplicates": 0.3253112033195021,
+        "false_alarms_per_100_candles": 0.18031285277998949,
+        "false_alarms_per_instrument_year": 2.5803786083803035,
+        "alerts_per_instrument_year": 3.8848504509932247,
+        "lead_median": [
+         -8.0,
+         -9.0,
+         -7.0
+        ],
+        "lead_iqr": [
+         -12.0,
+         -4.0
+        ],
+        "remaining_median": 0.7662996795151891,
+        "remaining_share_gt_half": 0.9413265306122449,
+        "evaluable": true
+       },
+       "move_zone": {
+        "n": 1425,
+        "mfe_med": 3.7631392263468304,
+        "mae_med": 4.494355419364763,
+        "r_h_mean_net": -1.2692842977508216,
+        "r_h_med_net": -0.025494250596170817,
+        "ret_mean_net": -0.022472645286451515,
+        "ret_med_net": -0.00047937654438301273
+       },
+       "move_confirmed": {
+        "n": 1395,
+        "mfe_med": 2.995406605462799,
+        "mae_med": 3.522623393856865,
+        "r_h_mean_net": -0.7952448854841987,
+        "r_h_med_net": -0.2778862625582199,
+        "ret_mean_net": -0.023199883105211812,
+        "ret_med_net": -0.00246904315197005,
+        "ret_mean_net_2x_cost": -0.024612716558708572
+       },
+       "by_class": [
+        {
+         "cls": "bond",
+         "n": 36,
+         "near": 0.5833333333333334,
+         "bench": 0.6154788838612368
+        },
+        {
+         "cls": "commodity",
+         "n": 44,
+         "near": 0.45454545454545453,
+         "bench": 0.5059903331962156
+        },
+        {
+         "cls": "crypto",
+         "n": 804,
+         "near": 0.4490049751243781,
+         "bench": 0.34640136597325344
+        },
+        {
+         "cls": "equity",
+         "n": 107,
+         "near": 0.411214953271028,
+         "bench": 0.43122806275637504
+        },
+        {
+         "cls": "equity_index",
+         "n": 69,
+         "near": 0.37681159420289856,
+         "bench": 0.39768181520099677
+        },
+        {
+         "cls": "fx",
+         "n": 156,
+         "near": 0.3974358974358974,
+         "bench": 0.3810781012690603
+        }
+       ],
+       "by_era": [
+        {
+         "era": "early",
+         "n": 440,
+         "near": 0.4340909090909091,
+         "bench": 0.34544621172560797
+        },
+        {
+         "era": "late",
+         "n": 776,
+         "near": 0.4420103092783505,
+         "bench": 0.3917020764492791
+        }
+       ],
+       "by_vol": [
+        {
+         "atr_t": "high",
+         "n": 482,
+         "near": 0.3962655601659751,
+         "bench": 0.3597950971298974
+        },
+        {
+         "atr_t": "low",
+         "n": 431,
+         "near": 0.48259860788863107,
+         "bench": 0.39261092223688376
+        },
+        {
+         "atr_t": "mid",
+         "n": 303,
+         "near": 0.44554455445544555,
+         "bench": 0.37399538014257644
+        }
+       ],
+       "confirmed_vs_baselines": {
+        "htf_flip": {
+         "precision_excl_dup": 0.3622538936232745,
+         "recall": 0.2853587962963009,
+         "alerts": 691.6999999999982,
+         "target": 1224,
+         "available": 3993
+        },
+        "ema_cross": {
+         "precision_excl_dup": 0.356672769558125,
+         "recall": 0.4171296296296371,
+         "alerts": 1046.149999999993,
+         "target": 1224,
+         "available": 4742
+        },
+        "supertrend_flip": {
+         "precision_excl_dup": 0.3092742645763644,
+         "recall": 0.40642361111111724,
+         "alerts": 1173.1499999999871,
+         "target": 1224,
+         "available": 6177
+        },
+        "counter_reversal": {
+         "precision_excl_dup": 0.33816746496363564,
+         "recall": 0.44126157407407657,
+         "alerts": 1164.8499999999885,
+         "target": 1224,
+         "available": 4660
+        }
+       }
+      },
+      "B_ext": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 864,
+        "alerts": 1216,
+        "events_censored": 386,
+        "alerts_censored": 209,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.5578703703703703,
+         0.496213058480417,
+         0.6203622903339833
+        ],
+        "precision": [
+         0.3963815789473684,
+         0.3327572481615707,
+         0.4635555601245978
+        ],
+        "matched": 482,
+        "duplicates": 52,
+        "false_alarms": 682,
+        "precision_excluding_duplicates": 0.41408934707903783,
+        "false_alarms_per_100_candles": 0.1512587522705447,
+        "false_alarms_per_instrument_year": 2.1645980454063554,
+        "alerts_per_instrument_year": 3.859459271574968,
+        "lead_median": [
+         13.0,
+         10.0,
+         18.0
+        ],
+        "lead_iqr": [
+         2.0,
+         30.75
+        ],
+        "remaining_median": 0.7989906535444906,
+        "remaining_share_gt_half": 0.8858921161825726,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1216,
+        "near": 0.43914473684210525,
+        "bench": 0.37496475697689813,
+        "lift": 1.171162699083107,
+        "excess": 0.06417997986520714,
+        "ci95": [
+         -0.005341848496013046,
+         0.13370180822642733
+        ],
+        "p_wild": 0.0361,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "B_rsi": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 864,
+        "alerts": 1044,
+        "events_censored": 386,
+        "alerts_censored": 158,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.44560185185185186,
+         0.3935737189421305,
+         0.4978968973577956
+        ],
+        "precision": [
+         0.36877394636015326,
+         0.30596998800294123,
+         0.4313330752793321
+        ],
+        "matched": 385,
+        "duplicates": 26,
+        "false_alarms": 633,
+        "precision_excluding_duplicates": 0.3781925343811395,
+        "false_alarms_per_100_candles": 0.1403911879578516,
+        "false_alarms_per_instrument_year": 2.009077071469535,
+        "alerts_per_instrument_year": 3.3135489140824563,
+        "lead_median": [
+         14.0,
+         10.0,
+         18.0
+        ],
+        "lead_iqr": [
+         2.0,
+         32.0
+        ],
+        "remaining_median": 0.7648492232713984,
+        "remaining_share_gt_half": 0.8597402597402597,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1044,
+        "near": 0.3936781609195402,
+        "bench": 0.3610365209667051,
+        "lift": 1.0904109087508225,
+        "excess": 0.03264163995283517,
+        "ci95": [
+         -0.03251883487842236,
+         0.0978021147840927
+        ],
+        "p_wild": 0.1549,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "B_rng": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 864,
+        "alerts": 1274,
+        "events_censored": 386,
+        "alerts_censored": 193,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.5324074074074074,
+         0.45038706977717335,
+         0.6029918057329926
+        ],
+        "precision": [
+         0.36106750392464676,
+         0.299477788148849,
+         0.4250253435085629
+        ],
+        "matched": 460,
+        "duplicates": 43,
+        "false_alarms": 771,
+        "precision_excluding_duplicates": 0.3736799350121852,
+        "false_alarms_per_100_candles": 0.17099779765482398,
+        "false_alarms_per_instrument_year": 2.4470749164344574,
+        "alerts_per_instrument_year": 4.0435453223573266,
+        "lead_median": [
+         16.5,
+         13.0,
+         21.0
+        ],
+        "lead_iqr": [
+         5.0,
+         38.25
+        ],
+        "remaining_median": 0.7944528630170773,
+        "remaining_share_gt_half": 0.8913043478260869,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1274,
+        "near": 0.39481946624803765,
+        "bench": 0.3735403675917477,
+        "lift": 1.0569659948494414,
+        "excess": 0.02127909865628992,
+        "ci95": [
+         -0.04596266388281621,
+         0.08852086119539605
+        ],
+        "p_wild": 0.262,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "L_price": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 864,
+        "alerts": 1226,
+        "events_censored": 386,
+        "alerts_censored": 186,
+        "event_clusters": 29,
+        "alert_clusters": 28,
+        "recall": [
+         0.5648148148148148,
+         0.4805730767657032,
+         0.6317857008987025
+        ],
+        "precision": [
+         0.39804241435562804,
+         0.3306293401591683,
+         0.46975181617047485
+        ],
+        "matched": 488,
+        "duplicates": 21,
+        "false_alarms": 717,
+        "precision_excluding_duplicates": 0.4049792531120332,
+        "false_alarms_per_100_candles": 0.15902129820818262,
+        "false_alarms_per_instrument_year": 2.275684455361227,
+        "alerts_per_instrument_year": 3.8911982458477885,
+        "lead_median": [
+         13.0,
+         10.0,
+         18.0
+        ],
+        "lead_iqr": [
+         3.0,
+         33.25
+        ],
+        "remaining_median": 0.8259877384196185,
+        "remaining_share_gt_half": 0.8995901639344263,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1226,
+        "near": 0.41517128874388254,
+        "bench": 0.37222727481103207,
+        "lift": 1.1153704116783267,
+        "excess": 0.04294401393285044,
+        "ci95": [
+         -0.02991926238869895,
+         0.11580729025439983
+        ],
+        "p_wild": 0.115,
+        "G": 28,
+        "valid": true
+       }
+      },
+      "L_mom": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 864,
+        "alerts": 1284,
+        "events_censored": 386,
+        "alerts_censored": 195,
+        "event_clusters": 29,
+        "alert_clusters": 28,
+        "recall": [
+         0.6145833333333334,
+         0.559095216356795,
+         0.6631932256932257
+        ],
+        "precision": [
+         0.4135514018691589,
+         0.35154823001038976,
+         0.4829166396124977
+        ],
+        "matched": 531,
+        "duplicates": 25,
+        "false_alarms": 728,
+        "precision_excluding_duplicates": 0.4217633042096902,
+        "false_alarms_per_100_candles": 0.16146095550286882,
+        "false_alarms_per_instrument_year": 2.3105973270613296,
+        "alerts_per_instrument_year": 4.075284296630147,
+        "lead_median": [
+         10.0,
+         7.0,
+         16.0
+        ],
+        "lead_iqr": [
+         1.5,
+         33.0
+        ],
+        "remaining_median": 0.8189815283896207,
+        "remaining_share_gt_half": 0.8983050847457628,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1284,
+        "near": 0.43302180685358255,
+        "bench": 0.37001253502139003,
+        "lift": 1.1702895601321994,
+        "excess": 0.0630092718321925,
+        "ci95": [
+         -0.007685437270222417,
+         0.13370398093460742
+        ],
+        "p_wild": 0.0424,
+        "G": 28,
+        "valid": true
+       }
+      },
+      "L_vol": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 96,
+        "events": 767,
+        "alerts": 1100,
+        "events_censored": 381,
+        "alerts_censored": 169,
+        "event_clusters": 29,
+        "alert_clusters": 28,
+        "recall": [
+         0.6101694915254238,
+         0.5606807582303378,
+         0.6568951659400156
+        ],
+        "precision": [
+         0.4254545454545455,
+         0.3529824875150709,
+         0.4995289855072464
+        ],
+        "matched": 468,
+        "duplicates": 26,
+        "false_alarms": 606,
+        "precision_excluding_duplicates": 0.43575418994413406,
+        "false_alarms_per_100_candles": 0.15073839426298627,
+        "false_alarms_per_instrument_year": 2.1312345940533035,
+        "alerts_per_instrument_year": 3.8685776459713432,
+        "lead_median": [
+         10.0,
+         6.0,
+         16.0
+        ],
+        "lead_iqr": [
+         1.0,
+         38.0
+        ],
+        "remaining_median": 0.8100885946274256,
+        "remaining_share_gt_half": 0.8952991452991453,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1100,
+        "near": 0.4490909090909091,
+        "bench": 0.36782616626891335,
+        "lift": 1.2209324683078258,
+        "excess": 0.08126474282199576,
+        "ci95": [
+         2.8688016085187673e-05,
+         0.16250079762790634
+        ],
+        "p_wild": 0.0272,
+        "G": 28,
+        "valid": true
+       }
+      },
+      "L_int": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 96,
+        "events": 767,
+        "alerts": 1122,
+        "events_censored": 381,
+        "alerts_censored": 170,
+        "event_clusters": 29,
+        "alert_clusters": 28,
+        "recall": [
+         0.6245110821382008,
+         0.5712165463869319,
+         0.6746321370118327
+        ],
+        "precision": [
+         0.4269162210338681,
+         0.3576590013901761,
+         0.49873335078338255
+        ],
+        "matched": 479,
+        "duplicates": 33,
+        "false_alarms": 610,
+        "precision_excluding_duplicates": 0.4398530762167126,
+        "false_alarms_per_100_candles": 0.15173336716241193,
+        "false_alarms_per_instrument_year": 2.145302149129563,
+        "alerts_per_instrument_year": 3.9459491988907702,
+        "lead_median": [
+         9.0,
+         5.0,
+         15.012499999999989
+        ],
+        "lead_iqr": [
+         0.0,
+         35.5
+        ],
+        "remaining_median": 0.8047184272442468,
+        "remaining_share_gt_half": 0.8810020876826722,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1122,
+        "near": 0.4563279857397504,
+        "bench": 0.36836306763385357,
+        "lift": 1.238799504714008,
+        "excess": 0.08796491810589685,
+        "ci95": [
+         0.010841389043646843,
+         0.16508844716814686
+        ],
+        "p_wild": 0.0145,
+        "G": 28,
+        "valid": true
+       }
+      }
+     },
+     "shipped_minus_B_ext_near": {
+      "clusters": 29,
+      "delta": 0.0,
+      "ci95": [
+       -2.9704199459119846e-17,
+       2.9704199459119846e-17
+      ],
+      "p_wild": 0.5045
+     }
+    },
+    "bot": {
+     "models": {
+      "SHIPPED": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 916,
+        "alerts": 1679,
+        "events_censored": 397,
+        "alerts_censored": 225,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.62882096069869,
+         0.565819424833429,
+         0.7022011840817874
+        ],
+        "precision": [
+         0.3430613460393091,
+         0.27256817081444595,
+         0.4163054599450122
+        ],
+        "matched": 576,
+        "duplicates": 42,
+        "false_alarms": 1061,
+        "precision_excluding_duplicates": 0.3518631643249847,
+        "false_alarms_per_100_candles": 0.23531603542382393,
+        "false_alarms_per_instrument_year": 3.367505170346251,
+        "alerts_per_instrument_year": 5.328973780406556,
+        "lead_median": [
+         21.0,
+         17.0,
+         24.0
+        ],
+        "lead_iqr": [
+         5.75,
+         39.25
+        ],
+        "remaining_median": 0.7708734100860681,
+        "remaining_share_gt_half": 0.8211805555555556,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1679,
+        "near": 0.3680762358546754,
+        "bench": 0.3828032562494287,
+        "lift": 0.961528487142342,
+        "excess": -0.014727020394753244,
+        "ci95": [
+         -0.08717100839088837,
+         0.05771696760138189
+        ],
+        "p_wild": 0.6658,
+        "G": 29,
+        "valid": true
+       },
+       "developing": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 916,
+        "alerts": 1685,
+        "events_censored": 397,
+        "alerts_censored": 218,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.62882096069869,
+         0.563914901123255,
+         0.7023540219470452
+        ],
+        "precision": [
+         0.34183976261127597,
+         0.2709092300393321,
+         0.41384678925019847
+        ],
+        "matched": 576,
+        "duplicates": 35,
+        "false_alarms": 1074,
+        "precision_excluding_duplicates": 0.3490909090909091,
+        "false_alarms_per_100_candles": 0.23819926677208944,
+        "false_alarms_per_instrument_year": 3.4087658369009177,
+        "alerts_per_instrument_year": 5.348017164970248,
+        "lead_median": [
+         20.0,
+         14.0,
+         23.0
+        ],
+        "lead_iqr": [
+         4.0,
+         37.0
+        ],
+        "remaining_median": 0.7738365559833595,
+        "remaining_share_gt_half": 0.8263888888888888,
+        "evaluable": true
+       },
+       "confirmed": {
+        "kind": "confirmation",
+        "instruments": 108,
+        "events": 916,
+        "alerts": 1697,
+        "events_censored": 397,
+        "alerts_censored": 172,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.4039301310043668,
+         0.35749788151204775,
+         0.46029714701759117
+        ],
+        "precision": [
+         0.21803182086034179,
+         0.17954844465421124,
+         0.25549007390501927
+        ],
+        "matched": 370,
+        "duplicates": 19,
+        "false_alarms": 1308,
+        "precision_excluding_duplicates": 0.2205005959475566,
+        "false_alarms_per_100_candles": 0.2900974310408687,
+        "false_alarms_per_instrument_year": 4.1514578348849165,
+        "alerts_per_instrument_year": 5.386103934097632,
+        "lead_median": [
+         -7.0,
+         -9.0,
+         -6.0
+        ],
+        "lead_iqr": [
+         -13.75,
+         -4.0
+        ],
+        "remaining_median": 0.7820549741785253,
+        "remaining_share_gt_half": 0.9567567567567568,
+        "evaluable": true
+       },
+       "move_zone": {
+        "n": 1904,
+        "mfe_med": 3.114139907670923,
+        "mae_med": 3.524080382707923,
+        "r_h_mean_net": 0.051473371479937455,
+        "r_h_med_net": -0.26369478131091245,
+        "ret_mean_net": -0.0011595380344219463,
+        "ret_med_net": -0.003829399138563965
+       },
+       "move_confirmed": {
+        "n": 1869,
+        "mfe_med": 3.0314500751932245,
+        "mae_med": 3.1458444656388553,
+        "r_h_mean_net": -0.1776897496978794,
+        "r_h_med_net": -0.38245011589922967,
+        "ret_mean_net": -0.006177813199173975,
+        "ret_med_net": -0.005477509771974398,
+        "ret_mean_net_2x_cost": -0.007759582054301485
+       },
+       "by_class": [
+        {
+         "cls": "bond",
+         "n": 27,
+         "near": 0.25925925925925924,
+         "bench": 0.32541478129713425
+        },
+        {
+         "cls": "commodity",
+         "n": 39,
+         "near": 0.6410256410256411,
+         "bench": 0.5371272769462815
+        },
+        {
+         "cls": "crypto",
+         "n": 1287,
+         "near": 0.3581973581973582,
+         "bench": 0.38137559877552835
+        },
+        {
+         "cls": "equity",
+         "n": 91,
+         "near": 0.34065934065934067,
+         "bench": 0.37789020933817313
+        },
+        {
+         "cls": "equity_index",
+         "n": 50,
+         "near": 0.6,
+         "bench": 0.3662217194570136
+        },
+        {
+         "cls": "fx",
+         "n": 185,
+         "near": 0.34594594594594597,
+         "bench": 0.3754757497304521
+        }
+       ],
+       "by_era": [
+        {
+         "era": "early",
+         "n": 662,
+         "near": 0.3610271903323263,
+         "bench": 0.3786305698585125
+        },
+        {
+         "era": "late",
+         "n": 1017,
+         "near": 0.3726647000983284,
+         "bench": 0.38551940019317155
+        }
+       ],
+       "by_vol": [
+        {
+         "atr_t": "high",
+         "n": 821,
+         "near": 0.37880633373934225,
+         "bench": 0.37837796667073986
+        },
+        {
+         "atr_t": "low",
+         "n": 497,
+         "near": 0.352112676056338,
+         "bench": 0.3892767477908028
+        },
+        {
+         "atr_t": "mid",
+         "n": 361,
+         "near": 0.3656509695290859,
+         "bench": 0.38395516053762957
+        }
+       ],
+       "confirmed_vs_baselines": {
+        "htf_flip": {
+         "precision_excl_dup": 0.24658301590858422,
+         "recall": 0.2402838427947657,
+         "alerts": 922.3500000000021,
+         "target": 1697,
+         "available": 3957
+        },
+        "ema_cross": {
+         "precision_excl_dup": 0.3304821664465026,
+         "recall": 0.5462336244541588,
+         "alerts": 1589.0500000000036,
+         "target": 1697,
+         "available": 4718
+        },
+        "supertrend_flip": {
+         "precision_excl_dup": 0.3060554397928931,
+         "recall": 0.5291484716157326,
+         "alerts": 1652.4500000000066,
+         "target": 1697,
+         "available": 6213
+        },
+        "counter_reversal": {
+         "precision_excl_dup": 0.30646569848303856,
+         "recall": 0.5171943231441162,
+         "alerts": 1611.300000000014,
+         "target": 1697,
+         "available": 5416
+        }
+       }
+      },
+      "B_ext": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 916,
+        "alerts": 1862,
+        "events_censored": 397,
+        "alerts_censored": 262,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.7150655021834061,
+         0.6589920522229803,
+         0.7735677517914991
+        ],
+        "precision": [
+         0.3517722878625134,
+         0.285916307435463,
+         0.4178487051763453
+        ],
+        "matched": 655,
+        "duplicates": 153,
+        "false_alarms": 1054,
+        "precision_excluding_duplicates": 0.38326506729081333,
+        "false_alarms_per_100_candles": 0.23376352623629634,
+        "false_alarms_per_instrument_year": 3.345287888355277,
+        "alerts_per_instrument_year": 5.90979700959917,
+        "lead_median": [
+         17.0,
+         13.0,
+         23.01249999999999
+        ],
+        "lead_iqr": [
+         3.0,
+         40.0
+        ],
+        "remaining_median": 0.7690008100364413,
+        "remaining_share_gt_half": 0.8320610687022901,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1862,
+        "near": 0.4339419978517723,
+        "bench": 0.38663768346483424,
+        "lift": 1.1223479148825402,
+        "excess": 0.047304314386938,
+        "ci95": [
+         -0.022933191469686552,
+         0.11754182024356255
+        ],
+        "p_wild": 0.0929,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "B_rsi": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 916,
+        "alerts": 1640,
+        "events_censored": 397,
+        "alerts_censored": 216,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.6572052401746725,
+         0.5639701716998692,
+         0.744873816491651
+        ],
+        "precision": [
+         0.3670731707317073,
+         0.3017534890297007,
+         0.4369595014497914
+        ],
+        "matched": 602,
+        "duplicates": 77,
+        "false_alarms": 961,
+        "precision_excluding_duplicates": 0.38515674984005116,
+        "false_alarms_per_100_candles": 0.2131373327448584,
+        "false_alarms_per_instrument_year": 3.050115427618046,
+        "alerts_per_instrument_year": 5.205191780742556,
+        "lead_median": [
+         9.0,
+         6.0,
+         15.0
+        ],
+        "lead_iqr": [
+         2.0,
+         28.0
+        ],
+        "remaining_median": 0.7997802001087297,
+        "remaining_share_gt_half": 0.8438538205980066,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1640,
+        "near": 0.4140243902439024,
+        "bench": 0.3808600596990022,
+        "lift": 1.087077470321016,
+        "excess": 0.0331643305449002,
+        "ci95": [
+         -0.05088429318823645,
+         0.11721295427803685
+        ],
+        "p_wild": 0.2199,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "B_rng": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 916,
+        "alerts": 1880,
+        "events_censored": 397,
+        "alerts_censored": 263,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.7729257641921398,
+         0.7163109096629567,
+         0.8298330224205865
+        ],
+        "precision": [
+         0.37659574468085105,
+         0.30387788831588897,
+         0.4499891167073403
+        ],
+        "matched": 708,
+        "duplicates": 49,
+        "false_alarms": 1123,
+        "precision_excluding_duplicates": 0.3866739486619334,
+        "false_alarms_per_100_candles": 0.24906683108478253,
+        "false_alarms_per_instrument_year": 3.564286810837738,
+        "alerts_per_instrument_year": 5.966927163290247,
+        "lead_median": [
+         15.0,
+         10.0,
+         20.0
+        ],
+        "lead_iqr": [
+         4.0,
+         32.0
+        ],
+        "remaining_median": 0.8048379996540223,
+        "remaining_share_gt_half": 0.8545197740112994,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1880,
+        "near": 0.4026595744680851,
+        "bench": 0.38497408739346123,
+        "lift": 1.0459394220384202,
+        "excess": 0.017685487074623852,
+        "ci95": [
+         -0.061528573331431205,
+         0.0968995474806789
+        ],
+        "p_wild": 0.3284,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "L_price": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 916,
+        "alerts": 1724,
+        "events_censored": 397,
+        "alerts_censored": 229,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.675764192139738,
+         0.6126930619372755,
+         0.7492546448870421
+        ],
+        "precision": [
+         0.3590487238979118,
+         0.27988488225399494,
+         0.439474605443566
+        ],
+        "matched": 619,
+        "duplicates": 37,
+        "false_alarms": 1068,
+        "precision_excluding_duplicates": 0.3669235328986366,
+        "false_alarms_per_100_candles": 0.2368685446113515,
+        "false_alarms_per_instrument_year": 3.3897224523372254,
+        "alerts_per_instrument_year": 5.471799164634247,
+        "lead_median": [
+         20.0,
+         16.0,
+         24.0
+        ],
+        "lead_iqr": [
+         4.5,
+         37.5
+        ],
+        "remaining_median": 0.7778382793356928,
+        "remaining_share_gt_half": 0.8255250403877221,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1724,
+        "near": 0.3805104408352668,
+        "bench": 0.3829566493822586,
+        "lift": 0.9936123095109127,
+        "excess": -0.002446208546991793,
+        "ci95": [
+         -0.07976444671044457,
+         0.07487202961646099
+        ],
+        "p_wild": 0.5349,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "L_mom": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 108,
+        "events": 916,
+        "alerts": 1751,
+        "events_censored": 397,
+        "alerts_censored": 239,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.7358078602620087,
+         0.6868348075090941,
+         0.7974471909555214
+        ],
+        "precision": [
+         0.38492290119931466,
+         0.3118852922690132,
+         0.46370353176075946
+        ],
+        "matched": 674,
+        "duplicates": 25,
+        "false_alarms": 1052,
+        "precision_excluding_duplicates": 0.3904982618771727,
+        "false_alarms_per_100_candles": 0.23331995218271703,
+        "false_alarms_per_instrument_year": 3.3389400935007125,
+        "alerts_per_instrument_year": 5.557494395170863,
+        "lead_median": [
+         17.0,
+         12.0,
+         22.01249999999999
+        ],
+        "lead_iqr": [
+         4.0,
+         34.0
+        ],
+        "remaining_median": 0.7913757506852944,
+        "remaining_share_gt_half": 0.8323442136498517,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1751,
+        "near": 0.39920045688178185,
+        "bench": 0.3840309259495761,
+        "lift": 1.0395008055528254,
+        "excess": 0.015169530932205771,
+        "ci95": [
+         -0.06361082444307391,
+         0.09394988630748545
+        ],
+        "p_wild": 0.3507,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "L_vol": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 96,
+        "events": 818,
+        "alerts": 1570,
+        "events_censored": 391,
+        "alerts_censored": 214,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.7457212713936431,
+         0.6919722766981636,
+         0.8101990119313945
+        ],
+        "precision": [
+         0.3885350318471338,
+         0.3079923076923077,
+         0.47282086516051675
+        ],
+        "matched": 610,
+        "duplicates": 26,
+        "false_alarms": 934,
+        "precision_excluding_duplicates": 0.3950777202072539,
+        "false_alarms_per_100_candles": 0.2323261720158897,
+        "false_alarms_per_instrument_year": 3.284774110306577,
+        "alerts_per_instrument_year": 5.521515367431826,
+        "lead_median": [
+         16.0,
+         10.0,
+         22.0
+        ],
+        "lead_iqr": [
+         4.0,
+         34.0
+        ],
+        "remaining_median": 0.7900607901818146,
+        "remaining_share_gt_half": 0.8213114754098361,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1570,
+        "near": 0.4050955414012739,
+        "bench": 0.3848686985957532,
+        "lift": 1.0525551775951674,
+        "excess": 0.02022684280552076,
+        "ci95": [
+         -0.066528236899036,
+         0.10698192251007752
+        ],
+        "p_wild": 0.3211,
+        "G": 29,
+        "valid": true
+       }
+      },
+      "L_int": {
+       "zone": {
+        "kind": "warning",
+        "instruments": 96,
+        "events": 818,
+        "alerts": 1584,
+        "events_censored": 391,
+        "alerts_censored": 212,
+        "event_clusters": 29,
+        "alert_clusters": 29,
+        "recall": [
+         0.7359413202933985,
+         0.6805690728464661,
+         0.8029968197563306
+        ],
+        "precision": [
+         0.380050505050505,
+         0.30087421575773166,
+         0.4642120677307141
+        ],
+        "matched": 602,
+        "duplicates": 33,
+        "false_alarms": 949,
+        "precision_excluding_duplicates": 0.38813668600902645,
+        "false_alarms_per_100_candles": 0.23605732038873592,
+        "false_alarms_per_instrument_year": 3.33752744184255,
+        "alerts_per_instrument_year": 5.570751810198734,
+        "lead_median": [
+         16.0,
+         11.0,
+         21.0
+        ],
+        "lead_iqr": [
+         4.0,
+         33.75
+        ],
+        "remaining_median": 0.7896619865925822,
+        "remaining_share_gt_half": 0.8255813953488372,
+        "evaluable": true
+       },
+       "lift": {
+        "units": 1584,
+        "near": 0.4008838383838384,
+        "bench": 0.38484068058437804,
+        "lift": 1.0416877908413917,
+        "excess": 0.01604315779946032,
+        "ci95": [
+         -0.06804901964642096,
+         0.1001353352453416
+        ],
+        "p_wild": 0.351,
+        "G": 29,
+        "valid": true
+       }
+      }
+     },
+     "shipped_minus_B_ext_near": {
+      "clusters": 29,
+      "delta": -0.06586576199709687,
+      "ci95": [
+       -0.08873744270521813,
+       -0.042994081288975604
+      ],
+      "p_wild": 1.0
+     }
+    }
+   },
+   "instruments": 108,
+   "baseline_errors": [],
+   "n_vol_instruments": 96
   }
  },
  "meta": {
   "mode": "self_audited_exploration_only",
   "config": "reports/CYCLE_CONFIG.md",
   "manifest": "57e107b08c6912a08042639c633604b90e612a60e06fe024b88b84a20e40530d",
-  "git_head": "3939f263cc66c21273ecb96ce2bebd6ba0762818"
+  "git_head": "708360b3ee4b10483fa0d10819b014a2f2e6bd9e"
  },
  "primary": {
   "1W|bot": {

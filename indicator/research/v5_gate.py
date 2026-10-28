@@ -78,6 +78,8 @@ KWB2_CONFIG = "reports/KWB2_CONFIG.md"
 KWB2_CODE = KWB_CODE
 KX_CONFIG = "reports/KX_CONFIG.md"
 KX_CODE = KF_CODE + ("research/kenny_context.py", "scripts/kx_eval.py", "data_ext/VIX_History.csv")
+KCS_CONFIG = "reports/KCS_CONFIG.md"
+KCS_CODE = KF_CODE + ("research/kenny_closeshort.py", "scripts/kcs_eval.py")
 KC_CODE = KB_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "scripts/kc_eval.py", "scripts/kenny_export_pine.py")
 
 
@@ -397,6 +399,17 @@ def require_kx_ready(root: Path = ROOT) -> str:
     b = kx_blockers(root)
     if b:
         raise NotReady("KX evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
+
+
+def kcs_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KCS_CONFIG, KCS_CODE)
+
+
+def require_kcs_ready(root: Path = ROOT) -> str:
+    b = kcs_blockers(root)
+    if b:
+        raise NotReady("KCS evaluation is blocked:\n  " + "\n  ".join(b))
     return review_mode(root)
 
 

@@ -201,6 +201,8 @@ TEMPLATE = r'''//@version=6
 //   BUY = High Conviction (threshold x1.1 on 1W/4H); SELL = early top states (1D High Conviction
 //   x0.9, 4H Early Warning x0.9, 1H Early Warning; 1W exhaustion + reversal near the 52-week high).
 //   Input "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed everywhere.
+//   Stocks/indices on 1D/1W: a BUY right after a VIX spike-and-reversal is drawn larger
+//   (input "Larger BUY after a VIX spike-and-reversal"; reports/KX_RESULTS.md).
 //   4H and below also show a small red X when a mature uptrend breaks down (exit / protect;
 //   reports/KT_RESULTS.md); input "Breakdown / exit markers" turns it off. A candle with both BUY and SELL draws neither; a same-direction repeat within
 //   Q candles is suppressed. Timeframe sets the turn scale: >= 1W major, >= 1D intermediate,
@@ -224,6 +226,7 @@ showBuy  = input.bool(true, "BUY triangles", group = grpS)
 showSell = input.bool(true, "SELL triangles", group = grpS)
 volMode  = input.string("Auto", "Volume features", options = ["Auto", "Off"], group = grpS, tooltip = "Auto uses volume features when the feed has volume on >90% of the last 50 candles; otherwise they are treated as missing (as for no-volume instruments in the research).")
 showBrk  = input.bool(true, "Breakdown / exit markers (4H and below)", group = grpS, tooltip = "Small red X above the candle: a mature uptrend has broken down (exit / protect). Shown only where it beat its baseline in research (reports/KT_RESULTS.md).")
+showVixW = input.bool(true, "Larger BUY after a VIX spike-and-reversal (stocks/indices, 1D/1W)", group = grpS, tooltip = "Stocks, ETFs and indices on 1D/1W only: a BUY that comes within 10 days after VIX spiked (>= 30 and >= its 1-year 90th percentile) and then fell >= 20% is drawn larger. Research (reports/KX_RESULTS.md): stronger in early data, only modestly better in later data; it did not pass the full test.")
 grpA = "Advanced display (off by default)"
 showStates = input.bool(false, "Mark every internal state (dots and labels)", group = grpA)
 showBg     = input.bool(false, "Shade candles above the High Conviction threshold", group = grpA)
@@ -521,7 +524,17 @@ if barstate.isconfirmed and not (rawBuy and rawSell)
         lastSell := bar_index
 cBuy  = #00C853
 cSell = #FF1744
-plotshape(showBuy and buySig, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)
+// VIX weighting (= research/kenny_context.vix_reversal; previous completed VIX day, no repaint)
+vixF() =>
+    mx10 = ta.highest(close, 10)
+    p90 = ta.percentile_linear_interpolation(close, 252, 90)
+    flag = mx10 >= math.max(30.0, p90) and close <= 0.8 * mx10
+    ta.highest(flag ? 1.0 : 0.0, 10)
+vixAct = request.security("CBOE:VIX", "D", vixF()[1], lookahead = barmerge.lookahead_on, ignore_invalid_symbol = true)
+isEquity = syminfo.type == "stock" or syminfo.type == "index" or syminfo.type == "fund" or syminfo.type == "dr"
+buyHeavy = showVixW and isEquity and bucket >= 2 and nz(vixAct) > 0
+plotshape(showBuy and buySig and not buyHeavy, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)
+plotshape(showBuy and buySig and buyHeavy, "BUY (VIX-confirmed)", shape.triangleup, location.belowbar, cBuy, size = size.large)
 plotshape(showSell and sellSig, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)
 // breakdown / exit (= research/kenny_types.breakdown; 4H and below, reports/KT_RESULTS.md)
 hh2L   = ta.highest(high, 2 * L)

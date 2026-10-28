@@ -111,7 +111,8 @@ def test_default_chart_is_only_buy_and_sell_triangles():
     plots = [ln for ln in src.splitlines() if ln.startswith(("plotshape(", "plot(", "bgcolor(", "plotchar(", "plotarrow("))]
     on_by_default = [ln for ln in plots if "showStates" not in ln and "showBg" not in ln and "showBrk" not in ln]
     assert on_by_default == [
-        'plotshape(showBuy and buySig, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)',
+        'plotshape(showBuy and buySig and not buyHeavy, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)',
+        'plotshape(showBuy and buySig and buyHeavy, "BUY (VIX-confirmed)", shape.triangleup, location.belowbar, cBuy, size = size.large)',
         'plotshape(showSell and sellSig, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)']
     for ln in src.splitlines():                        # every label/line/box/table draw is behind an off-by-default input
         if "label.new(" in ln or "line.new(" in ln or "box.new(" in ln:
@@ -236,3 +237,14 @@ def test_breakdown_marker_follows_kt_result_and_definition():
                 "sma15  = ta.sma(close, int(math.round(1.5 * L)))", "firstBelow = belowS and math.sum(belowS[1] ? 1.0 : 0.0, M) == 0",
                 'plotshape(showBrk and brkSig, "Breakdown", shape.xcross, location.abovebar, cSell, size = size.normal)'):
         assert tok in src, tok
+
+
+def test_vix_weighting_mirrors_research_definition_and_never_adds_arrows():
+    _, S = _spec()
+    src = K.generate(S)
+    for tok in ("mx10 >= math.max(30.0, p90) and close <= 0.8 * mx10", "ta.highest(flag ? 1.0 : 0.0, 10)",
+                'request.security("CBOE:VIX", "D", vixF()[1], lookahead = barmerge.lookahead_on, ignore_invalid_symbol = true)',
+                "buyHeavy = showVixW and isEquity and bucket >= 2 and nz(vixAct) > 0"):
+        assert tok in src, tok
+    # both BUY plots are gated by buySig: VIX only changes the size, never creates or removes an arrow
+    assert src.count("showBuy and buySig and") == 2

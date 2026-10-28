@@ -67,6 +67,14 @@ against its own job and a baseline:
   * bottom forming (early);
   * breakdown on 1W and 1D.
 
+**VIX-weighted BUY** (stocks, ETFs and indices on 1D/1W; `reports/KX_RESULTS.md`). A BUY that comes
+within 10 days after a VIX spike-and-reversal is drawn **larger**. Every BUY still shows; only the
+size changes.
+* **Early data:** such BUYs were right 93% of the time vs 51% (15 arrows).
+* **Later data:** only modestly better, 62% vs 59% (21 arrows). It did not pass the full test.
+* Turn it off with "Larger BUY after a VIX spike-and-reversal".
+* **Timing:** Pine reads the previous completed VIX day, one day more conservative than research.
+
 **Rollback.** Setting "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed
 everywhere.
 

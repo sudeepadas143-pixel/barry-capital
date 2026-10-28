@@ -227,6 +227,7 @@ showSell = input.bool(true, "SELL triangles", group = grpS)
 volMode  = input.string("Auto", "Volume features", options = ["Auto", "Off"], group = grpS, tooltip = "Auto uses volume features when the feed has volume on >90% of the last 50 candles; otherwise they are treated as missing (as for no-volume instruments in the research).")
 showBrk  = input.bool(true, "Breakdown / exit markers (4H and below)", group = grpS, tooltip = "Small red X above the candle: a mature uptrend has broken down (exit / protect). Shown only where it beat its baseline in research (reports/KT_RESULTS.md).")
 showVixW = input.bool(true, "Larger BUY after a VIX spike-and-reversal (stocks/indices, 1D/1W)", group = grpS, tooltip = "Stocks, ETFs and indices on 1D/1W only: a BUY that comes within 10 days after VIX spiked (>= 30 and >= its 1-year 90th percentile) and then fell >= 20% is drawn larger. Research (reports/KX_RESULTS.md): stronger in early data, only modestly better in later data; it did not pass the full test.")
+showDz   = input.bool(true, "Daily BUY zone on 4H and below", group = grpS, tooltip = "On 4H and lower charts: a green '1D' marker on the first candle after a completed daily BUY, and a faint green background for the following 15 days (a quarter of the daily cycle). The daily BUY is the same arrow the 1D chart shows, read from the previous completed day, so it never repaints. Research: 4H/1H BUYs alone are weak (reports/KLB_RESULTS.md); a daily BUY is right in retrospect about 54% of the time.")
 grpA = "Advanced display (off by default)"
 showStates = input.bool(false, "Mark every internal state (dots and labels)", group = grpA)
 showBg     = input.bool(false, "Shade candles above the High Conviction threshold", group = grpA)
@@ -545,6 +546,14 @@ plotshape(buyV and bucket == 3, "BUY 1W (VIX-confirmed)", shape.triangleup, loca
 plotshape(sellN and bucket <= 1, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)
 plotshape(sellN and bucket == 2, "SELL 1D", shape.triangledown, location.abovebar, cSell, size = size.normal)
 plotshape(sellN and bucket == 3, "SELL 1W", shape.triangledown, location.abovebar, cSell, size = size.large)
+// daily BUY zone on 4H and below (the 1D chart's BUY, previous completed day, no repaint; reports/KBAL_CONFIG.md)
+dNew   = request.security(syminfo.tickerid, "D", buySig[1], lookahead = barmerge.lookahead_on)
+dSince = request.security(syminfo.tickerid, "D", ta.barssince(buySig)[1], lookahead = barmerge.lookahead_on)
+dOn = showDz and bucket <= 1
+dMark = dOn and nz(dNew) and timeframe.change("D")
+plotshape(dMark, "Daily BUY (on 4H and below)", shape.labelup, location.belowbar, cBuy, text = "1D", textcolor = color.white, size = size.small)
+bgcolor(dOn and not na(dSince) and dSince < 15 ? color.new(cBuy, 92) : na, title = "Daily BUY zone")
+alertcondition(dMark, "Kenny Div: Daily BUY (on 4H and below)", "Kenny Div DAILY BUY {{ticker}} {{interval}} {{close}}")
 // breakdown / exit (= research/kenny_types.breakdown; 4H and below, reports/KT_RESULTS.md)
 hh2L   = ta.highest(high, 2 * L)
 nearHi = (hh2L - close) / atr <= 2.0
@@ -617,7 +626,7 @@ KR_SELL = {2: ("H", 0.9), 1: ("W", 0.9), 0: ("W", 1.0)}              # bucket 3 
 KS_BUY_K = {3: 1, 2: 0, 1: 0, 0: 1}                                  # reports/KS_RESULTS.md adopted strength cut-offs (0 = all arrows)
 
 # reports/KBAL_CONFIG.md: what the Pine uses (more BUYs on 4H/1H; 1W/1D unchanged)
-BAL_BUY_SCALE = {**KR_BUY_SCALE, 1: 0.8, 0: 0.8}
+BAL_BUY_SCALE = {**KR_BUY_SCALE, 0: 0.8}                            # 4H back to x1.1 after reports/KLB_RESULTS.md (user decision)
 BAL_BUY_K = {**KS_BUY_K, 0: 0}
 
 

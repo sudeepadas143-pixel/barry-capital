@@ -77,15 +77,28 @@ size changes.
 * Turn it off with "Larger BUY after a VIX spike-and-reversal".
 * **Timing:** Pine reads the previous completed VIX day, one day more conservative than research.
 
-**More BUYs on 4H and 1H** (`reports/KBAL_CONFIG.md`). BUYs on these timeframes were far rarer than
-SELLs (zero on BTC 1H), so the bar was lowered:
-* **Threshold:** the High-Conviction threshold is now ×0.8 on both timeframes.
-* **Strength cut:** removed on 1H.
-* **Effect on frequency and accuracy:**
-  * **4H:** about 3× as many BUYs. Excess vs random in the check period goes from +0.18 to +0.13.
-  * **1H:** about 1.7× as many. Excess goes from +0.07 to +0.06.
-* **BTC, last year:** 4H goes from 3 to 6 BUYs (7 SELLs); 1H from 0 shown to 21 (33 SELLs).
-* **Unchanged:** 1W and 1D.
+**Lower-timeframe BUYs** (`reports/KBAL_CONFIG.md`, `reports/KLB_RESULTS.md`).
+* **1H:** the High-Conviction threshold is ×0.8 with no strength cut, so BUYs fire there too.
+  Before, BTC 1H showed none.
+* **4H:** back to ×1.1. The looser ×0.8 was right in retrospect only 41% of the time (check period),
+  against 56%.
+* **Placement:** four other definitions were tested to place 4H/1H BUYs closer to real lows, and
+  none was better:
+  * a location filter;
+  * waiting for a turn up;
+  * a confirmed swing low.
+
+  On these timeframes about 90% of BUYs still see a lower low within a quarter-cycle.
+
+**Daily BUY zone on 4H and below** (input "Daily BUY zone on 4H and below", on by default).
+* **Marker:** a green "1D" marker on the first lower-timeframe candle after a completed daily BUY.
+* **Zone:** a faint green background for the next 15 days.
+* **Why:** a daily BUY is right in retrospect about 54% of the time. Use the zone as the area where a
+  larger low is forming, and the 4H/1H chart to time an entry inside it.
+* **Timing:** it reads the previous completed day, so it never repaints.
+* **Frequency:** daily BUYs are rare on crypto. Since 2024, for example:
+  * BTC: 1 (2026-02-05);
+  * ETH: 4.
 
 **Rollback.** Setting "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed
 everywhere.

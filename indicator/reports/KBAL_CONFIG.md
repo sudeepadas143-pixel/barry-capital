@@ -36,3 +36,16 @@ The weight of an arrow follows its timeframe:
 |---|---|---|---|
 | BUY / SELL | small | normal | large |
 | VIX-confirmed BUY | — | large | huge |
+
+## Amendment (2026-10-28, user decision after `reports/KLB_RESULTS.md`)
+
+**4H is back to H × 1.1.** In the KLB check period:
+* the looser H × 0.8 was right in retrospect 41% of the time, against 56% for × 1.1;
+* its excess was +0.13, against +0.17.
+
+The user judged the looser 4H BUYs poor.
+
+**1H stays at H × 0.8** with no strength cut.
+
+**New on 4H and below: a daily BUY zone.** It is the 1D BUY from the previous completed day, plus 15
+days of faint background.

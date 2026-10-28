@@ -109,7 +109,7 @@ def test_default_chart_is_only_buy_and_sell_triangles():
     _, S = _spec()
     src = K.generate(S)
     plots = [ln for ln in src.splitlines() if ln.startswith(("plotshape(", "plot(", "bgcolor(", "plotchar(", "plotarrow("))]
-    on_by_default = [ln for ln in plots if "showStates" not in ln and "showBg" not in ln and "showBrk" not in ln]
+    on_by_default = [ln for ln in plots if "showStates" not in ln and "showBg" not in ln and "showBrk" not in ln and "dOn" not in ln and "dMark" not in ln]
     assert on_by_default == [
         'plotshape(buyN and bucket <= 1, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)',
         'plotshape(buyN and bucket == 2, "BUY 1D", shape.triangleup, location.belowbar, cBuy, size = size.normal)',
@@ -258,18 +258,26 @@ def test_vix_weighting_mirrors_research_definition_and_never_adds_arrows():
 
 
 def test_pine_buy_choices_follow_the_kbal_rule():
-    """4H/1H: lowest High-Conviction scale with tuning excess >= +0.02 (n >= 30), no strength cut; 1W/1D unchanged."""
+    """1H: lowest High-Conviction scale with tuning excess >= +0.02 (n >= 30), no strength cut. 4H went back to
+    the KR choice (x1.1) after reports/KLB_RESULTS.md showed the looser BUY was worse; 1W/1D unchanged."""
     res = ROOT / "reports" / "kf_results.json"
     if not res.exists():
         pytest.skip("no KF results")
     R = json.loads(res.read_text())
-    for tf, b in (("4H", 1), ("1H", 0)):
-        opts = R["tfs"][tf]["bot"]["options"]
-        ok = [sc for sc in (0.7, 0.8, 0.9, 1.0, 1.1)
-              if opts[f"H|{sc}"]["tune"]["all"]["n"] >= 30 and opts[f"H|{sc}"]["tune"]["all"]["excess"] >= 0.02]
-        assert K.BAL_BUY_SCALE[b] == min(ok) and K.BAL_BUY_K[b] == 0, tf
-    for b in (3, 2):
+    opts = R["tfs"]["1H"]["bot"]["options"]
+    ok = [sc for sc in (0.7, 0.8, 0.9, 1.0, 1.1) if opts[f"H|{sc}"]["tune"]["all"]["n"] >= 30 and opts[f"H|{sc}"]["tune"]["all"]["excess"] >= 0.02]
+    assert K.BAL_BUY_SCALE[0] == min(ok) and K.BAL_BUY_K[0] == 0
+    for b in (3, 2, 1):
         assert K.BAL_BUY_SCALE[b] == K.KR_BUY_SCALE[b] and K.BAL_BUY_K[b] == K.KS_BUY_K[b]
     _, S = _spec()
     src = K.generate(S)
-    assert "bucket == 3 ? 1.1 : bucket == 2 ? 1.0 : bucket == 1 ? 0.8 : 0.8" in src
+    assert "bucket == 3 ? 1.1 : bucket == 2 ? 1.0 : bucket == 1 ? 1.1 : 0.8" in src
+
+
+def test_daily_buy_zone_reads_the_previous_completed_day_and_only_shows_on_4h_and_below():
+    _, S = _spec()
+    src = K.generate(S)
+    assert 'dNew   = request.security(syminfo.tickerid, "D", buySig[1], lookahead = barmerge.lookahead_on)' in src
+    assert 'dSince = request.security(syminfo.tickerid, "D", ta.barssince(buySig)[1], lookahead = barmerge.lookahead_on)' in src
+    assert "dOn = showDz and bucket <= 1" in src and 'dMark = dOn and nz(dNew) and timeframe.change("D")' in src
+    assert "dSince < 15" in src and re.search(r"^showDz\s+= input\.bool\(true", src, re.M)

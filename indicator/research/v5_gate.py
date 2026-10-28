@@ -48,6 +48,8 @@ CY2_CONFIG = "reports/CYCLE2_CONFIG.md"
 CY2_CODE = CY_CODE + ("research/cycle2_features.py", "scripts/cycle2_research.py")
 KB_CONFIG = "reports/KB_CONFIG.md"
 KB_CODE = CY2_CODE + ("research/kb_signals.py", "scripts/kb_bench.py")
+KC_CONFIG = "reports/KC_CONFIG.md"
+KC_CODE = KB_CODE + ("research/kenny_sim.py", "research/kenny_cluster.py", "scripts/kc_eval.py", "scripts/kenny_export_pine.py")
 
 
 class NotReady(RuntimeError):
@@ -209,6 +211,17 @@ def cy2_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
 
 def kb_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
     return cy_blockers(root, check_cache, KB_CONFIG, KB_CODE)
+
+
+def kc_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, KC_CONFIG, KC_CODE)
+
+
+def require_kc_ready(root: Path = ROOT) -> str:
+    b = kc_blockers(root)
+    if b:
+        raise NotReady("KC cluster evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
 
 
 def require_kb_ready(root: Path = ROOT) -> str:

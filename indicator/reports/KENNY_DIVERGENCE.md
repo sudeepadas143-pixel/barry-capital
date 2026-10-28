@@ -11,6 +11,8 @@ reserved instruments; neither was read.
 
 * **BUY:** a green upward triangle below the candle.
 * **SELL:** a red downward triangle above the candle.
+* **Size follows the timeframe:** small on 4H and below, normal on 1D, large on 1W. A weekly arrow
+  is the heaviest signal.
 
 Nothing else is drawn by default. State dots and labels, shading and a diagnostics table are
 available as optional inputs, all off by default.
@@ -74,6 +76,16 @@ size changes.
 * **Later data:** only modestly better, 62% vs 59% (21 arrows). It did not pass the full test.
 * Turn it off with "Larger BUY after a VIX spike-and-reversal".
 * **Timing:** Pine reads the previous completed VIX day, one day more conservative than research.
+
+**More BUYs on 4H and 1H** (`reports/KBAL_CONFIG.md`). BUYs on these timeframes were far rarer than
+SELLs (zero on BTC 1H), so the bar was lowered:
+* **Threshold:** the High-Conviction threshold is now ×0.8 on both timeframes.
+* **Strength cut:** removed on 1H.
+* **Effect on frequency and accuracy:**
+  * **4H:** about 3× as many BUYs. Excess vs random in the check period goes from +0.18 to +0.13.
+  * **1H:** about 1.7× as many. Excess goes from +0.07 to +0.06.
+* **BTC, last year:** 4H goes from 3 to 6 BUYs (7 SELLs); 1H from 0 shown to 21 (33 SELLs).
+* **Unchanged:** 1W and 1D.
 
 **Rollback.** Setting "Signal profile = Previous" restores BUY High Conviction / SELL Confirmed
 everywhere.

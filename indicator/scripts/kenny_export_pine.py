@@ -533,9 +533,18 @@ vixF() =>
 vixAct = request.security("CBOE:VIX", "D", vixF()[1], lookahead = barmerge.lookahead_on, ignore_invalid_symbol = true)
 isEquity = syminfo.type == "stock" or syminfo.type == "index" or syminfo.type == "fund" or syminfo.type == "dr"
 buyHeavy = showVixW and isEquity and bucket >= 2 and nz(vixAct) > 0
-plotshape(showBuy and buySig and not buyHeavy, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)
-plotshape(showBuy and buySig and buyHeavy, "BUY (VIX-confirmed)", shape.triangleup, location.belowbar, cBuy, size = size.large)
-plotshape(showSell and sellSig, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)
+// arrow size follows the timeframe: 4H and below small, 1D normal, 1W large (VIX-confirmed BUY one step larger)
+buyN = showBuy and buySig and not buyHeavy
+buyV = showBuy and buySig and buyHeavy
+sellN = showSell and sellSig
+plotshape(buyN and bucket <= 1, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)
+plotshape(buyN and bucket == 2, "BUY 1D", shape.triangleup, location.belowbar, cBuy, size = size.normal)
+plotshape(buyN and bucket == 3, "BUY 1W", shape.triangleup, location.belowbar, cBuy, size = size.large)
+plotshape(buyV and bucket == 2, "BUY 1D (VIX-confirmed)", shape.triangleup, location.belowbar, cBuy, size = size.large)
+plotshape(buyV and bucket == 3, "BUY 1W (VIX-confirmed)", shape.triangleup, location.belowbar, cBuy, size = size.huge)
+plotshape(sellN and bucket <= 1, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)
+plotshape(sellN and bucket == 2, "SELL 1D", shape.triangledown, location.abovebar, cSell, size = size.normal)
+plotshape(sellN and bucket == 3, "SELL 1W", shape.triangledown, location.abovebar, cSell, size = size.large)
 // breakdown / exit (= research/kenny_types.breakdown; 4H and below, reports/KT_RESULTS.md)
 hh2L   = ta.highest(high, 2 * L)
 nearHi = (hh2L - close) / atr <= 2.0
@@ -607,14 +616,18 @@ KR_SELL = {2: ("H", 0.9), 1: ("W", 0.9), 0: ("W", 1.0)}              # bucket 3 
 
 KS_BUY_K = {3: 1, 2: 0, 1: 0, 0: 1}                                  # reports/KS_RESULTS.md adopted strength cut-offs (0 = all arrows)
 
+# reports/KBAL_CONFIG.md: what the Pine uses (more BUYs on 4H/1H; 1W/1D unchanged)
+BAL_BUY_SCALE = {**KR_BUY_SCALE, 1: 0.8, 0: 0.8}
+BAL_BUY_K = {**KS_BUY_K, 0: 0}
+
 
 def kr_block() -> dict:
-    kb = " : ".join(f"bucket == {b} ? {_f(KR_BUY_SCALE[b])}" for b in (3, 2, 1)) + f" : {_f(KR_BUY_SCALE[0])}"
+    kb = " : ".join(f"bucket == {b} ? {_f(BAL_BUY_SCALE[b])}" for b in (3, 2, 1)) + f" : {_f(BAL_BUY_SCALE[0])}"
     ks = " : ".join(f"bucket == {b} ? {_f(KR_SELL[b][1])}" for b in (2, 1)) + f" : {_f(KR_SELL[0][1])}"
     th = {"H": "thTopH", "W": "thTopW"}
     st = " : ".join(f"bucket == {b} ? onset(pTop, prevTop, {th[KR_SELL[b][0]]} * kSell)" for b in (2, 1)) \
         + f" : onset(pTop, prevTop, {th[KR_SELL[0][0]]} * kSell)"
-    kk = " : ".join(f"bucket == {b} ? {KS_BUY_K[b]}" for b in (3, 2, 1)) + f" : {KS_BUY_K[0]}"
+    kk = " : ".join(f"bucket == {b} ? {BAL_BUY_K[b]}" for b in (3, 2, 1)) + f" : {BAL_BUY_K[0]}"
     return {"__KBUY__": kb, "__KSELL__": ks, "__SELLSTATE__": st, "__KSBUY__": kk}
 
 

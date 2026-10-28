@@ -111,9 +111,16 @@ def test_default_chart_is_only_buy_and_sell_triangles():
     plots = [ln for ln in src.splitlines() if ln.startswith(("plotshape(", "plot(", "bgcolor(", "plotchar(", "plotarrow("))]
     on_by_default = [ln for ln in plots if "showStates" not in ln and "showBg" not in ln and "showBrk" not in ln]
     assert on_by_default == [
-        'plotshape(showBuy and buySig and not buyHeavy, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)',
-        'plotshape(showBuy and buySig and buyHeavy, "BUY (VIX-confirmed)", shape.triangleup, location.belowbar, cBuy, size = size.large)',
-        'plotshape(showSell and sellSig, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)']
+        'plotshape(buyN and bucket <= 1, "BUY", shape.triangleup, location.belowbar, cBuy, size = size.small)',
+        'plotshape(buyN and bucket == 2, "BUY 1D", shape.triangleup, location.belowbar, cBuy, size = size.normal)',
+        'plotshape(buyN and bucket == 3, "BUY 1W", shape.triangleup, location.belowbar, cBuy, size = size.large)',
+        'plotshape(buyV and bucket == 2, "BUY 1D (VIX-confirmed)", shape.triangleup, location.belowbar, cBuy, size = size.large)',
+        'plotshape(buyV and bucket == 3, "BUY 1W (VIX-confirmed)", shape.triangleup, location.belowbar, cBuy, size = size.huge)',
+        'plotshape(sellN and bucket <= 1, "SELL", shape.triangledown, location.abovebar, cSell, size = size.small)',
+        'plotshape(sellN and bucket == 2, "SELL 1D", shape.triangledown, location.abovebar, cSell, size = size.normal)',
+        'plotshape(sellN and bucket == 3, "SELL 1W", shape.triangledown, location.abovebar, cSell, size = size.large)']
+    assert "buyN = showBuy and buySig and not buyHeavy" in src and "buyV = showBuy and buySig and buyHeavy" in src \
+        and "sellN = showSell and sellSig" in src
     for ln in src.splitlines():                        # every label/line/box/table draw is behind an off-by-default input
         if "label.new(" in ln or "line.new(" in ln or "box.new(" in ln:
             prev = src.splitlines()[src.splitlines().index(ln) - 1]
@@ -248,3 +255,21 @@ def test_vix_weighting_mirrors_research_definition_and_never_adds_arrows():
         assert tok in src, tok
     # both BUY plots are gated by buySig: VIX only changes the size, never creates or removes an arrow
     assert src.count("showBuy and buySig and") == 2
+
+
+def test_pine_buy_choices_follow_the_kbal_rule():
+    """4H/1H: lowest High-Conviction scale with tuning excess >= +0.02 (n >= 30), no strength cut; 1W/1D unchanged."""
+    res = ROOT / "reports" / "kf_results.json"
+    if not res.exists():
+        pytest.skip("no KF results")
+    R = json.loads(res.read_text())
+    for tf, b in (("4H", 1), ("1H", 0)):
+        opts = R["tfs"][tf]["bot"]["options"]
+        ok = [sc for sc in (0.7, 0.8, 0.9, 1.0, 1.1)
+              if opts[f"H|{sc}"]["tune"]["all"]["n"] >= 30 and opts[f"H|{sc}"]["tune"]["all"]["excess"] >= 0.02]
+        assert K.BAL_BUY_SCALE[b] == min(ok) and K.BAL_BUY_K[b] == 0, tf
+    for b in (3, 2):
+        assert K.BAL_BUY_SCALE[b] == K.KR_BUY_SCALE[b] and K.BAL_BUY_K[b] == K.KS_BUY_K[b]
+    _, S = _spec()
+    src = K.generate(S)
+    assert "bucket == 3 ? 1.1 : bucket == 2 ? 1.0 : bucket == 1 ? 0.8 : 0.8" in src

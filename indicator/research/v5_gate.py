@@ -44,6 +44,8 @@ V6_CODE = ("research/v6_signals.py", "research/v5_context.py", "research/v5_infe
 # cycle engine CY-1 (reports/CYCLE_CONFIG.md §8)
 CY_CONFIG = "reports/CYCLE_CONFIG.md"
 CY_CODE = ("research/cycle_features.py", "scripts/cycle_research.py", "research/v5_inference.py")
+CY2_CONFIG = "reports/CYCLE2_CONFIG.md"
+CY2_CODE = CY_CODE + ("research/cycle2_features.py", "scripts/cycle2_research.py")
 
 
 class NotReady(RuntimeError):
@@ -174,9 +176,11 @@ def require_v6_ready(root: Path = ROOT) -> str:
     return review_mode(root)
 
 
-def cy_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
-    """Cycle-engine CY-1 exploration gate: valid review mode, CY config committed, unmodified and
-    FROZEN, baselines and CY code committed and unmodified, cache equal to the manifest."""
+def cy_blockers(root: Path = ROOT, check_cache: bool = True, config: str = CY_CONFIG, code: tuple = CY_CODE) -> list[str]:
+    """Cycle-engine exploration gate (CY-1 by default; CY-2 via cy2_blockers): valid review mode,
+    config committed, unmodified and FROZEN, baselines and code committed and unmodified, cache
+    equal to the manifest."""
+    CY_CONFIG, CY_CODE = config, code                                   # noqa: N806 (local override)
     out = []
     if review_mode(root) is None:
         out += _review_problems(root) + _waiver_problems(root)
@@ -195,6 +199,17 @@ def cy_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
         if any(v.values()):
             out.append(f"Y3: cache differs from the manifest: {v}")
     return out
+
+
+def cy2_blockers(root: Path = ROOT, check_cache: bool = True) -> list[str]:
+    return cy_blockers(root, check_cache, CY2_CONFIG, CY2_CODE)
+
+
+def require_cy2_ready(root: Path = ROOT) -> str:
+    b = cy2_blockers(root)
+    if b:
+        raise NotReady("cycle-engine CY-2 evaluation is blocked:\n  " + "\n  ".join(b))
+    return review_mode(root)
 
 
 def require_cy_ready(root: Path = ROOT) -> str:

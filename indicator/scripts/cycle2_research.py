@@ -45,6 +45,7 @@ VARIANTS = {"d2": dict(PRIMARY, max_depth=2), "d4": dict(PRIMARY, max_depth=4), 
             "t120": dict(PRIMARY, max_iter=120)}
 TIERS = {"warning": 3.0, "standard": 2.0, "high": 0.75}
 MAX_ROWS = 300_000
+ATTEMPT = "a2"
 SEED = 20261027
 DIRS = {"top": -1, "bot": 1}
 CODE_FILES = ["research/cycle2_features.py", "scripts/cycle2_research.py", "research/cycle_features.py", "scripts/cycle_research.py",
@@ -116,8 +117,10 @@ def predict(model, r, feats):
     kind, m, mu, sd = model
     X = r["F"][feats].to_numpy(float)
     if kind == "LR":
-        p = m.predict_proba(np.clip((X - mu) / sd, -5, 5))[:, 1]
-        p[np.isnan(X).any(axis=1)] = np.nan
+        bad = np.isnan(X).any(axis=1)
+        p = np.full(len(X), np.nan)
+        if (~bad).any():
+            p[~bad] = m.predict_proba(np.clip((X[~bad] - mu) / sd, -5, 5))[:, 1]
     else:
         p = m.predict_proba(X)[:, 1]
         p[np.isnan(X[:, :len(CF.PRICE)]).any(axis=1)] = np.nan
@@ -305,7 +308,7 @@ def _commit_ledger(tid):
 
 
 def run_tf(tf, data_files, mode):
-    tid = f"cy2-{tf}"
+    tid = f"cy2-{tf}-{ATTEMPT}"          # attempt 1 (cy2-1W) failed before producing output; disclosed
     LG.record(tid, f"CY2-{tf}", ["exploration"], {"config": CONFIG, "tf": tf, "mode": mode}, CODE_FILES,
               ["recall", "precision", "false_alarms", "lead", "lift", "net_return", "win_rate"], True, CONFIG, data_files,
               notes=f"exploration; review mode {mode}")

@@ -93,6 +93,8 @@ def test_walk_forward_dry_run(monkeypatch):
     res = [M.build((s, "1D")) for s in SYMS]
     assert (ST.classify, B.generate) == before                            # shared modules left unpatched
     assert all(r is not None for r in res)
+    lr = M.walk_forward(res, "1D", "top", "LR")                          # LR must score rows with undefined features as NaN
+    assert sum(len(v["standard"]) for v in lr.values()) > 0
     al = M.walk_forward(res, "1D", "bot", "GBB")
     n = sum(len(v["standard"]) for v in al.values())
     assert n > 0
@@ -108,3 +110,33 @@ def test_walk_forward_dry_run(monkeypatch):
     fm = M.final_models(res, "1D", {"top": {"vs_B_ext": {"GBZ": {"promoted": False}, "GBB": {"promoted": False}}},
                                     "bot": {"vs_B_ext": {"GBZ": {"promoted": False}, "GBB": {"promoted": True, "standard": {"net": {"delta": 0.1}}}}}})
     assert fm["top"]["model"] == "B_ext" and fm["bot"]["kind"] == "gb" and set(fm["bot"]["theta"]) == set(M.TIERS)
+
+
+def test_full_run_tf_dry_run(monkeypatch):
+    frames = {}
+    for k, s in enumerate(SYMS):
+        d = daily(seed=60 + k)
+        if s == "EURUSD=X":
+            d["volume"] = 0.0
+        frames[s] = {"1D": d, "1W": rs(d, "W-MON"), "1M": rs(d, "MS")}
+    monkeypatch.setattr(M.DG, "load", lambda sym, tf: frames[sym][tf])
+    monkeypatch.setattr(M.CR.DG, "load", lambda sym, tf: frames[sym][tf])
+    monkeypatch.setattr(M.DG, "EVAL_SYMBOLS", tuple(SYMS))
+    monkeypatch.setattr(M, "YEARS", {**M.YEARS, "1D": [2016, 2019, 2022]})
+    monkeypatch.setattr(M.LG, "record", lambda *a, **k: None)
+    monkeypatch.setattr(M, "_commit_ledger", lambda tid: None)
+
+    class _Pool:                                   # in-process (monkeypatches do not reach worker processes)
+        def __init__(self, *a): pass
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def map(self, f, it): return map(f, it)
+    monkeypatch.setattr(M, "ProcessPoolExecutor", _Pool)
+    res, results = M.run_tf("1D", ["x"], "test")
+    for d in ("top", "bot"):
+        assert set(res[d]["models"]) == {"B_ext", "LR", "GBZ", "GBB"}
+        assert set(res[d]["vs_B_ext"]) == {"LR", "GBZ", "GBB"}
+        assert set(res[d]["confirm"]["B_ext"]) == {"cy1_rule", "ema_cross_after_zone"}
+    spec = M.final_models(results, "1D", res)
+    assert set(spec) == {"top", "bot"} and all(set(v["theta"]) == set(M.TIERS) for v in spec.values())
+    M.CR._clean(res)                                # JSON-serialisable

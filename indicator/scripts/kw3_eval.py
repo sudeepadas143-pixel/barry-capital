@@ -209,7 +209,7 @@ def evaluate():
         ok = {prm: v for prm, v in pre.items() if v["n"] >= 25}
         chosen[cand] = max(ok, key=lambda p: (ok[p]["useful"], ok[p]["f26_med"])) if ok else prms[0]
         for y in range(2012, 2027):
-            hist = T[(T["t"] < pd.Timestamp(f"{y}-01-01", tz="UTC"))]
+            hist = T[(T["t"] < pd.Timestamp(f"{y}-01-01", tz="UTC") - pd.Timedelta(weeks=27))]   # outcome windows closed before y
             best, bu = prms[0], -1
             for prm in prms:
                 g = hist[hist["name"] == f"{cand}|{prm}"]
@@ -217,7 +217,6 @@ def evaluate():
                     best, bu = prm, u
             yr = T[(T["name"] == f"{cand}|{best}") & (T["t"] >= pd.Timestamp(f"{y}-01-01", tz="UTC")) & (T["t"] < pd.Timestamp(f"{y + 1}-01-01", tz="UTC"))]
             wf_rows.append(yr.assign(name=f"{cand}|WF"))
-        tsets = {f"{cand}|{chosen[cand]}"}
     T = pd.concat([T, *wf_rows], ignore_index=True)
     for cand in grid:                                                  # top catch for WF uses the frozen pre-2018 choice
         tops[f"{cand}|WF"] = tops[f"{cand}|{chosen[cand]}"]

@@ -25,7 +25,7 @@ def _all(df):
     f = WS.features(df)
     st = KSIM.states(df, "1W", SPEC)
     low = df["low"].to_numpy(float)
-    return {"A": WS.cand_A(f, 10.0), "B": WS.cand_B(f, "sma40"), "C": WS.cand_C_signals(f, st["top"]["K_S"], 6.0, low),
+    return {"A": WS.cand_A(f, 6.0), "B": WS.cand_B(f, 6.0), "C": WS.cand_C_signals(f, st["top"]["K_S"], 5.0, low),
             "SMA40x": WS.base_sma40_cross(f), "RSI70": WS.base_rsi70(f)}
 
 

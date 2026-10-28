@@ -137,6 +137,17 @@ reach similar win rates at 4H and 1H only with far more false alerts.
 * Charts below 1H, and timeframes between buckets (for example 2H), use the nearest lower model
   and are unvalidated.
 * 4H and 1H history covers mostly crypto before 2023 and test years 2021–2026 only.
+* **Weekly SELL is a known weak spot.** Three weekly-only follow-up studies tried to improve it:
+  * KW-1 and KW-2 (`reports/KW_RESULTS.md`, `reports/KW2_RESULTS.md`);
+  * KW-3 (`reports/KW3_DIAG.md`, `reports/KW3_RESULTS.md`).
+
+  The current weekly SELL fires mostly after a decline is under way. About half of the weekly
+  SELLs come when price is already ≥ 3 ATR below its 26-week high, and only 7–9% are followed
+  by a clean ≥ 3 ATR decline. The best alternative (KW-3 candidate A, exhaustion plus a reversal
+  candle or failed new high near the 52-week high) fires near peaks and catches 3–5× more major
+  tops. But 45–60% of its signals are followed by further gains in continuing uptrends. It failed
+  the frozen adoption rule, so the shipped weekly SELL is unchanged. No tested weekly SELL is
+  profitable as a short after costs.
 
 ## How to test in TradingView
 
